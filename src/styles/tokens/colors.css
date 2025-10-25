@@ -6,13 +6,10 @@
   --color-neutral-4: #f1f1f1;
   --color-neutral-5: #dbdbdb;
   --color-neutral-6: #c3c4c4;
-  --color-neutral-7: #939494;
-  --color-neutral-8: #636465;
-  --color-neutral-9: #505152;
-  --color-neutral-10: #333536;
-  --color-neutral-11: #2c2e2e;
-  --color-neutral-12: #222425;
-  --color-neutral-13: #0f1112;
+  --color-neutral-7: #505152; /* 수정됨 */
+  --color-neutral-8: #333536; /* 수정됨 */
+  --color-neutral-9: #1e2021; /* 수정됨 */
+  --color-neutral-10: #0f1112; /* 수정됨 */
 
   /* Pink */
   --color-pink-1: #ffecf1;
