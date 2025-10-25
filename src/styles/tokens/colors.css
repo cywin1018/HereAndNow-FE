@@ -34,4 +34,88 @@
   --color-iceblue-8: #888e91;
   --color-iceblue-9: #666b6c;
   --color-iceblue-10: #4f5354;
+
+  /* Yellow */
+  --color-yellow-1: #fffbe6;
+  --color-yellow-2: #fff5c2;
+  --color-yellow-3: #ffed91;
+  --color-yellow-4: #ffe55e;
+  --color-yellow-5: #ffdd2e;
+  --color-yellow-6: #ffd500;
+  --color-yellow-7: #d9b500;
+  --color-yellow-8: #b59700;
+  --color-yellow-9: #917900;
+  --color-yellow-10: #736000;
+
+  /* Orange */
+  --color-orange-1: #fff7e6;
+  --color-orange-2: #ffebc2;
+  --color-orange-3: #ffda92;
+  --color-orange-4: #ffc95f;
+  --color-orange-5: #ffb92f;
+  --color-orange-6: #ffaa01;
+  --color-orange-7: #d99101;
+  --color-orange-8: #b57901;
+  --color-orange-9: #916101;
+  --color-orange-10: #734c00;
+
+  /* Red */
+  --color-red-1: #ffeff0;
+  --color-red-2: #ffdada;
+  --color-red-3: #ffbcbc;
+  --color-red-4: #ff9d9d;
+  --color-red-5: #ff7f80;
+  --color-red-6: #ff6364;
+  --color-red-7: #d95455;
+  --color-red-8: #b54647;
+  --color-red-9: #913839;
+  --color-red-10: #732d2d;
+
+  /* Purple */
+  --color-purple-1: #f1effe;
+  --color-purple-2: #ddd9fb;
+  --color-purple-3: #c2bbf9;
+  --color-purple-4: #a59bf6;
+  --color-purple-5: #8a7df3;
+  --color-purple-6: #7061f0;
+  --color-purple-7: #5f52cc;
+  --color-purple-8: #5045aa;
+  --color-purple-9: #403789;
+  --color-purple-10: #322c6c;
+
+  /* Blue */
+  --color-blue-1: #edf5ff;
+  --color-blue-2: #d4e6fe;
+  --color-blue-3: #b2d3fd;
+  --color-blue-4: #8ebefc;
+  --color-blue-5: #6cabfc;
+  --color-blue-6: #4c98fb;
+  --color-blue-7: #4181d5;
+  --color-blue-8: #366cb2;
+  --color-blue-9: #2b578f;
+  --color-blue-10: #224471;
+
+  /* Cyan */
+  --color-cyan-1: #edfffc;
+  --color-cyan-2: #d3fff8;
+  --color-cyan-3: #affff2;
+  --color-cyan-4: #8afeeb;
+  --color-cyan-5: #67fee6;
+  --color-cyan-6: #46fee0;
+  --color-cyan-7: #3cd8be;
+  --color-cyan-8: #32b49f;
+  --color-cyan-9: #289180;
+  --color-cyan-10: #1f7265;
+
+  /* Green */
+  --color-green-1: #fbfdf5;
+  --color-green-2: #f6fbe7;
+  --color-green-3: #eef8d4;
+  --color-green-4: #e6f4c0;
+  --color-green-5: #dff1ad;
+  --color-green-6: #d8ee9b;
+  --color-green-7: #b8ca84;
+  --color-green-8: #99a96e;
+  --color-green-9: #7b8858;
+  --color-green-10: #616b46;
 }
