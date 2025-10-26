@@ -11,7 +11,7 @@ const KakaoCallback = () => {
     if (code) {
       mutate({ authKey: code });
     }
-  }, [mutate]);
+  }, []);
 
   if (isPending) {
     return <div>로그인 처리 중입니다. 잠시만 기다려주세요...</div>;
