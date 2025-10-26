@@ -1,12 +1,10 @@
-// src/components/layout/Layout.tsx
-
 import { Outlet } from 'react-router-dom';
 
 const Layout = () => {
   return (
     <div className="min-h-screen">
-      {/* 개발용 main의 border-1 로 너비 확인 */}
-      <main className="mx-auto min-h-screen w-full max-w-md border-1 bg-white">
+      {/* 개발용 main의 border 로 너비 확인 */}
+      <main className="mx-auto min-h-screen w-full max-w-md border bg-white">
         <header className="border-b p-4">
           <h1 className="text-s1 text-neutral-13 text-center">임시 헤더</h1>
         </header>

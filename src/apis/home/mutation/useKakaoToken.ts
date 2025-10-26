@@ -39,9 +39,8 @@ export const useKakaoToken = () => {
         if (refreshToken) {
           localStorage.setItem('refreshToken', refreshToken);
         }
+        navigate('/');
       }
-
-      navigate('/');
     },
     onError: error => {
       const axiosError = error as AxiosError;
