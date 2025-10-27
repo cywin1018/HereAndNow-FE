@@ -1,4 +1,5 @@
 import useKakaoLogin from '@hooks/home/useKakaoLogin';
+import KakaoMap from '@common/KakaoMap';
 
 const HomePage = () => {
   const { handleKakaoLogin } = useKakaoLogin();
@@ -7,6 +8,7 @@ const HomePage = () => {
       <button className="bg-yellow-5 h-[30px] w-[200px]" onClick={handleKakaoLogin}>
         카카오 로그인
       </button>
+      <KakaoMap />
     </div>
   );
 };
