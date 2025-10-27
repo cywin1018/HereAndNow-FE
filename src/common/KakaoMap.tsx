@@ -1,10 +1,4 @@
-import { useEffect, useRef } from 'react';
-
-declare global {
-  interface Window {
-    kakao: any;
-  }
-}
+import { useEffect, useRef, useCallback } from 'react';
 
 interface KakaoMapProps {
   latitude: number;
@@ -25,26 +19,12 @@ const KakaoMap = ({
 }: KakaoMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (window.kakao && window.kakao.maps) {
-      window.kakao.maps.load(initMap);
-    } else {
-      const script = document.createElement('script');
-      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_APP_KEY}&autoload=false`;
-      document.head.appendChild(script);
-      script.onload = () => {
-        window.kakao.maps.load(initMap);
-      };
-    }
-  }, [latitude, longitude]);
-
-  const initMap = () => {
+  const initMap = useCallback(() => {
     if (mapContainer.current) {
       const mapOption = {
         center: new window.kakao.maps.LatLng(latitude, longitude),
         level: level,
       };
-
       const map = new window.kakao.maps.Map(mapContainer.current, mapOption);
 
       if (showMarker) {
@@ -59,7 +39,23 @@ const KakaoMap = ({
         marker.setMap(map);
       }
     }
-  };
+  }, [latitude, longitude, level, showMarker]);
+
+  useEffect(() => {
+    if (window.kakao && window.kakao.maps) {
+      window.kakao.maps.load(initMap);
+    } else {
+      const script = document.createElement('script');
+      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY}&libraries=services,clusterer,drawing&autoload=false`;
+      document.head.appendChild(script);
+      script.onload = () => {
+        window.kakao.maps.load(initMap);
+      };
+      script.onerror = () => {
+        console.error('Kakao Maps 스크립트 로드 실패');
+      };
+    }
+  }, [initMap]);
 
   return <div style={{ width, height }} ref={mapContainer} />;
 };
