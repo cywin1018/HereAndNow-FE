@@ -91,6 +91,7 @@
   --text-b5-weight: 400;
 
   /* Description (Pretendard) */
+
   --text-d1-size: 14px;
   --text-d1-line-height: 20px;
   --text-d1-spacing: -0.2px;
@@ -100,6 +101,18 @@
   --text-d2-line-height: 16px;
   --text-d2-spacing: -0.2px;
   --text-d2-weight: 500;
+
+  /* 👇 [수정] D3 스타일 값 변경 */
+  --text-d3-size: 10px;
+  --text-d3-line-height: 14px;
+  --text-d3-spacing: -0.2px;
+  --text-d3-weight: 500;
+
+  /* 👇 [추가] D4 스타일 변수 */
+  --text-d4-size: 8px;
+  --text-d4-line-height: 12px;
+  --text-d4-spacing: -0.2px;
+  --text-d4-weight: 500;
 }
 
 /* Title Utility Classes */
@@ -234,6 +247,7 @@
 }
 
 /* Description Utility Classes */
+/* Description Utility Classes */
 .text-d1 {
   font-family: var(--font-pretendard);
   font-size: var(--text-d1-size);
@@ -248,4 +262,22 @@
   line-height: var(--text-d2-line-height);
   letter-spacing: var(--text-d2-spacing);
   font-weight: var(--text-d2-weight);
+}
+
+/* 👇 [수정] D3 유틸리티 클래스 (내용은 변경 없음, 변수 값만 수정됨) */
+.text-d3 {
+  font-family: var(--font-pretendard);
+  font-size: var(--text-d3-size);
+  line-height: var(--text-d3-line-height);
+  letter-spacing: var(--text-d3-spacing);
+  font-weight: var(--text-d3-weight);
+}
+
+/* 👇 [추가] D4 유틸리티 클래스 */
+.text-d4 {
+  font-family: var(--font-pretendard);
+  font-size: var(--text-d4-size);
+  line-height: var(--text-d4-line-height);
+  letter-spacing: var(--text-d4-spacing);
+  font-weight: var(--text-d4-weight);
 }
