@@ -15,7 +15,19 @@ const HomePage = () => {
       <div className="flex flex-col gap-[28px]">
         <AddCourse />
 
-        <KakaoMap latitude={37.566826} longitude={126.9786567} className="h-[292px]" />
+        <KakaoMap
+          latitude={37.566826}
+          longitude={126.9786567}
+          className="h-[292px]"
+          searchBar={{
+            placeholder: '장소를 검색하세요',
+            previewImages: ['/dummy_placecard.png', '/dummy_placecard.png', '/dummy_placecard.png'],
+            onSearch: query => {
+              console.log('검색어:', query);
+              // 여기에 실제 검색 로직을 추가할 수 있습니다
+            },
+          }}
+        />
 
         <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
