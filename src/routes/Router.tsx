@@ -8,14 +8,18 @@ const Router = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<HomePage />} />
+        <Route element={<Layout withHeader={false} />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/oauth/kakao" element={<KakaoCallback />} />
           <Route path="/auth/callback" element={<KakaoCallback />} />
+        </Route>
+
+        <Route element={<Layout />}>
+          <Route path="/" element={<HomePage />} />
         </Route>
       </Routes>
     </BrowserRouter>
   );
 };
+
 export default Router;
