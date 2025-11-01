@@ -6,9 +6,9 @@ import PlaceIcon from '@assets/icons/place.svg';
 
 const navItems = [
   { path: '/', icon: HomeIcon, alt: '홈' },
+  { path: '/place', icon: PlaceIcon, alt: '장소' },
   { path: '/archive', icon: ArchiveIcon, alt: '아카이브' },
   { path: '/connecting', icon: ConnectingIcon, alt: '연결' },
-  { path: '/place', icon: PlaceIcon, alt: '장소' },
 ];
 
 const BottomNavigation = () => {
