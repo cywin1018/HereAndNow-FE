@@ -19,13 +19,14 @@ const HomePage = () => {
           latitude={37.566826}
           longitude={126.9786567}
           className="h-[292px]"
+          markers={[
+            { latitude: 37.566826, longitude: 126.9786567 },
+            { latitude: 37.568, longitude: 126.98 },
+            { latitude: 37.565, longitude: 126.976 },
+          ]}
           searchBar={{
-            placeholder: '장소를 검색하세요',
+            name: '갓덴스시 강남점',
             previewImages: ['/dummy_placecard.png', '/dummy_placecard.png', '/dummy_placecard.png'],
-            onSearch: query => {
-              console.log('검색어:', query);
-              // 여기에 실제 검색 로직을 추가할 수 있습니다
-            },
           }}
         />
 

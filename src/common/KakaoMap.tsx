@@ -1,5 +1,11 @@
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import HeartIcon from '@assets/icons/heart.svg';
+import PlacePickerIcon from '@assets/icons/placePicker.svg';
+
+interface MarkerPosition {
+  latitude: number;
+  longitude: number;
+}
 
 interface KakaoMapProps {
   latitude: number;
@@ -9,10 +15,10 @@ interface KakaoMapProps {
   height?: string;
   className?: string;
   showMarker?: boolean;
+  markers?: MarkerPosition[];
   searchBar?: {
-    placeholder?: string;
+    name?: string;
     previewImages?: string[];
-    onSearch?: (query: string) => void;
   };
   showHeartButton?: boolean;
 }
@@ -25,11 +31,11 @@ const KakaoMap = ({
   height,
   className,
   showMarker = true,
+  markers,
   searchBar,
   showHeartButton = true,
 }: KakaoMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const [searchQuery, setSearchQuery] = useState('');
 
   const initMap = useCallback(() => {
     if (mapContainer.current) {
@@ -39,19 +45,22 @@ const KakaoMap = ({
       };
       const map = new window.kakao.maps.Map(mapContainer.current, mapOption);
 
-      if (showMarker) {
-        const markerPosition = new window.kakao.maps.LatLng(latitude, longitude);
-        const imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png';
-        const imageSize = new window.kakao.maps.Size(24, 35);
+      // markers 배열이 있으면 여러 마커 표시, 없으면 기본 마커 1개 표시
+      const positionsToShow = markers || (showMarker ? [{ latitude, longitude }] : []);
+
+      positionsToShow.forEach(position => {
+        const markerPosition = new window.kakao.maps.LatLng(position.latitude, position.longitude);
+        const imageSrc = PlacePickerIcon;
+        const imageSize = new window.kakao.maps.Size(36, 36);
         const markerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize);
         const marker = new window.kakao.maps.Marker({
           position: markerPosition,
           image: markerImage,
         });
         marker.setMap(map);
-      }
+      });
     }
-  }, [latitude, longitude, level, showMarker]);
+  }, [latitude, longitude, level, showMarker, markers]);
 
   useEffect(() => {
     if (window.kakao && window.kakao.maps) {
@@ -76,18 +85,9 @@ const KakaoMap = ({
       <div className="absolute right-4 bottom-4 left-4 z-10 flex items-end gap-[18px]">
         {searchBar && (
           <div className="flex flex-1 items-center gap-4 rounded-[16px] bg-white pt-[6px] pr-[6px] pb-[6px] pl-4 shadow-lg">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && searchBar.onSearch) {
-                  searchBar.onSearch(searchQuery);
-                }
-              }}
-              placeholder={searchBar.placeholder || '장소를 검색하세요'}
-              className="text-b3 text-neutral-8 placeholder:text-neutral-5 max-w-[170px] min-w-0 flex-auto border-none bg-transparent outline-none"
-            />
+            {searchBar.name && (
+              <div className="text-b3 text-neutral-8 max-w-[170px] min-w-0 flex-auto">{searchBar.name}</div>
+            )}
 
             {searchBar.previewImages && searchBar.previewImages.length > 0 && (
               <div className="flex">
