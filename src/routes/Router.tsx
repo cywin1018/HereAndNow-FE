@@ -8,7 +8,7 @@ const Router = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<Layout withHeader={false} />}>
+        <Route element={<Layout withHeader={false} withBottomNavigation={false} />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/oauth/kakao" element={<KakaoCallback />} />
           <Route path="/auth/callback" element={<KakaoCallback />} />

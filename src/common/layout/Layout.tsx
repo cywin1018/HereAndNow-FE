@@ -4,9 +4,10 @@ import BottomNavigation from './BottomNavigation';
 
 interface LayoutProps {
   withHeader?: boolean;
+  withBottomNavigation?: boolean;
 }
 
-const Layout = ({ withHeader = true }: LayoutProps) => {
+const Layout = ({ withHeader = true, withBottomNavigation = true }: LayoutProps) => {
   return (
     <div className="min-h-screen">
       <main className="mx-auto min-h-screen w-full max-w-md border bg-white">
@@ -17,7 +18,7 @@ const Layout = ({ withHeader = true }: LayoutProps) => {
         </section>
       </main>
 
-      <BottomNavigation />
+      {withBottomNavigation && <BottomNavigation />}
     </div>
   );
 };

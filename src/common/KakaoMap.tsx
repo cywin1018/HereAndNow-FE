@@ -6,6 +6,7 @@ interface KakaoMapProps {
   level?: number;
   width?: string;
   height?: string;
+  className?: string;
   showMarker?: boolean;
 }
 
@@ -14,7 +15,8 @@ const KakaoMap = ({
   longitude,
   level = 3,
   width = '100%',
-  height = '500px',
+  height,
+  className,
   showMarker = true,
 }: KakaoMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -57,7 +59,7 @@ const KakaoMap = ({
     }
   }, [initMap]);
 
-  return <div style={{ width, height }} ref={mapContainer} />;
+  return <div className={className} style={{ width, height }} ref={mapContainer} />;
 };
 
 export default KakaoMap;
