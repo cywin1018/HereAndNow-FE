@@ -1,5 +1,6 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import HeartIcon from '@assets/icons/heart.svg';
+import UnheartIcon from '@assets/icons/unheart_icon.svg';
 import PlacePickerIcon from '@assets/icons/placePicker.svg';
 
 interface MarkerPosition {
@@ -36,6 +37,7 @@ const KakaoMap = ({
   showHeartButton = true,
 }: KakaoMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
+  const [isHeartClicked, setIsHeartClicked] = useState(false);
 
   const initMap = useCallback(() => {
     if (mapContainer.current) {
@@ -45,7 +47,6 @@ const KakaoMap = ({
       };
       const map = new window.kakao.maps.Map(mapContainer.current, mapOption);
 
-      // markers 배열이 있으면 여러 마커 표시, 없으면 기본 마커 1개 표시
       const positionsToShow = markers || (showMarker ? [{ latitude, longitude }] : []);
 
       positionsToShow.forEach(position => {
@@ -105,9 +106,16 @@ const KakaoMap = ({
         )}
 
         {showHeartButton && (
-          <div className="relative flex flex-shrink-0 items-center justify-center rounded-lg bg-white p-[10px] shadow-lg">
-            <img src={HeartIcon} alt="하트" className="h-[32px] w-[32px]" />
-          </div>
+          <button
+            onClick={() => setIsHeartClicked(!isHeartClicked)}
+            className="relative flex flex-shrink-0 items-center justify-center rounded-lg bg-white p-[10px] shadow-lg transition-opacity hover:opacity-80"
+          >
+            <img
+              src={isHeartClicked ? UnheartIcon : HeartIcon}
+              alt={isHeartClicked ? '언하트' : '하트'}
+              className="h-[32px] w-[32px]"
+            />
+          </button>
         )}
       </div>
     </div>

@@ -1,5 +1,6 @@
 import LocationIcon from '@assets/icons/pinpoint.svg';
 import MapIcon from '@assets/icons/map.svg';
+import Tag from '@common/Tag';
 
 interface CourseCardProps {
   profileImageUrl: string;
@@ -38,16 +39,12 @@ const CourseCard = ({ profileImageUrl, authorName, title, location, placeCount, 
         <div className="flex flex-row flex-wrap gap-1.5">
           {tags.map((tag, index) => {
             const tagColors = [
-              { bg: 'bg-orange-2', text: 'text-orange-8' },
-              { bg: 'bg-purple-1', text: 'text-purple-8' },
+              { bgColor: 'bg-orange-2', textColor: 'text-orange-8' },
+              { bgColor: 'bg-purple-1', textColor: 'text-purple-8' },
             ];
             const color = tagColors[index % tagColors.length];
 
-            return (
-              <span key={index} className={`${color.bg} ${color.text} text-d3 rounded-lg px-2 py-1`}>
-                {tag}
-              </span>
-            );
+            return <Tag key={index} text={tag} bgColor={color.bgColor} textColor={color.textColor} />;
           })}
         </div>
       </div>
