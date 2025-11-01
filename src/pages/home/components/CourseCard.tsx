@@ -8,30 +8,11 @@ interface CourseCardProps {
   location: string;
   placeCount: number;
   tags: string[];
-  previewImages: string[];
 }
 
-const CourseCard = ({
-  profileImageUrl,
-  authorName,
-  title,
-  location,
-  placeCount,
-  tags,
-  previewImages,
-}: CourseCardProps) => {
-  // 코스 프리뷰의 이미지 위치 계산 (간단한 그리드 레이아웃)
-  const imagePositions = [
-    { top: '20%', left: '10%' },
-    { top: '5%', left: '30%' },
-    { top: '45%', left: '60%' },
-    { top: '70%', left: '40%' },
-    { top: '75%', left: '75%' },
-  ];
-
+const CourseCard = ({ profileImageUrl, authorName, title, location, placeCount, tags }: CourseCardProps) => {
   return (
     <div className="flex w-full gap-2 rounded-lg bg-white p-4 shadow-sm">
-      {/* 왼쪽: 텍스트 정보 */}
       <div className="flex flex-1 flex-col gap-1.5">
         <div className="flex items-center gap-2">
           <img src={profileImageUrl} alt={authorName} className="h-[20px] w-[20px] rounded-full object-cover" />
@@ -71,7 +52,6 @@ const CourseCard = ({
         </div>
       </div>
 
-      {/* 오른쪽: 코스 프리뷰 맵 */}
       <div className="bg-iceblue-3 relative h-[128px] w-[128px] flex-shrink-0 rounded-lg">
         <img src="/public/dummy_course_preview.png" />
       </div>

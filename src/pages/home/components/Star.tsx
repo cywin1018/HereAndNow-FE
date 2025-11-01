@@ -10,10 +10,9 @@ const Star = ({ fillPercentage, starId }: StarProps) => {
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-          {/* 채울 비율(%)만큼 노란색으로 칠합니다. */}
           <stop offset="0%" stopColor="#FFD500" />
           <stop offset={`${fillPercentage}%`} stopColor="#FFD500" />
-          {/* 나머지 부분은 회색으로 칠합니다. */}
+
           <stop offset={`${fillPercentage}%`} stopColor="#E5E5E5" />
           <stop offset="100%" stopColor="#E5E5E5" />
         </linearGradient>

@@ -28,13 +28,14 @@ const HomePage = () => {
               location="강남"
               placeCount={5}
               tags={['음식이 맛있어요', '사진 찍기 좋아요']}
-              previewImages={[
-                '/dummy_placecard.png',
-                '/dummy_placecard.png',
-                '/dummy_placecard.png',
-                '/dummy_placecard.png',
-                '/dummy_placecard.png',
-              ]}
+            />
+            <CourseCard
+              profileImageUrl="/dummy_profile.png"
+              authorName="홍**"
+              title="아직 어색한 사이인 커플을 위한 감성 충만 코스"
+              location="강남"
+              placeCount={5}
+              tags={['음식이 맛있어요', '사진 찍기 좋아요']}
             />
           </div>
         )}
