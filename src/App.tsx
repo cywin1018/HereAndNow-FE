@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react';
 import Router from './routes/Router';
 import SplashScreen from '@common/SplashScreen';
 
-function App() {
+interface AppProps {
+  enableAuthCheck?: boolean; // 디버깅용: 인증 체크 활성화/비활성화 (기본값: true)
+}
+
+function App({ enableAuthCheck = true }: AppProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -21,7 +25,7 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  return isLoading ? <SplashScreen /> : <Router />;
+  return isLoading ? <SplashScreen /> : <Router enableAuthCheck={enableAuthCheck} />;
 }
 
 export default App;
