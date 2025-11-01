@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import Header from './Header';
+import BottomNavigation from './BottomNavigation';
 
 interface LayoutProps {
   withHeader?: boolean;
@@ -15,6 +16,8 @@ const Layout = ({ withHeader = true }: LayoutProps) => {
           <Outlet />
         </section>
       </main>
+
+      <BottomNavigation />
     </div>
   );
 };
