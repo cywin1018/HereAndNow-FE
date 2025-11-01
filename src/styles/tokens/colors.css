@@ -1,15 +1,15 @@
 @theme {
   /* Neutral  */
-  --color-neutral-1: #ffffff;
-  --color-neutral-2: #fdfdfd;
-  --color-neutral-3: #f5f5f6;
-  --color-neutral-4: #f1f1f1;
-  --color-neutral-5: #dbdbdb;
-  --color-neutral-6: #c3c4c4;
-  --color-neutral-7: #505152; /* 수정됨 */
-  --color-neutral-8: #333536; /* 수정됨 */
-  --color-neutral-9: #1e2021; /* 수정됨 */
-  --color-neutral-10: #0f1112; /* 수정됨 */
+  --color-neutral-1: #fdfdfd;
+  --color-neutral-2: #f5f5f6;
+  --color-neutral-3: #f1f1f1;
+  --color-neutral-4: #dbdbdb;
+  --color-neutral-5: #939494;
+  --color-neutral-6: #636465;
+  --color-neutral-7: #505152;
+  --color-neutral-8: #333536;
+  --color-neutral-9: #1e2021;
+  --color-neutral-10: #0f1112;
 
   /* Pink */
   --color-pink-1: #ffecf1;
