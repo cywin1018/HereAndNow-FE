@@ -3,6 +3,7 @@ import KakaoMap from '@common/KakaoMap';
 import AddCourse from './components/AddCourse';
 import TabNavigation from './components/TabNavigation';
 import PlaceCard from './components/PlaceCard';
+import CourseCard from './components/CourseCard';
 
 type TabType = 'course' | 'place';
 
@@ -20,17 +21,21 @@ const HomePage = () => {
 
         {activeTab === 'course' && (
           <div className="flex flex-col gap-4">
-            {
-              <PlaceCard
-                imageUrl="/dummy_placecard.png"
-                name="갓덴스시 강남점_코스탭"
-                category="디저트 카페2"
-                address="서울 강남구 강남대로102길 30 1-3층2"
-                addressDetail="(지번) 역삼동 822-4"
-                rating={3.5}
-                reviewCount={120}
-              />
-            }
+            <CourseCard
+              profileImageUrl="/dummy_profile.png"
+              authorName="홍**"
+              title="아직 어색한 사이인 커플을 위한 감성 충만 코스"
+              location="강남"
+              placeCount={5}
+              tags={['음식이 맛있어요', '사진 찍기 좋아요']}
+              previewImages={[
+                '/dummy_placecard.png',
+                '/dummy_placecard.png',
+                '/dummy_placecard.png',
+                '/dummy_placecard.png',
+                '/dummy_placecard.png',
+              ]}
+            />
           </div>
         )}
 
