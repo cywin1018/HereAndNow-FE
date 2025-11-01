@@ -34,6 +34,10 @@ const TabNavigation = ({ activeTab = 'course', onTabChange, onSortChange }: TabN
   ];
 
   useEffect(() => {
+    setSelectedTab(activeTab);
+  }, [activeTab]);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
