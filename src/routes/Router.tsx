@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import HomePage from '@pages/home/HomePage';
+import ArchivePage from '@pages/archive/ArchivePage';
 import Layout from '@common/layout/Layout';
 import KakaoCallback from '@pages/oauth/KakaoCallback';
 import LoginPage from '@pages/login/LoginPage';
@@ -22,6 +23,7 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
         <Route element={<ProtectedRoute enabled={enableAuthCheck} />}>
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/archive" element={<ArchivePage />} />
           </Route>
         </Route>
       </Routes>
