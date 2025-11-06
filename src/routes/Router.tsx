@@ -5,6 +5,7 @@ import Layout from '@common/layout/Layout';
 import KakaoCallback from '@pages/oauth/KakaoCallback';
 import LoginPage from '@pages/login/LoginPage';
 import ProtectedRoute from './ProtectedRoute';
+import ArchiveSearchPage from '@pages/archive/ArchiveSearchPage';
 
 interface RouterProps {
   enableAuthCheck?: boolean; // 디버깅용: 인증 체크 활성화/비활성화 (기본값: true)
@@ -18,6 +19,11 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/oauth/kakao" element={<KakaoCallback />} />
           <Route path="/auth/callback" element={<KakaoCallback />} />
+        </Route>
+
+        {/* 아카이브 검색 페이지 */}
+        <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="검색" />}>
+          <Route path="/archive/search" element={<ArchiveSearchPage />} />
         </Route>
 
         <Route element={<ProtectedRoute enabled={enableAuthCheck} />}>

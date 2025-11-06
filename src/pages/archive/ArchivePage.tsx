@@ -2,8 +2,16 @@ import bigFolder from '@assets/images/bigFolder.png';
 import filterSearchIcon from '@assets/icons/filter_search.svg';
 import filterCancelIcon from '@assets/icons/filter_cancel.svg';
 import smallFolder from '@assets/images/smallFolder.png';
+import { useNavigate } from 'react-router-dom';
 
 const ArchivePage = () => {
+  const navigate = useNavigate();
+
+  // 검색바 클릭 핸들러
+  const handleSearchClick = () => {
+    navigate('/archive/search');
+  };
+
   return (
     <div className="min-h-screen overflow-hidden">
       {/* TODO: overflow-hidden 어디에 넣을지 상의해야함 */}
@@ -94,7 +102,10 @@ const ArchivePage = () => {
           {/* 필터 검색 */}
           <div className="flex w-full flex-col gap-4">
             {/* 검색 바 */}
-            <div className="bg-neutral-2 flex h-12 w-full cursor-pointer items-center justify-between rounded-[44px] px-4">
+            <div
+              className="bg-neutral-2 flex h-12 w-full cursor-pointer items-center justify-between rounded-[44px] px-4"
+              onClick={handleSearchClick}
+            >
               <span className="text-b4 text-neutral-4">찾고 싶은 추억이 있나요?</span>
               <button className="flex h-7 w-7 items-center justify-center">
                 <img src={filterSearchIcon} alt="필터 검색" className="h-7 w-7" />
