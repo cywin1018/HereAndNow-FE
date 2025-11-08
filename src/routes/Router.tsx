@@ -6,6 +6,7 @@ import KakaoCallback from '@pages/oauth/KakaoCallback';
 import LoginPage from '@pages/login/LoginPage';
 import ProtectedRoute from './ProtectedRoute';
 import CourseSave from '@pages/place/CourseSave';
+import AddPlacePage from '@pages/place/AddPlacePage';
 import ArchiveSearchPage from '@pages/archive/ArchiveSearchPage';
 
 interface RouterProps {
@@ -21,6 +22,7 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
           <Route path="/oauth/kakao" element={<KakaoCallback />} />
           <Route path="/auth/callback" element={<KakaoCallback />} />
           <Route path="/place/save-place" element={<CourseSave />} />
+          <Route path="/place/add-place" element={<AddPlacePage />} />
         </Route>
 
         {/* 아카이브 검색 페이지 */}

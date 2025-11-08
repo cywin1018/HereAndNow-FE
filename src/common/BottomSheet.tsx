@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import KakaoMap from './KakaoMap';
 
 interface BottomSheetProps {
   isOpen: boolean;
@@ -35,9 +34,7 @@ const BottomSheet = ({ isOpen, onClose, children }: BottomSheetProps) => {
         className="fixed right-0 bottom-0 left-0 z-50 mx-auto max-h-[90vh] w-full max-w-md rounded-t-2xl bg-white shadow-lg"
       >
         {/* 드래그 핸들 */}
-        <div className="flex justify-center pt-3 pb-2">
-          <div className="bg-neutral-4 h-1 w-12 rounded-full" />
-        </div>
+        <div className="flex justify-center pt-[16px]"></div>
 
         {/* 컨텐츠 */}
         <div className="max-h-[calc(90vh-16px)] overflow-y-auto pb-4">{children}</div>

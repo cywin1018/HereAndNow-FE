@@ -1,9 +1,8 @@
-import { useState } from 'react';
-import BackIcon from '@assets/icons/back.svg';
-import { useNavigate } from 'react-router-dom';
-import AddressSearch from '@common/AddressSearch';
+import { useState, useEffect } from 'react';
+import DaumPostcode from 'react-daum-postcode';
 import BottomSheet from '@common/BottomSheet';
 import KakaoMap from '@common/KakaoMap';
+import PageHeader from '@common/layout/PageHeader';
 
 interface AddressData {
   zonecode: string;
@@ -14,20 +13,71 @@ interface AddressData {
   fullAddress: string;
 }
 
+type AddressSearchResultItem = {
+  x: string;
+  y: string;
+  [key: string]: unknown;
+};
+
+type AddressSearchStatus = 'OK' | 'ZERO_RESULT' | 'ERROR';
+
 const AddPlacePage = () => {
-  const navigate = useNavigate();
   const [selectedAddress, setSelectedAddress] = useState<AddressData | null>(null);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [placeName, setPlaceName] = useState('');
   const [detailAddress, setDetailAddress] = useState('');
+  const [coordinates, setCoordinates] = useState<{ latitude: number; longitude: number }>({
+    latitude: 37.566826,
+    longitude: 126.9786567,
+  });
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
 
-  const handleNavigateBack = () => {
-    navigate(-1);
-  };
+  const handleAddressComplete = (data: any) => {
+    let fullAddress = data.address;
+    let extraAddress = '';
 
-  const handleAddressComplete = (data: AddressData) => {
-    setSelectedAddress(data);
+    if (data.addressType === 'R') {
+      if (data.bname !== '') {
+        extraAddress += data.bname;
+      }
+      if (data.buildingName !== '') {
+        extraAddress += extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName;
+      }
+      fullAddress += extraAddress !== '' ? ` (${extraAddress})` : '';
+    }
+
+    const formattedData: AddressData = {
+      zonecode: data.zonecode,
+      address: data.address,
+      addressType: data.addressType,
+      bname: data.bname,
+      buildingName: data.buildingName,
+      fullAddress,
+    };
+
+    setSelectedAddress(formattedData);
+    setPlaceName(data.buildingName || data.address);
+    setIsAddressModalOpen(false);
     setIsBottomSheetOpen(true);
+
+    if (window.kakao?.maps?.services) {
+      const geocoder = new window.kakao.maps.services.Geocoder();
+      console.log('[AddPlacePage] 주소 검색 완료:', formattedData);
+      geocoder.addressSearch(
+        formattedData.fullAddress,
+        (result: AddressSearchResultItem[], status: AddressSearchStatus) => {
+          console.log('[AddPlacePage] 지오코딩 결과:', { status, result });
+          if (status === 'OK' && result[0]) {
+            const { x, y } = result[0];
+            setCoordinates({ latitude: Number(y), longitude: Number(x) });
+          } else {
+            console.warn('[AddPlacePage] 지오코딩 실패:', status);
+          }
+        },
+      );
+    } else {
+      console.warn('[AddPlacePage] Kakao 지도 SDK가 아직 준비되지 않았습니다.');
+    }
   };
 
   const handleCloseBottomSheet = () => {
@@ -39,6 +89,7 @@ const AddPlacePage = () => {
     setSelectedAddress(null);
     setPlaceName('');
     setDetailAddress('');
+    setCoordinates({ latitude: 37.566826, longitude: 126.9786567 });
   };
 
   const handleConfirm = () => {
@@ -51,33 +102,28 @@ const AddPlacePage = () => {
     setIsBottomSheetOpen(false);
   };
 
-  // 주소를 좌표로 변환 (임시로 기본 좌표 사용, 실제로는 Geocoder API 사용)
-  const getCoordinates = () => {
-    // 실제로는 카카오 Geocoder API를 사용하여 주소를 좌표로 변환해야 함
-    // 임시로 강남역 좌표 사용
-    return { latitude: 37.566826, longitude: 126.9786567 };
-  };
-
-  const coordinates = selectedAddress ? getCoordinates() : { latitude: 37.566826, longitude: 126.9786567 };
-
   // 도로명 주소와 지번 주소 구분
   const roadAddress = selectedAddress?.address || '';
   const oldAddress = selectedAddress?.bname ? `서울 ${selectedAddress.bname} ${selectedAddress.zonecode}` : '';
 
+  useEffect(() => {
+    console.log('[AddPlacePage] 현재 좌표 상태:', coordinates);
+  }, [coordinates]);
+
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col">
-      <header className="mb-2 grid grid-cols-3 items-center">
-        <button type="button" className="cursor-pointer justify-self-start p-2" onClick={handleNavigateBack}>
-          <img src={BackIcon} alt="뒤로가기" className="h-6 w-6" />
-        </button>
-        <h1 className="text-s4 text-neutral-8 text-center">장소 추가</h1>
-        <div className="justify-self-end"></div>
-      </header>
+    <div className="flex w-full flex-col">
+      <PageHeader title="장소 추가" />
 
       <main className="flex flex-col gap-4 py-2">
         <div className="flex flex-col gap-2">
           <h2 className="text-s5 text-neutral-8">주소 검색</h2>
-          <AddressSearch onComplete={handleAddressComplete} className="w-full" />
+          <button
+            type="button"
+            onClick={() => setIsAddressModalOpen(true)}
+            className="text-d1 text-neutral-8 border-neutral-4 hover:bg-neutral-2 w-full rounded-lg border bg-white px-4 py-3 text-left transition-colors"
+          >
+            {selectedAddress?.fullAddress || '주소를 검색하세요'}
+          </button>
         </div>
 
         {selectedAddress && !isBottomSheetOpen && (
@@ -101,11 +147,34 @@ const AddPlacePage = () => {
         )}
       </main>
 
+      {isAddressModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-[402px] rounded-2xl bg-white p-5 shadow-lg">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-s4 text-neutral-8">주소 검색</h2>
+              <button
+                type="button"
+                onClick={() => setIsAddressModalOpen(false)}
+                className="text-d1 text-neutral-6 hover:text-neutral-8"
+              >
+                닫기
+              </button>
+            </div>
+            <div className="border-neutral-4 overflow-hidden rounded-xl border">
+              <DaumPostcode
+                onComplete={handleAddressComplete}
+                onClose={() => setIsAddressModalOpen(false)}
+                autoClose={false}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 바텀시트 */}
       <BottomSheet isOpen={isBottomSheetOpen} onClose={handleCloseBottomSheet}>
-        <div className="flex flex-col gap-4 px-4">
-          {/* 제목 */}
-          <h2 className="text-s4 text-neutral-8">이 장소가 맞나요?</h2>
+        <div className="flex flex-col gap-4 px-[20px]">
+          <h2 className="text-b3 text-iceblue-8">이 장소가 맞나요?</h2>
 
           {/* 지도 영역 */}
           <div className="relative h-[200px] w-full overflow-hidden rounded-lg">
@@ -117,23 +186,20 @@ const AddPlacePage = () => {
               showMarker={true}
               showHeartButton={false}
             />
-            {/* 장소명 오버레이 */}
             {placeName && (
-              <div className="border-pink-6 absolute top-4 left-1/2 z-10 -translate-x-1/2 rounded-lg border-2 bg-white px-3 py-1 shadow-lg">
-                <span className="text-b3 text-pink-6">{placeName}</span>
+              <div className="border-pink-6 absolute top-4 left-1/2 z-10 -translate-x-1/2 rounded-lg border bg-white px-[8px] py-[4px] shadow-lg">
+                <span className="text-d2 text-iceblue-8">{placeName}</span>
               </div>
             )}
           </div>
 
-          {/* 주소 정보 */}
-          <div className="flex flex-col gap-2">
-            <div className="text-b3 text-neutral-8">{roadAddress}</div>
-            {oldAddress && <div className="text-d1 text-neutral-5">{oldAddress}</div>}
+          <div className="flex flex-col">
+            <div className="text-s1 text-iceblue-8">{roadAddress}</div>
+            {oldAddress && <div className="text-b4 text-iceblue-8">{oldAddress}</div>}
           </div>
 
-          {/* 상세 주소 입력 */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="detail-address" className="text-s6 text-neutral-8">
+            <label htmlFor="detail-address" className="text-b4 text-iceblue-8">
               상세 주소
             </label>
             <input
@@ -142,23 +208,23 @@ const AddPlacePage = () => {
               value={detailAddress}
               onChange={e => setDetailAddress(e.target.value)}
               placeholder="1-3층"
-              className="border-neutral-4 bg-neutral-2 text-d1 text-neutral-8 placeholder:text-neutral-5 focus:border-pink-6 rounded-lg border px-4 py-3 outline-none"
+              className="border-iceblue-3 bg-iceblue-2 text-d1 text-neutral-8 placeholder:text-neutral-5 focus:border-pink-6 rounded-lg border px-4 py-3 outline-none"
             />
           </div>
 
           {/* 버튼들 */}
-          <div className="flex gap-3 pb-4">
+          <div className="flex gap-3 py-[20px]">
             <button
               type="button"
               onClick={handleReregister}
-              className="border-neutral-4 text-b3 text-neutral-8 hover:bg-neutral-2 flex-1 rounded-lg border bg-white px-4 py-3 transition-colors"
+              className="text-s5 text-iceblue-7 bg-iceblue-2 flex-1 rounded-[12px] p-[10px] transition-colors"
             >
               다시 입력하기
             </button>
             <button
               type="button"
               onClick={handleConfirm}
-              className="bg-pink-6 text-b3 hover:bg-pink-7 flex-1 rounded-lg px-4 py-3 text-white transition-colors"
+              className="bg-pink-6 text-s4 flex-1 rounded-[12px] p-[10px] text-white transition-colors"
             >
               이대로 등록
             </button>

@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PageHeader from '@common/layout/PageHeader';
 import RegionDropdown from '@common/RegionDropdown';
 
 type CompanionType = '연인' | '친구' | '혼자' | '가족' | '지인';
 
 const CourseSave = () => {
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedCompanion, setSelectedCompanion] = useState<CompanionType | null>('연인');
   const [selectedRegion, setSelectedRegion] = useState<string>('');
@@ -27,7 +29,7 @@ const CourseSave = () => {
   }, [selectedDate, selectedCompanion, selectedRegion]);
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col">
+    <div className="flex w-full flex-col">
       <PageHeader title="코스 등록" />
 
       <main className="flex flex-col gap-[32px] px-5 pt-[32px]">
@@ -90,6 +92,7 @@ const CourseSave = () => {
         <button
           type="button"
           disabled={!isFormValid}
+          onClick={() => navigate('/place/add-place')}
           className={`text-s4 w-full max-w-[362px] rounded-lg px-4 py-3 transition-colors ${
             isFormValid ? 'bg-pink-6 hover:bg-pink-7 text-white' : 'bg-neutral-2 text-neutral-6 cursor-not-allowed'
           }`}
