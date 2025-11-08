@@ -11,7 +11,7 @@ const HomePage = () => {
   const [activeTab, setActiveTab] = useState<TabType>('course');
 
   return (
-    <div className="bg-neutral-1 min-h-screen">
+    <div className="bg-neutral-1 min-h-screen p-4">
       <div className="flex flex-col gap-[28px]">
         <AddCourse />
 
