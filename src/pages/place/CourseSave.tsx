@@ -1,20 +1,14 @@
 import { useState, useEffect } from 'react';
-import BackIcon from '@assets/icons/back.svg';
-import { useNavigate } from 'react-router-dom';
+import PageHeader from '@common/layout/PageHeader';
 import RegionDropdown from '@common/RegionDropdown';
 
 type CompanionType = '연인' | '친구' | '혼자' | '가족' | '지인';
 
 const CourseSave = () => {
-  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedCompanion, setSelectedCompanion] = useState<CompanionType | null>('연인');
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [isFormValid, setIsFormValid] = useState(false);
-
-  const handleNavigateBack = () => {
-    navigate(-1);
-  };
 
   const companionOptions: CompanionType[] = ['연인', '친구', '혼자', '가족', '지인'];
 
@@ -34,18 +28,19 @@ const CourseSave = () => {
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-col">
-      <header className="mb-2 grid grid-cols-3 items-center">
-        <button type="button" className="cursor-pointer justify-self-start p-2" onClick={handleNavigateBack}>
-          <img src={BackIcon} alt="뒤로가기" className="h-6 w-6" />
-        </button>
-        <h1 className="text-s4 text-neutral-8 text-center">코스 등록</h1>
-        <div className="justify-self-end"></div>
-      </header>
+      <PageHeader title="코스 등록" />
 
-      <main className="flex flex-col gap-6 py-2 pb-24">
+      <main className="flex flex-col gap-[32px] px-5 pt-[32px]">
         {/* 날짜 입력 섹션 */}
+
         <div className="flex flex-col gap-2">
-          <label htmlFor="visit-date" className="text-s5 text-neutral-8">
+          <h1 className="text-h4 pb-[32px] text-black">
+            <span>
+              저장하려는 코스에 대해 <br />
+            </span>
+            <span>알려주세요.</span>
+          </h1>
+          <label htmlFor="visit-date" className="text-d1 text-iceblue-8">
             언제 다녀오셨나요?
             <span className="text-red-6 ml-1">•</span>
           </label>
@@ -59,8 +54,8 @@ const CourseSave = () => {
         </div>
 
         {/* 동행 선택 섹션 */}
-        <div className="flex flex-col gap-2">
-          <label className="text-s5 text-neutral-8">
+        <div className="flex flex-col gap-[8px]">
+          <label className="text-d1 text-iceblue-8">
             누구와 함께하셨나요?
             <span className="text-red-6 ml-1">•</span>
           </label>
@@ -81,17 +76,21 @@ const CourseSave = () => {
             ))}
           </div>
         </div>
-        <div>
-          <RegionDropdown selectedRegion={selectedRegion} onSelect={handleRegionSelect} />
+        <div className="flex flex-col gap-[8px]">
+          <label className="text-d1 text-iceblue-8">
+            어느 지역 인가요?
+            <span className="text-red-6 ml-1">•</span>
+          </label>
+          <RegionDropdown selectedRegion={selectedRegion} onSelect={handleRegionSelect} className="w-full" />
         </div>
       </main>
 
       {/* 하단 고정 버튼 영역 */}
-      <div className="fixed right-0 bottom-8 left-0 mx-auto w-full max-w-md px-4">
+      <div className="fixed right-0 bottom-8 left-0 mx-auto flex w-full max-w-md justify-center px-4">
         <button
           type="button"
           disabled={!isFormValid}
-          className={`text-s4 mx-auto w-full max-w-[362px] rounded-lg px-4 py-3 transition-colors ${
+          className={`text-s4 w-full max-w-[362px] rounded-lg px-4 py-3 transition-colors ${
             isFormValid ? 'bg-pink-6 hover:bg-pink-7 text-white' : 'bg-neutral-2 text-neutral-6 cursor-not-allowed'
           }`}
         >

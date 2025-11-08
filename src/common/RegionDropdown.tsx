@@ -38,33 +38,36 @@ const RegionDropdown = ({ selectedRegion, onSelect, className }: RegionDropdownP
   const displayValue = selectedRegion || '지역을 선택하세요';
 
   return (
-    <div ref={dropdownRef} className={`relative ${className || ''}`}>
-      {/* 선택된 값 표시 영역 */}
+    <div
+      ref={dropdownRef}
+      className={`relative w-full rounded-[16px] bg-white shadow-[0px_12px_30px_rgba(0,0,0,0.08)] ${className || ''}`}
+    >
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="border-iceblue-6 flex h-12 w-[362px] items-center justify-between rounded-t-lg border bg-white pt-3 pr-5 pb-3 pl-5 transition-colors"
+        onClick={() => setIsOpen(prev => !prev)}
+        className={`bg-iceblue-2 flex h-12 w-full items-center justify-between px-5 py-3 transition-colors ${
+          isOpen ? 'rounded-t-[16px]' : 'rounded-[16px]'
+        }`}
       >
-        <span className="text-d1 text-neutral-8">{displayValue}</span>
+        <span className="text-b4 text-iceblue-9">{displayValue}</span>
         <img
           src={DownArrowIcon}
           alt="드롭다운"
-          className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`h-[12px] w-[12px] opacity-50 transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
-      {/* 드롭다운 메뉴 */}
       {isOpen && (
-        <div className="border-iceblue-6 absolute top-full z-10 mt-2 w-[362px] overflow-hidden rounded-lg border bg-white shadow-lg">
-          <div className="max-h-[120px] overflow-y-auto">
+        <div className="absolute top-full right-0 left-0 z-10 rounded-b-[16px] bg-white shadow-[0px_12px_30px_rgba(0,0,0,0.08)]">
+          <div className="max-h-[140px] overflow-y-auto">
             {REGION_GROUPS.map((region, index) => (
               <div key={region}>
-                {index > 0 && <div className="bg-neutral-4 h-px" />}
+                {index > 0 && <div className="bg-iceblue-2 h-px" />}
                 <button
                   type="button"
                   onClick={() => handleSelect(region)}
-                  className={`text-d1 text-neutral-6 hover:bg-neutral-2 w-full px-4 py-3 text-left transition-colors ${
-                    selectedRegion === region ? 'bg-neutral-2 text-neutral-8' : ''
+                  className={`text-b4 w-full px-5 py-3 text-left transition-colors ${
+                    selectedRegion === region ? 'bg-iceblue-1 text-iceblue-9' : 'text-iceblue-7 hover:bg-iceblue-2'
                   }`}
                 >
                   {region}
