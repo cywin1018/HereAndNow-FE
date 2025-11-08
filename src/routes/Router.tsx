@@ -18,12 +18,12 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/oauth/kakao" element={<KakaoCallback />} />
           <Route path="/auth/callback" element={<KakaoCallback />} />
+          <Route path="/place/save-place" element={<CourseSave />} />
         </Route>
 
         <Route element={<ProtectedRoute enabled={enableAuthCheck} />}>
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
-            <Route path="/place/save-place" element={<CourseSave />} />
           </Route>
         </Route>
       </Routes>
