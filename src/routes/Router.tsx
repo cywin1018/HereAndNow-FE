@@ -12,6 +12,7 @@ import PlaceDetail from '@pages/place/PlaceDetail';
 import CourseRegister from '@pages/place/CourseRegister';
 import CourseSubmit from '@pages/place/CourseSubmit';
 import CourseResult from '@pages/place/CoureResult';
+import ConnectingPage from '@pages/connecting/ConnectingPage';
 
 interface RouterProps {
   enableAuthCheck?: boolean; // 디버깅용: 인증 체크 활성화/비활성화 (기본값: true)
@@ -42,6 +43,7 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/archive" element={<ArchivePage />} />
+            <Route path="/connecting" element={<ConnectingPage />} />
           </Route>
         </Route>
       </Routes>
