@@ -38,7 +38,7 @@ const CourseSubmit = () => {
 
       <main className="flex flex-1 flex-col gap-8 px-5 pt-6 pb-16">
         <section className="flex flex-col gap-3">
-          <h1 className="text-h3 text-neutral-10 leading-snug">
+          <h1 className="text-h4 text-neutral-10 leading-snug">
             코스를 완성하기 위한
             <br />
             마지막 단계예요

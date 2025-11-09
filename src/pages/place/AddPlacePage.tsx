@@ -1,18 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DaumPostcode from 'react-daum-postcode';
-import BottomSheet from '@common/BottomSheet';
-import KakaoMap from '@common/KakaoMap';
 import PageHeader from '@common/layout/PageHeader';
-
-interface AddressData {
-  zonecode: string;
-  address: string;
-  addressType: string;
-  bname?: string;
-  buildingName?: string;
-  fullAddress: string;
-}
+import useEnsureKakaoMapsReady from '../../course/hooks/useEnsureKakaoMapsReady';
+import ConfirmAddressBottomSheet from './components/ConfirmAddressBottomSheet';
+import type { AddressData } from './types';
 
 type AddressSearchResultItem = {
   x: string;
@@ -33,6 +25,7 @@ const AddPlacePage = () => {
     longitude: 126.9786567,
   });
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const ensureKakaoMapsReady = useEnsureKakaoMapsReady();
 
   const handleAddressComplete = (data: any) => {
     let fullAddress = data.address;
@@ -62,24 +55,25 @@ const AddPlacePage = () => {
     setIsAddressModalOpen(false);
     setIsBottomSheetOpen(true);
 
-    if (window.kakao?.maps?.services) {
-      const geocoder = new window.kakao.maps.services.Geocoder();
-      console.log('[AddPlacePage] 주소 검색 완료:', formattedData);
-      geocoder.addressSearch(
-        formattedData.fullAddress,
-        (result: AddressSearchResultItem[], status: AddressSearchStatus) => {
-          console.log('[AddPlacePage] 지오코딩 결과:', { status, result });
-          if (status === 'OK' && result[0]) {
-            const { x, y } = result[0];
-            setCoordinates({ latitude: Number(y), longitude: Number(x) });
-          } else {
-            console.warn('[AddPlacePage] 지오코딩 실패:', status);
-          }
-        },
-      );
-    } else {
-      console.warn('[AddPlacePage] Kakao 지도 SDK가 아직 준비되지 않았습니다.');
-    }
+    ensureKakaoMapsReady()
+      .then(() => {
+        if (!window.kakao?.maps?.services) {
+          return;
+        }
+        const geocoder = new window.kakao.maps.services.Geocoder();
+        geocoder.addressSearch(
+          formattedData.fullAddress,
+          (result: AddressSearchResultItem[], status: AddressSearchStatus) => {
+            if (status === 'OK' && result[0]) {
+              const { x, y } = result[0];
+              setCoordinates({ latitude: Number(y), longitude: Number(x) });
+            } else {
+              console.warn('[AddPlacePage] 지오코딩 실패:', status);
+            }
+          },
+        );
+      })
+      .catch(() => {});
   };
 
   const handleCloseBottomSheet = () => {
@@ -96,7 +90,6 @@ const AddPlacePage = () => {
 
   const handleConfirm = () => {
     if (!selectedAddress) {
-      console.warn('[AddPlacePage] 선택된 주소가 없어 상세 페이지로 이동하지 못했습니다.');
       return;
     }
 
@@ -107,20 +100,11 @@ const AddPlacePage = () => {
       coordinates,
     };
 
-    console.log('[AddPlacePage] 장소 등록 버튼 클릭, 상세 페이지로 이동:', statePayload);
     setIsBottomSheetOpen(false);
     navigate(`/place/detail/${encodeURIComponent(selectedAddress.zonecode)}`, {
       state: statePayload,
     });
   };
-
-  // 도로명 주소와 지번 주소 구분
-  const roadAddress = selectedAddress?.address || '';
-  const oldAddress = selectedAddress?.bname ? `서울 ${selectedAddress.bname} ${selectedAddress.zonecode}` : '';
-
-  useEffect(() => {
-    console.log('[AddPlacePage] 현재 좌표 상태:', coordinates);
-  }, [coordinates]);
 
   return (
     <div className="flex w-full flex-col">
@@ -183,66 +167,17 @@ const AddPlacePage = () => {
         </div>
       )}
 
-      {/* 바텀시트 */}
-      <BottomSheet isOpen={isBottomSheetOpen} onClose={handleCloseBottomSheet}>
-        <div className="flex flex-col gap-4 px-[20px]">
-          <h2 className="text-b3 text-iceblue-8">이 장소가 맞나요?</h2>
-
-          {/* 지도 영역 */}
-          <div className="relative h-[200px] w-full overflow-hidden rounded-lg">
-            <KakaoMap
-              latitude={coordinates.latitude}
-              longitude={coordinates.longitude}
-              level={3}
-              className="h-full w-full"
-              showMarker={true}
-              showHeartButton={false}
-            />
-            {placeName && (
-              <div className="border-pink-6 absolute top-4 left-1/2 z-10 -translate-x-1/2 rounded-lg border bg-white px-[8px] py-[4px] shadow-lg">
-                <span className="text-d2 text-iceblue-8">{placeName}</span>
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-col">
-            <div className="text-s1 text-iceblue-8">{roadAddress}</div>
-            {oldAddress && <div className="text-b4 text-iceblue-8">{oldAddress}</div>}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label htmlFor="detail-address" className="text-b4 text-iceblue-8">
-              상세 주소
-            </label>
-            <input
-              id="detail-address"
-              type="text"
-              value={detailAddress}
-              onChange={e => setDetailAddress(e.target.value)}
-              placeholder="1-3층"
-              className="border-iceblue-3 bg-iceblue-2 text-d1 text-neutral-8 placeholder:text-neutral-5 focus:border-pink-6 rounded-lg border px-4 py-3 outline-none"
-            />
-          </div>
-
-          {/* 버튼들 */}
-          <div className="flex gap-3 py-[20px]">
-            <button
-              type="button"
-              onClick={handleReregister}
-              className="text-s5 text-iceblue-7 bg-iceblue-2 flex-1 rounded-[12px] p-[10px] transition-colors"
-            >
-              다시 입력하기
-            </button>
-            <button
-              type="button"
-              onClick={handleConfirm}
-              className="bg-pink-6 text-s4 flex-1 rounded-[12px] p-[10px] text-white transition-colors"
-            >
-              이대로 등록
-            </button>
-          </div>
-        </div>
-      </BottomSheet>
+      <ConfirmAddressBottomSheet
+        isOpen={isBottomSheetOpen}
+        onClose={handleCloseBottomSheet}
+        onReregister={handleReregister}
+        onConfirm={handleConfirm}
+        coordinates={coordinates}
+        placeName={placeName}
+        address={selectedAddress}
+        detailAddress={detailAddress}
+        onDetailAddressChange={setDetailAddress}
+      />
     </div>
   );
 };

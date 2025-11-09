@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import RegionDropdown from '@common/RegionDropdown';
 import BottomActionButton from '@common/button/BottomActionButton';
 import PageHeader from '@common/layout/PageHeader';
+import Modal from '@common/components/Modal';
+import CoupleInviteBottomSheet from '@pages/place/components/CoupleInviteBottomSheet';
 
 type CompanionType = '연인' | '친구' | '혼자' | '가족' | '지인';
 
@@ -12,6 +14,9 @@ const CourseSave = () => {
   const [selectedCompanion, setSelectedCompanion] = useState<CompanionType | null>('연인');
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [isFormValid, setIsFormValid] = useState(false);
+  const [isCoupleModalOpen, setIsCoupleModalOpen] = useState(false);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [isInviteCompleteModalOpen, setIsInviteCompleteModalOpen] = useState(false);
 
   const companionOptions: CompanionType[] = ['연인', '친구', '혼자', '가족', '지인'];
 
@@ -21,6 +26,13 @@ const CourseSave = () => {
 
   const handleRegionSelect = (region: string) => {
     setSelectedRegion(region);
+  };
+
+  const handleCompanionClick = (option: CompanionType) => {
+    setSelectedCompanion(option);
+    if (option === '연인') {
+      setIsCoupleModalOpen(true);
+    }
   };
 
   // 폼 유효성 검사
@@ -67,7 +79,7 @@ const CourseSave = () => {
               <button
                 key={option}
                 type="button"
-                onClick={() => setSelectedCompanion(option)}
+                onClick={() => handleCompanionClick(option)}
                 className={`text-d1 rounded-lg px-4 py-2 transition-colors ${
                   selectedCompanion === option
                     ? 'bg-neutral-6 text-white'
@@ -91,6 +103,42 @@ const CourseSave = () => {
       <BottomActionButton type="button" disabled={!isFormValid} onClick={() => navigate('/place/add-place')}>
         장소 추가하기
       </BottomActionButton>
+
+      <Modal
+        isOpen={isCoupleModalOpen}
+        onClose={() => setIsCoupleModalOpen(false)}
+        mainMessage="연인을 초대해주세요"
+        subMessage="커넥팅 화면에서 연인을 초대 후 이용 가능해요"
+        leftButtonText="홈으로"
+        leftButtonOnClick={() => {
+          setIsCoupleModalOpen(false);
+          navigate('/');
+        }}
+        rightButtonText="연인 초대하기"
+        rightButtonOnClick={() => {
+          setIsCoupleModalOpen(false);
+          setIsBottomSheetOpen(true);
+        }}
+      />
+
+      <CoupleInviteBottomSheet
+        isOpen={isBottomSheetOpen}
+        onClose={() => setIsBottomSheetOpen(false)}
+        onInvite={_partnerId => {
+          setIsBottomSheetOpen(false);
+          setIsInviteCompleteModalOpen(true);
+        }}
+        myId="@hereandnow"
+      />
+
+      <Modal
+        isOpen={isInviteCompleteModalOpen}
+        onClose={() => setIsInviteCompleteModalOpen(false)}
+        mainMessage="초대를 완료했어요"
+        subMessage="연인이 수락한 후 다시 이용해주세요"
+        rightButtonText="확인"
+        rightButtonOnClick={() => setIsInviteCompleteModalOpen(false)}
+      />
     </div>
   );
 };
