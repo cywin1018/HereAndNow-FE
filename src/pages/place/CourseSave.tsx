@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PageHeader from '@common/layout/PageHeader';
 import RegionDropdown from '@common/RegionDropdown';
+import BottomActionButton from '@common/button/BottomActionButton';
+import PageHeader from '@common/layout/PageHeader';
 
 type CompanionType = '연인' | '친구' | '혼자' | '가족' | '지인';
 
@@ -87,19 +88,9 @@ const CourseSave = () => {
         </div>
       </main>
 
-      {/* 하단 고정 버튼 영역 */}
-      <div className="fixed right-0 bottom-8 left-0 mx-auto flex w-full max-w-md justify-center px-4">
-        <button
-          type="button"
-          disabled={!isFormValid}
-          onClick={() => navigate('/place/add-place')}
-          className={`text-s4 w-full max-w-[362px] rounded-lg px-4 py-3 transition-colors ${
-            isFormValid ? 'bg-pink-6 hover:bg-pink-7 text-white' : 'bg-neutral-2 text-neutral-6 cursor-not-allowed'
-          }`}
-        >
-          장소 추가하기
-        </button>
-      </div>
+      <BottomActionButton type="button" disabled={!isFormValid} onClick={() => navigate('/place/add-place')}>
+        장소 추가하기
+      </BottomActionButton>
     </div>
   );
 };

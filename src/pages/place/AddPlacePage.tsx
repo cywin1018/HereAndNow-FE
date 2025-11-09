@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DaumPostcode from 'react-daum-postcode';
 import BottomSheet from '@common/BottomSheet';
 import KakaoMap from '@common/KakaoMap';
@@ -22,6 +23,7 @@ type AddressSearchResultItem = {
 type AddressSearchStatus = 'OK' | 'ZERO_RESULT' | 'ERROR';
 
 const AddPlacePage = () => {
+  const navigate = useNavigate();
   const [selectedAddress, setSelectedAddress] = useState<AddressData | null>(null);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [placeName, setPlaceName] = useState('');
@@ -93,13 +95,23 @@ const AddPlacePage = () => {
   };
 
   const handleConfirm = () => {
-    // 여기에 등록 로직 추가
-    console.log('장소 등록:', {
+    if (!selectedAddress) {
+      console.warn('[AddPlacePage] 선택된 주소가 없어 상세 페이지로 이동하지 못했습니다.');
+      return;
+    }
+
+    const statePayload = {
       address: selectedAddress,
       placeName,
       detailAddress,
-    });
+      coordinates,
+    };
+
+    console.log('[AddPlacePage] 장소 등록 버튼 클릭, 상세 페이지로 이동:', statePayload);
     setIsBottomSheetOpen(false);
+    navigate(`/place/detail/${encodeURIComponent(selectedAddress.zonecode)}`, {
+      state: statePayload,
+    });
   };
 
   // 도로명 주소와 지번 주소 구분
