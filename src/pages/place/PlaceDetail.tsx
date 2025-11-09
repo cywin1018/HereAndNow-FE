@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import StarRatingFilter from '@common/components/StarRatingFilter';
 import PhotoUploader from '@common/components/PhotoUploader';
 import TagSelector from '@common/components/TagSelector';
@@ -7,6 +8,8 @@ import PlaceCard from '@pages/home/components/PlaceCard';
 import BottomActionButton from '@common/button/BottomActionButton';
 
 const PlaceDetail = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="flex w-full flex-col gap-[32px] pb-16">
       <PageHeader title="장소 세부설명" />
@@ -102,9 +105,11 @@ const PlaceDetail = () => {
       </div>
       <LabeledTextarea label="어떤 점이 좋았나요?" required maxLength={100} />
       <LabeledTextarea label="어떤 점이 아쉬웠나요?" required maxLength={100} />
-      <BottomActionButton className="mt-[80px]" type="button" onClick={() => {}}>
-        세부설명 저장
-      </BottomActionButton>
+      <div className="pt-[80px]">
+        <BottomActionButton type="button" onClick={() => navigate('/place/register')}>
+          세부설명 저장
+        </BottomActionButton>
+      </div>
     </div>
   );
 };

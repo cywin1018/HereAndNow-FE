@@ -16,7 +16,7 @@ const BottomActionButton = ({
   disabled,
   ...buttonProps
 }: BottomActionButtonProps) => {
-  const containerBaseClass = 'fixed right-0 bottom-8 left-0 mx-auto flex w-full max-w-md justify-center px-4';
+  const containerBaseClass = ' right-0 bottom-8 left-0 mx-auto flex w-full max-w-md justify-center px-4';
   const buttonBaseClass = 'text-s4 w-full max-w-[362px] rounded-lg px-5 py-3 transition-colors';
 
   const stateClass = disabled ? disabledClassName : activeClassName;

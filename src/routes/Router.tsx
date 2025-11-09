@@ -9,6 +9,9 @@ import CourseSave from '@pages/place/CourseSave';
 import AddPlacePage from '@pages/place/AddPlacePage';
 import ArchiveSearchPage from '@pages/archive/ArchiveSearchPage';
 import PlaceDetail from '@pages/place/PlaceDetail';
+import CourseRegister from '@pages/place/CourseRegister';
+import CourseSubmit from '@pages/place/CourseSubmit';
+import CourseResult from '@pages/place/CoureResult';
 
 interface RouterProps {
   enableAuthCheck?: boolean; // 디버깅용: 인증 체크 활성화/비활성화 (기본값: true)
@@ -23,7 +26,10 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
           <Route path="/oauth/kakao" element={<KakaoCallback />} />
           <Route path="/auth/callback" element={<KakaoCallback />} />
           <Route path="/place/save-place" element={<CourseSave />} />
+          <Route path="/place/register" element={<CourseRegister />} />
           <Route path="/place/add-place" element={<AddPlacePage />} />
+          <Route path="/place/course/submit" element={<CourseSubmit />} />
+          <Route path="/place/course/result" element={<CourseResult />} />
           <Route path="/place/detail/:id" element={<PlaceDetail />} />
         </Route>
 
