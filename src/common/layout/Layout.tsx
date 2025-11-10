@@ -16,7 +16,7 @@ const Layout = ({ withHeader = true, pageTitle, withBottomNavigation = true }: L
         {withHeader && <Header />}
         {pageTitle && <PageHeader title={pageTitle} />}
 
-        <section className="px-5">
+        <section className="overflow-x-hidden px-5">
           <Outlet />
         </section>
       </main>
