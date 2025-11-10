@@ -14,7 +14,7 @@ const StarRatingFilter = ({ rating, onRatingChange, title }: StarRatingFilterPro
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-d1 text-neutral-5">{title}</span>
+      <span className="text-d1 text-iceblue-8">{title}</span>
 
       {/* 별 */}
       <div className="flex items-center gap-1">
