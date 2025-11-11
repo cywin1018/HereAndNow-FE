@@ -2,8 +2,13 @@ import LoveIcon from '@assets/icons/love.svg';
 import DotsIcon from '@assets/icons/dots.svg';
 import KimHereIcon from '@assets/icons/kim_here.svg';
 import ChoiNowIcon from '@assets/icons/choi_now.svg';
+import { useNavigate } from 'react-router-dom';
 
 const ConnectingPage = () => {
+  const navigate = useNavigate();
+  const handleDotsClick = () => {
+    navigate('/connecting/profile-modify');
+  };
   return (
     <div className="relative w-full pb-[150px]">
       <div className="relative h-[120px] w-full">
@@ -25,7 +30,7 @@ const ConnectingPage = () => {
             <span>0개의 장소, 0개의 코스</span>
           </div>
           <button type="button" className="flex items-center justify-start" aria-label="옵션">
-            <img src={DotsIcon} alt="더보기" className="h-5 w-5" />
+            <img src={DotsIcon} alt="더보기" className="h-5 w-5 cursor-pointer" onClick={handleDotsClick} />
           </button>
         </div>
       </div>

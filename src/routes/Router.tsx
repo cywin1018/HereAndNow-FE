@@ -13,6 +13,7 @@ import CourseRegister from '@pages/place/CourseRegister';
 import CourseSubmit from '@pages/place/CourseSubmit';
 import CourseResult from '@pages/place/CoureResult';
 import ConnectingPage from '@pages/connecting/ConnectingPage';
+import ProfileModifyPage from '@pages/connecting/ProfileModifyPage';
 
 interface RouterProps {
   enableAuthCheck?: boolean; // 디버깅용: 인증 체크 활성화/비활성화 (기본값: true)
@@ -32,6 +33,7 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
           <Route path="/place/course/submit" element={<CourseSubmit />} />
           <Route path="/place/course/result" element={<CourseResult />} />
           <Route path="/place/detail/:id" element={<PlaceDetail />} />
+          <Route path="/connecting/profile-modify" element={<ProfileModifyPage />} />
         </Route>
 
         {/* 아카이브 검색 페이지 */}
