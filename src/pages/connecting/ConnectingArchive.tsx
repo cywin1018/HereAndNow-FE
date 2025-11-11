@@ -1,4 +1,4 @@
-import bigFolder from '@assets/images/bigFolder.png';
+import bigPinkFolder from '@assets/images/bigPinkFolder.png';
 import filterSearchIcon from '@assets/icons/filter_search.svg';
 import filterCancelIcon from '@assets/icons/filter_cancel.svg';
 import smallPinkFolder from '@assets/images/smallPinkFolder.png';
@@ -23,10 +23,10 @@ const ConnectingArchive = () => {
         </div>
 
         <div className="relative h-66.75 w-93">
-          <img src={bigFolder} alt="폴더" className="h-full w-full object-cover" />
+          <img src={bigPinkFolder} alt="폴더" className="h-full w-full object-cover" />
           <span className="text-s2 text-iceblue-1 absolute top-2.75 left-10">2일 전</span>
 
-          <div className="bg-pink-6 text-s2 absolute top-8 right-6 flex h-9 w-9 items-center justify-center rounded-full text-white">
+          <div className="bg-pink-6 text-s2 absolute top-7 right-5 flex h-9 w-9 items-center justify-center rounded-full text-white">
             4
           </div>
 

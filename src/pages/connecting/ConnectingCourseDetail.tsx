@@ -9,17 +9,20 @@ const ConnectingCourseDetail = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen overflow-hidden">
+    <div className="min-h-screen overflow-hidden px-5">
       <PageHeader title="커넥팅 코스 상세" />
-      <div className="flex w-full flex-col items-center gap-8">
-        <div className="bg-pink-2 border-pink-2 flex items-center justify-center gap-6 rounded-[50px] border border-solid px-10 py-3">
-          <span className="text-s2 text-pink-6">Fri</span>
-          <span className="text-s2 text-pink-6">Nov</span>
-          <span className="text-s2 text-pink-6">7</span>
+      <div className="relative z-0 w-full overflow-hidden rounded-[24px]">
+        <KakaoMap latitude={37.566826} longitude={126.9786567} className="h-[292px] w-full" />
+
+        <div className="absolute top-1 left-1/2 z-20 flex -translate-x-1/2 gap-4">
+          <div className="bg-pink-2 border-pink-2 shadow-pink-3/30 flex items-center justify-center gap-6 rounded-[50px] border border-solid px-10 py-3 shadow-lg">
+            <span className="text-s2 text-pink-6">Fri</span>
+            <span className="text-s2 text-pink-6">Nov</span>
+            <span className="text-s2 text-pink-6">7</span>
+          </div>
         </div>
       </div>
-      <KakaoMap latitude={37.566826} longitude={126.9786567} className="h-[292px]" />
-      <div className="flex flex-col gap-[32px]">
+      <div className="mt-8 flex flex-col gap-[32px]">
         <div className="flex flex-col gap-[8px]">
           <label className="text-d1 text-iceblue-8">
             분위기는 어땠나요?
