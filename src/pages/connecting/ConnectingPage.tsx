@@ -3,6 +3,7 @@ import DotsIcon from '@assets/icons/dots.svg';
 import KimHereIcon from '@assets/icons/kim_here.svg';
 import ChoiNowIcon from '@assets/icons/choi_now.svg';
 import { useNavigate } from 'react-router-dom';
+import CardSlider from './components/CardSlider';
 
 const ConnectingPage = () => {
   const navigate = useNavigate();
@@ -56,6 +57,7 @@ const ConnectingPage = () => {
           <span className="text-s4 text-neutral-6 font-semibold">???</span>
         </div>
       </div>
+      <CardSlider cards={[<div>1</div>, <div>2</div>, <div>3</div>]} />
     </div>
   );
 };
