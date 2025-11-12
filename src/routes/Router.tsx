@@ -17,6 +17,7 @@ import ProfileModifyPage from '@pages/connecting/ProfileModifyPage';
 import ConnectingSearchPage from '@pages/connecting/ConnectingSearchPage';
 import ConnectingArchive from '@pages/connecting/ConnectingArchive';
 import ConnectingCourseDetail from '@pages/connecting/ConnectingCourseDetail';
+import ArchiveDetailPage from '@pages/archive/ArchiveDetailPage';
 
 interface RouterProps {
   enableAuthCheck?: boolean; // 디버깅용: 인증 체크 활성화/비활성화 (기본값: true)
@@ -45,6 +46,11 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
         {/* 아카이브 검색 페이지 */}
         <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="검색" />}>
           <Route path="/archive/search" element={<ArchiveSearchPage />} />
+        </Route>
+
+        {/* 아카이브 상세 페이지 */}
+        <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="아카이빙" />}>
+          <Route path="/archive/:id" element={<ArchiveDetailPage />} />
         </Route>
 
         <Route element={<ProtectedRoute enabled={enableAuthCheck} />}>

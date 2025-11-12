@@ -50,7 +50,7 @@ const PlaceCard = ({ imageUrl, name, category, address, addressDetail, rating, r
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-s4 text-yellow-6">{rating}</span>
+          <span className="text-b5 text-yellow-5">{rating}</span>
           <div className="flex items-center gap-0.5">{renderStars(rating)}</div>
           <span className="text-b5 text-neutral-5">리뷰 {reviewCount}건</span>
         </div>
