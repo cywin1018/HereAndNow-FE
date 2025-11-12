@@ -57,7 +57,7 @@ const LabeledTextarea = ({
         {label}
         {required && <span className="text-red-6 ml-1">•</span>}
       </label>
-      <div className="border-iceblue-3/60 rounded-[18px] border bg-white px-[20px] py-3 shadow-[0_8px_18px_rgba(24,44,70,0.04)]">
+      <div className="border-iceblue-3/60 rounded-[18px] border bg-white px-[20px] py-3">
         <textarea
           ref={textareaRef}
           value={value}

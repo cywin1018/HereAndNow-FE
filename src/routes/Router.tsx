@@ -12,6 +12,11 @@ import PlaceDetail from '@pages/place/PlaceDetail';
 import CourseRegister from '@pages/place/CourseRegister';
 import CourseSubmit from '@pages/place/CourseSubmit';
 import CourseResult from '@pages/place/CoureResult';
+import ConnectingPage from '@pages/connecting/ConnectingPage';
+import ProfileModifyPage from '@pages/connecting/ProfileModifyPage';
+import ConnectingSearchPage from '@pages/connecting/ConnectingSearchPage';
+import ConnectingArchive from '@pages/connecting/ConnectingArchive';
+import ConnectingCourseDetail from '@pages/connecting/ConnectingCourseDetail';
 import ArchiveDetailPage from '@pages/archive/ArchiveDetailPage';
 
 interface RouterProps {
@@ -32,6 +37,10 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
           <Route path="/place/course/submit" element={<CourseSubmit />} />
           <Route path="/place/course/result" element={<CourseResult />} />
           <Route path="/place/detail/:id" element={<PlaceDetail />} />
+          <Route path="/connecting/profile-modify" element={<ProfileModifyPage />} />
+          <Route path="/connecting/search" element={<ConnectingSearchPage />} />
+          <Route path="/connecting/archive" element={<ConnectingArchive />} />
+          <Route path="/connecting/course/detail" element={<ConnectingCourseDetail />} />
         </Route>
 
         {/* 아카이브 검색 페이지 */}
@@ -48,6 +57,7 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/archive" element={<ArchivePage />} />
+            <Route path="/connecting" element={<ConnectingPage />} />
           </Route>
         </Route>
       </Routes>

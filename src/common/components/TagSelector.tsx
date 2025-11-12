@@ -56,7 +56,7 @@ const TagSelector = ({
   };
 
   return (
-    <div className="rounded-[16px] bg-white shadow-[0_8px_18px_rgba(24,44,70,0.08)]">
+    <div className="rounded-[16px] bg-white">
       <div
         className={`flex min-h-[52px] items-center justify-between gap-3 bg-white px-4 py-3 ${
           isOptionsOpen ? 'rounded-t-[16px]' : 'rounded-[16px]'
@@ -67,10 +67,7 @@ const TagSelector = ({
             <span className="text-b3 text-iceblue-8">{placeholder}</span>
           ) : (
             selectedTags.map(tag => (
-              <div
-                key={tag}
-                className="flex items-center gap-2 rounded-[12px] bg-white px-3 py-2 shadow-[0_4px_12px_rgba(20,36,64,0.06)]"
-              >
+              <div key={tag} className="flex items-center gap-2 rounded-[12px] bg-white px-3 py-2">
                 <span className="text-b3 text-iceblue-9 font-medium">{tag}</span>
                 <button
                   type="button"
