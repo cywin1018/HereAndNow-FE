@@ -13,6 +13,8 @@ import CourseRegister from '@pages/place/CourseRegister';
 import CourseSubmit from '@pages/place/CourseSubmit';
 import CourseResult from '@pages/place/CoureResult';
 import ArchiveDetailPage from '@pages/archive/ArchiveDetailPage';
+import ExplorePage from '@pages/explore/ExplorePage';
+import ExploreCoursePage from '@pages/explore/ExploreCoursePage';
 
 interface RouterProps {
   enableAuthCheck?: boolean; // 디버깅용: 인증 체크 활성화/비활성화 (기본값: true)
@@ -42,6 +44,16 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
         {/* 아카이브 상세 페이지 */}
         <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="아카이빙" />}>
           <Route path="/archive/:id" element={<ArchiveDetailPage />} />
+        </Route>
+
+        {/* 둘러보기 페이지 */}
+        <Route element={<Layout withHeader={false} withBottomNavigation={true} />}>
+          <Route path="/explore" element={<ExplorePage />} />
+        </Route>
+
+        {/* 둘러보기 - 코스 */}
+        <Route element={<Layout withHeader={false} withBottomNavigation={false} />}>
+          <Route path="/explore/course" element={<ExploreCoursePage />} />
         </Route>
 
         <Route element={<ProtectedRoute enabled={enableAuthCheck} />}>

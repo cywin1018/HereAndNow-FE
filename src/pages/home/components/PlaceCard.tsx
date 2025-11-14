@@ -44,8 +44,14 @@ const PlaceCard = ({ imageUrl, name, category, address, addressDetail, rating, r
           </div>
 
           <div className="flex flex-col gap-0.5">
-            <p className="text-d1 text-neutral-5">{address}</p>
-            {addressDetail && <p className="text-d1 text-neutral-4">{addressDetail}</p>}
+            <p className="text-d1 text-neutral-5 line-clamp-1 truncate overflow-hidden break-all text-ellipsis whitespace-nowrap">
+              {address}
+            </p>
+            {addressDetail && (
+              <p className="text-d1 text-neutral-4 line-clamp-1 truncate overflow-hidden break-all text-ellipsis whitespace-nowrap">
+                {addressDetail}
+              </p>
+            )}
           </div>
         </div>
 
