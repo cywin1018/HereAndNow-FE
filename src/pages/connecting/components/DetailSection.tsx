@@ -1,7 +1,6 @@
-import React from 'react';
+import { useState } from 'react';
+import Modal from '@common/components/Modal';
 
-// '@assets/icons/right-arrow.svg' import 오류를 해결하기 위해
-// 아이콘을 인라인 SVG 컴포넌트로 정의합니다.
 const RightArrowIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -14,7 +13,23 @@ const RightArrowIcon = () => (
     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
   </svg>
 );
-
+// 임시 댓글 데이터
+const commentList = [
+  {
+    id: 1,
+    user: '홍**',
+    img: 'https://placehold.co/32x32/E8A0BF/333?text=홍',
+    comment: '우와! 성수동에서 북한산까지 가셨군요? 좋아요 누르고 갑니당!!',
+  },
+  { id: 2, user: '문**', img: 'https://placehold.co/32x32/A0E8D5/333?text=문', comment: '리뷰 넘 귀여워용 💕' },
+  {
+    id: 3,
+    user: '마**',
+    img: 'https://placehold.co/32x32/D5A0E8/333?text=마',
+    comment: '저도 성수동 잘 안 가봤는데 코스 참고할게요 ㅎㅎ 감사합니당~!',
+  },
+  { id: 4, user: '김**', img: 'https://placehold.co/32x32/E8D5A0/333?text=김', comment: '좋아요 눌러요~^^' },
+];
 // 임시 사진 데이터 (이 부분은 실제 데이터로 대체하셔야 합니다)
 const photoList = [
   'https://placehold.co/80x80/a9d1a0/333?text=Seoul+1',
@@ -26,6 +41,21 @@ const photoList = [
 ];
 
 const DetailSection = () => {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  const handleDelete = () => {
+    // 삭제 로직 구현
+    console.log('삭제하기');
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleShare = () => {
+    // 공유 로직 구현
+    console.log('공유하기');
+    setIsShareModalOpen(false);
+  };
+
   return (
     // p-4 max-w-md mx-auto 등은 레이아웃 확인을 위한 래퍼입니다.
     // 실제 환경에 맞게 조정하세요.
@@ -92,11 +122,15 @@ const DetailSection = () => {
       </div>
 
       {/* --- 포토 슬라이드 영역 (수정됨) --- */}
-      {/* 'scrollbar-hide' 유틸리티 클래스가 tailwind에 추가되어 있다고 가정합니다. */}
-      <div className="scrollbar-hide mt-4 overflow-x-auto whitespace-nowrap">
+      <div
+        className="hide-scrollbar mt-3 mb-3 overflow-x-auto whitespace-nowrap"
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        }}
+      >
+        <style>{`.hide-scrollbar::-webkit-scrollbar { display: none; }`}</style>
         <div className="flex flex-row gap-2">
-          {' '}
-          {/* 8px gap */}
           {photoList.map((src, index) => (
             <img
               key={index}
@@ -113,7 +147,96 @@ const DetailSection = () => {
         상위 컴포넌트에서 gap으로 관리될 수 있으므로, 
         필요 없다면 제거하셔도 됩니다.
       */}
-      <div className="flex flex-col gap-[20px]"></div>
+      <div className="flex flex-col gap-[20px]">
+        {/* --- 새로 추가된 리뷰 섹션 (이미지 참고) --- */}
+
+        {/* 좋았던 점 */}
+        <div>
+          <h3 className="text-d1 text-iceblue-8">좋았던 점</h3>
+          <div className="mt-2 rounded-lg border border-gray-200 bg-white p-4">
+            <p className="text-b4 text-iceblue-8">
+              입장료가 무료라서 좋다. 그리고 내부 꽃사슴도 볼 수 있고, 멋있는 조형물도 보는 재미가 있다. 평야에서
+              사람들이 돗자리 깔고 여유를 즐기는 모습을 바라보는 풍경도 평화로워!
+            </p>
+          </div>
+        </div>
+
+        {/* 아쉬웠던 점 */}
+        <div>
+          <h3 className="text-d1 text-iceblue-8">아쉬웠던 점</h3>
+          <div className="mt-2 rounded-lg border border-gray-200 bg-white p-4">
+            <p className="text-b4 text-iceblue-8">무료라서 막 엄청 보고 즐길 건 없는 듯?</p>
+          </div>
+        </div>
+      </div>
+      <div className="mt-6 border-t border-gray-200 pt-6">
+        {/* 댓글 헤더 */}
+        <h3 className="text-lg font-semibold text-gray-900">댓글 {commentList.length}개</h3>
+
+        {/* 댓글 입력창 */}
+        <div className="mt-4">
+          <input
+            type="text"
+            placeholder="댓글을 남겨보세요!"
+            className="w-full rounded-lg border border-gray-300 p-4 text-base placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+          />
+        </div>
+
+        {/* 댓글 목록 */}
+        <div className="mt-6 flex flex-col gap-4">
+          {commentList.map(item => (
+            <div key={item.id} className="flex flex-row items-start gap-3">
+              <img
+                src={item.img}
+                alt={`${item.user} profile`}
+                className="h-8 w-8 flex-shrink-0 rounded-full object-cover"
+              />
+              <div className="flex flex-col">
+                <span className="text-sm font-semibold text-gray-800">{item.user}</span>
+                <p className="text-base text-gray-700">{item.comment}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 삭제하기, 공유하기 버튼 */}
+      <div className="mt-[52px] flex gap-2">
+        <button
+          type="button"
+          onClick={() => setIsDeleteModalOpen(true)}
+          className="bg-iceblue-2 text-s5 text-iceblue-7 h-13.5 min-h-13.5 flex-1 cursor-pointer rounded-xl"
+        >
+          삭제하기
+        </button>
+        <button
+          type="button"
+          onClick={() => setIsShareModalOpen(true)}
+          className="bg-pink-6 text-s4 h-13.5 min-h-13.5 flex-1 cursor-pointer rounded-xl text-white"
+        >
+          공유하기
+        </button>
+      </div>
+
+      {/* 삭제하기 모달 */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        mainMessage="정말 삭제하시겠어요?"
+        leftButtonText="취소"
+        leftButtonOnClick={() => setIsDeleteModalOpen(false)}
+        rightButtonText="삭제"
+        rightButtonOnClick={handleDelete}
+      />
+
+      {/* 공유하기 모달 */}
+      <Modal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        mainMessage="공유하기"
+        rightButtonText="확인"
+        rightButtonOnClick={handleShare}
+      />
     </div>
   );
 };

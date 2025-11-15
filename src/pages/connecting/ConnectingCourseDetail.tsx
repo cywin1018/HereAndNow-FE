@@ -4,7 +4,7 @@ import DetailSection from './components/DetailSection';
 
 const ConnectingCourseDetail = () => {
   return (
-    <div className="min-h-screen overflow-hidden">
+    <div className="">
       <PageHeader title="코스 상세" />
       <div className="relative z-0 w-full overflow-hidden rounded-[24px]">
         <KakaoMap latitude={37.566826} longitude={126.9786567} className="h-[292px] w-full" />
