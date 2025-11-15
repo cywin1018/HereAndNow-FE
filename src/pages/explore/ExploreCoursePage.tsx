@@ -27,7 +27,7 @@ const ExploreCoursePage = () => {
             <div
               className="flex h-full flex-1 cursor-pointer items-center justify-between rounded-[44px] bg-white px-4"
               style={{ boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.1)' }}
-              onClick={() => navigate('/archive/1')}
+              onClick={() => navigate('/explore/search')}
             >
               <input
                 type="text"
