@@ -57,7 +57,7 @@ const TabNavigation = ({ activeTab = 'course', onTabChange, onSortChange }: TabN
   const isPlace = selectedTab === 'place';
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex w-full items-center justify-between">
       <div className="flex items-center">
         <button
           onClick={() => handleTabClick('course')}

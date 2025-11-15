@@ -18,6 +18,11 @@ import ConnectingSearchPage from '@pages/connecting/ConnectingSearchPage';
 import ConnectingArchive from '@pages/connecting/ConnectingArchive';
 import ConnectingCourseDetail from '@pages/connecting/ConnectingCourseDetail';
 import ArchiveDetailPage from '@pages/archive/ArchiveDetailPage';
+import ArchivePlacePage from '@pages/archive/ArchivePlacePage';
+import ArchiveSavePage from '@pages/archive/ArchiveSavePage';
+import ExplorePage from '@pages/explore/ExplorePage';
+import ExploreCoursePage from '@pages/explore/ExploreCoursePage';
+import ExploreSearchPage from '@pages/explore/ExploreSearchPage';
 import Mypage from '@pages/mypage/Mypage';
 import SettingPage from '@pages/mypage/SettingPage';
 
@@ -52,9 +57,34 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
           <Route path="/archive/search" element={<ArchiveSearchPage />} />
         </Route>
 
+        {/* 아카이브 저장 페이지 */}
+        <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="저장" />}>
+          <Route path="/archive/save" element={<ArchiveSavePage />} />
+        </Route>
+
         {/* 아카이브 상세 페이지 */}
         <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="아카이빙" />}>
           <Route path="/archive/:id" element={<ArchiveDetailPage />} />
+        </Route>
+
+        {/* 아카이브 상세 페이지 - 장소 */}
+        <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="아카이빙" />}>
+          <Route path="/archive/place/:id" element={<ArchivePlacePage />} />
+        </Route>
+
+        {/* 둘러보기 페이지 */}
+        <Route element={<Layout withHeader={false} withBottomNavigation={true} />}>
+          <Route path="/explore" element={<ExplorePage />} />
+        </Route>
+
+        {/* 둘러보기 - 코스 */}
+        <Route element={<Layout withHeader={false} withBottomNavigation={false} />}>
+          <Route path="/explore/course" element={<ExploreCoursePage />} />
+        </Route>
+
+        {/* 둘러보기 - 검색 */}
+        <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="검색" />}>
+          <Route path="/explore/search" element={<ExploreSearchPage />} />
         </Route>
 
         <Route element={<ProtectedRoute enabled={enableAuthCheck} />}>

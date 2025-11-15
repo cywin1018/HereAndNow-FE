@@ -14,7 +14,6 @@ const ArchivePage = () => {
 
   return (
     <div className="min-h-screen">
-      {/* TODO: overflow-hidden 어디에 넣을지 상의해야함 */}
       <div className="flex w-full flex-col items-center gap-8">
         {/* 날짜 */}
         <div className="bg-iceblue-2 border-iceblue-2 flex items-center justify-center gap-6 rounded-[50px] border border-solid px-10 py-3">
