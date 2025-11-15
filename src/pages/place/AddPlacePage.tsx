@@ -88,7 +88,7 @@ const AddPlacePage = () => {
     setCoordinates({ latitude: 37.566826, longitude: 126.9786567 });
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = (pinIndex: number) => {
     if (!selectedAddress) {
       return;
     }
@@ -98,7 +98,13 @@ const AddPlacePage = () => {
       placeName,
       detailAddress,
       coordinates,
+      pinIndex, // 새로 추가된 핀의 인덱스
     };
+
+    console.log('[AddPlacePage] PlaceDetail로 이동:', {
+      pinIndex,
+      placeName,
+    });
 
     setIsBottomSheetOpen(false);
     navigate(`/place/detail/${encodeURIComponent(selectedAddress.zonecode)}`, {

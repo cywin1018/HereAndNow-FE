@@ -1,12 +1,16 @@
+import { useEffect, useState } from 'react';
 import BottomSheet from '@common/BottomSheet';
 import KakaoMap from '@common/KakaoMap';
 import type { AddressData } from '../types';
+import { useCourseSaveStore } from '@stores/course-save';
+import type { Place, Pin } from '@stores/course-save';
+import useEnsureKakaoMapsReady from '../../../hooks/course/useEnsureKakaoMapsReady';
 
 interface ConfirmAddressBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onReregister: () => void;
-  onConfirm: () => void;
+  onConfirm: (pinIndex: number) => void;
   coordinates: { latitude: number; longitude: number };
   placeName: string;
   address: AddressData | null;
@@ -25,8 +29,161 @@ const ConfirmAddressBottomSheet = ({
   detailAddress,
   onDetailAddressChange,
 }: ConfirmAddressBottomSheetProps) => {
+  const { addPin, courseData } = useCourseSaveStore();
+  const ensureKakaoMapsReady = useEnsureKakaoMapsReady();
+  const [placeDetails, setPlaceDetails] = useState<{
+    category: string;
+    groupCode: string;
+    url: string;
+  } | null>(null);
+
+  // 카카오 맵 API로 장소 정보 검색
+  useEffect(() => {
+    if (!isOpen || !coordinates || !placeName) return;
+
+    ensureKakaoMapsReady()
+      .then(() => {
+        if (!window.kakao?.maps?.services) return;
+
+        const ps = new window.kakao.maps.services.Places();
+
+        // 키워드 검색 콜백
+        const searchCallback = (result: any[], status: any) => {
+          console.log('[ConfirmAddressBottomSheet] 카카오 장소 검색 결과:', {
+            status,
+            resultCount: result?.length,
+            results: result,
+          });
+
+          // 각 검색 결과의 상세 정보 출력
+          if (result && result.length > 0) {
+            console.log('[ConfirmAddressBottomSheet] 검색된 장소 목록:');
+            result.forEach((place, index) => {
+              console.log(`  [${index}] ${place.place_name}:`, {
+                id: place.id,
+                place_name: place.place_name,
+                category_name: place.category_name,
+                category_group_code: place.category_group_code,
+                category_group_name: place.category_group_name,
+                phone: place.phone,
+                address_name: place.address_name,
+                road_address_name: place.road_address_name,
+                place_url: place.place_url,
+                x: place.x, // 경도
+                y: place.y, // 위도
+                distance: place.distance,
+                전체객체: place,
+              });
+            });
+          }
+
+          if (status === window.kakao.maps.services.Status.OK && result.length > 0) {
+            // 좌표와 가장 가까운 장소 찾기
+            const closest = result.reduce((prev, curr) => {
+              const prevDist = Math.sqrt(
+                Math.pow(Number(prev.y) - coordinates.latitude, 2) +
+                  Math.pow(Number(prev.x) - coordinates.longitude, 2),
+              );
+              const currDist = Math.sqrt(
+                Math.pow(Number(curr.y) - coordinates.latitude, 2) +
+                  Math.pow(Number(curr.x) - coordinates.longitude, 2),
+              );
+              return currDist < prevDist ? curr : prev;
+            });
+
+            console.log('[ConfirmAddressBottomSheet] 선택된 장소:', {
+              placeName: closest.place_name,
+              category: closest.category_name,
+              groupCode: closest.category_group_code,
+              url: closest.place_url,
+            });
+
+            setPlaceDetails({
+              category: closest.category_name || '',
+              groupCode: closest.category_group_code || '',
+              url: closest.place_url || '',
+            });
+          } else {
+            console.warn('[ConfirmAddressBottomSheet] 장소 검색 결과 없음');
+            setPlaceDetails({
+              category: '',
+              groupCode: '',
+              url: '',
+            });
+          }
+        };
+
+        // 장소명으로 키워드 검색 (반경 1km 이내)
+        const searchOptions = {
+          location: new window.kakao.maps.LatLng(coordinates.latitude, coordinates.longitude),
+          radius: 1000, // 1km
+        };
+
+        ps.keywordSearch(placeName, searchCallback, searchOptions);
+      })
+      .catch(error => {
+        console.error('[ConfirmAddressBottomSheet] 카카오 맵 API 에러:', error);
+      });
+  }, [isOpen, coordinates, placeName, ensureKakaoMapsReady]);
+
   const handleDetailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onDetailAddressChange(event.target.value);
+  };
+
+  const handleConfirmClick = () => {
+    if (!address || !placeName) {
+      return;
+    }
+
+    // Place 정보 구성
+    const fullStreetAddress = detailAddress ? `${address.address} ${detailAddress}` : address.address;
+    const fullNumberAddress = address.bname
+      ? `서울시 ${address.bname} ${address.zonecode}${detailAddress ? ` ${detailAddress}` : ''}`
+      : '';
+
+    const place: Place = {
+      placeName,
+      placeStreetNameAddress: fullStreetAddress,
+      placeNumberAddress: fullNumberAddress,
+      placeLatitude: coordinates.latitude,
+      placeLongitude: coordinates.longitude,
+      placeGroupCode: placeDetails?.groupCode || '',
+      placeCategory: placeDetails?.category || '',
+      placeUrl: placeDetails?.url || '',
+    };
+
+    console.log('[ConfirmAddressBottomSheet] 생성된 Place 정보:', {
+      place,
+      placeDetails,
+    });
+
+    // 새로 추가될 핀의 인덱스 계산 (addPin 전에 계산해야 함)
+    const newPinIndex = courseData?.pinList?.length || 0;
+    console.log('[ConfirmAddressBottomSheet] 핀 추가 시작:', {
+      newPinIndex,
+      placeName,
+      currentPinListLength: courseData?.pinList?.length,
+    });
+
+    // 임시 Pin 생성 (평점, 설명, 태그는 PlaceDetail에서 입력받을 예정)
+    const pin: Pin = {
+      pinRating: 0,
+      pinPositiveDescription: '',
+      pinNegativeDescription: '',
+      pinTagNames: [],
+      place,
+    };
+
+    // 스토어에 Pin 추가
+    addPin(pin);
+
+    console.log('[ConfirmAddressBottomSheet] 핀 추가 완료:', {
+      newPinIndex,
+      placeName,
+    });
+
+    // onConfirm에 pinIndex 전달
+    onConfirm(newPinIndex);
   };
 
   const roadAddress = address?.address || '';
@@ -82,7 +239,7 @@ const ConfirmAddressBottomSheet = ({
           </button>
           <button
             type="button"
-            onClick={onConfirm}
+            onClick={handleConfirmClick}
             className="bg-pink-6 text-s4 flex-1 rounded-[12px] p-[10px] text-white transition-colors"
           >
             이대로 등록
