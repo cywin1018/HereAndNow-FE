@@ -57,14 +57,9 @@ const DetailSection = () => {
   };
 
   return (
-    // p-4 max-w-md mx-auto 등은 레이아웃 확인을 위한 래퍼입니다.
-    // 실제 환경에 맞게 조정하세요.
     <div className="">
       {/* --- 새로 추가된 헤더 (이미지 참고) --- */}
       <div className="mb-4 flex items-center gap-2">
-        {/* 이미지의 '1' 스타일을 적용합니다. 
-          커스텀 클래스 대신 표준 Tailwind 클래스로 유사하게 만듭니다.
-        */}
         <span className="text-d2 flex h-[20px] w-[20px] items-center justify-center rounded-full bg-pink-500 text-white">
           1
         </span>
@@ -106,15 +101,13 @@ const DetailSection = () => {
             </div>
           </div>
 
-          {/* 자세히 버튼 (flex-col 안에서 mt-auto로 맨 아래로) */}
           <div className="mt-auto">
             <button
               type="button"
               className="flex w-full items-center justify-between rounded-lg bg-gray-100 p-4 transition-colors hover:bg-gray-200"
             >
               <span className="font-medium text-gray-800">자세히</span>
-              {/* 오류를 수정하기 위해 import 대신 인라인 SVG 컴포넌트를 사용합니다.
-               */}
+
               <RightArrowIcon />
             </button>
           </div>
@@ -142,11 +135,6 @@ const DetailSection = () => {
         </div>
       </div>
 
-      {/* 이 div는 DetailSection과 그 다음 섹션 사이의 
-        간격을 조절하는 용도로 보입니다. 
-        상위 컴포넌트에서 gap으로 관리될 수 있으므로, 
-        필요 없다면 제거하셔도 됩니다.
-      */}
       <div className="flex flex-col gap-[20px]">
         {/* --- 새로 추가된 리뷰 섹션 (이미지 참고) --- */}
 
