@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Modal from '@common/components/Modal';
+import ReviewSection from './ReviewSection';
 
 const RightArrowIcon = () => (
   <svg
@@ -136,26 +137,11 @@ const DetailSection = () => {
       </div>
 
       <div className="flex flex-col gap-[20px]">
-        {/* --- 새로 추가된 리뷰 섹션 (이미지 참고) --- */}
-
-        {/* 좋았던 점 */}
-        <div>
-          <h3 className="text-d1 text-iceblue-8">좋았던 점</h3>
-          <div className="mt-2 rounded-lg border border-gray-200 bg-white p-4">
-            <p className="text-b4 text-iceblue-8">
-              입장료가 무료라서 좋다. 그리고 내부 꽃사슴도 볼 수 있고, 멋있는 조형물도 보는 재미가 있다. 평야에서
-              사람들이 돗자리 깔고 여유를 즐기는 모습을 바라보는 풍경도 평화로워!
-            </p>
-          </div>
-        </div>
-
-        {/* 아쉬웠던 점 */}
-        <div>
-          <h3 className="text-d1 text-iceblue-8">아쉬웠던 점</h3>
-          <div className="mt-2 rounded-lg border border-gray-200 bg-white p-4">
-            <p className="text-b4 text-iceblue-8">무료라서 막 엄청 보고 즐길 건 없는 듯?</p>
-          </div>
-        </div>
+        <ReviewSection
+          title="좋았던 점"
+          content="입장료가 무료라서 좋다. 그리고 내부 꽃사슴도 볼 수 있고, 멋있는 조형물도 보는 재미가 있다. 평야에서 사람들이 돗자리 깔고 여유를 즐기는 모습을 바라보는 풍경도 평화로워!"
+        />
+        <ReviewSection title="아쉬웠던 점" content="무료라서 막 엄청 보고 즐길 건 없는 듯?" />
       </div>
       <div className="mt-6 border-t border-gray-200 pt-6">
         {/* 댓글 헤더 */}
