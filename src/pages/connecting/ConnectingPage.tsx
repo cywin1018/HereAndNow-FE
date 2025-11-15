@@ -5,12 +5,17 @@ import ChoiNowIcon from '@assets/icons/choi_now.svg';
 import { useNavigate } from 'react-router-dom';
 import CardSlider from './components/CardSlider';
 import ConnectingCard from './components/ConnectingCard';
+import useGetCoupleInfo from '@apis/connecting/useGetCoupleInfo';
+import useGetCoupleBanner from '@apis/connecting/useGetCoupleBanner';
 
 const ConnectingPage = () => {
   const navigate = useNavigate();
   const handleDotsClick = () => {
     navigate('/connecting/profile-modify');
   };
+  const { data: coupleInfo } = useGetCoupleInfo();
+  const { data: coupleBanner } = useGetCoupleBanner({ page: 0, size: 10 });
+
   return (
     <div className="relative w-full pb-[150px]">
       <div className="relative h-[120px] w-full">
@@ -23,13 +28,17 @@ const ConnectingPage = () => {
           <div className="bg-neutral-1 flex h-8 w-8 items-center justify-center rounded-lg">
             <img src={LoveIcon} alt="커플 사랑 지수" className="h-5 w-5" />
           </div>
-          <span className="text-b5 text-neutral-8">???일</span>
+          <span className="text-b5 text-neutral-8">
+            {coupleInfo?.data?.datingDate !== undefined ? coupleInfo.data.datingDate : '???'}일
+          </span>
         </div>
 
         <div className="absolute top-5 right-5 z-10 flex items-center gap-0">
           <div className="text-b4 flex flex-col items-end text-right text-white">
             <span>우리가 함께한</span>
-            <span>0개의 장소, 0개의 코스</span>
+            <span>
+              {coupleInfo?.data?.placeWithCount ?? 0}개의 장소, {coupleInfo?.data?.courseWithCount ?? 0}개의 코스
+            </span>
           </div>
           <button type="button" className="flex items-center justify-start" aria-label="옵션">
             <img src={DotsIcon} alt="더보기" className="h-5 w-5 cursor-pointer" onClick={handleDotsClick} />
@@ -45,17 +54,25 @@ const ConnectingPage = () => {
         <div className="flex flex-col items-center gap-4">
           <div className="relative h-[72px] w-[72px]">
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 via-white/10 to-transparent blur-lg" />
-            <img src={KimHereIcon} alt="김히어" className="relative z-10 h-[72px] w-[72px]" />
+            <img
+              src={coupleInfo?.data?.member1ImageUrl || KimHereIcon}
+              alt={coupleInfo?.data?.member1Name || '사용자 1'}
+              className="relative z-10 h-[72px] w-[72px] rounded-full object-cover"
+            />
           </div>
-          <span className="text-s4 text-neutral-6 font-semibold">김히어</span>
+          <span className="text-s4 text-neutral-6 font-semibold">{coupleInfo?.data?.member1Name || '???'}</span>
         </div>
 
         <div className="flex flex-col items-center gap-4">
           <div className="relative h-[72px] w-[72px]">
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 via-white/10 to-transparent blur-lg" />
-            <img src={ChoiNowIcon} alt="??? 사용자" className="relative z-10 h-[72px] w-[72px]" />
+            <img
+              src={coupleInfo?.data?.member2ImageUrl || ChoiNowIcon}
+              alt={coupleInfo?.data?.member2Name || '사용자 2'}
+              className="relative z-10 h-[72px] w-[72px] rounded-full object-cover"
+            />
           </div>
-          <span className="text-s4 text-neutral-6 font-semibold">???</span>
+          <span className="text-s4 text-neutral-6 font-semibold">{coupleInfo?.data?.member2Name || '???'}</span>
         </div>
       </div>
       <CardSlider
