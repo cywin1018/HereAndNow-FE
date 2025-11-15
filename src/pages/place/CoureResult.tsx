@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import PageHeader from '@common/layout/PageHeader';
 import clappingHandsImage from '@assets/images/clapping-hands.png';
 import { useNavigate } from 'react-router-dom';
 

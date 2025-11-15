@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DaumPostcode from 'react-daum-postcode';
 import PageHeader from '@common/layout/PageHeader';
-import useEnsureKakaoMapsReady from '../../course/hooks/useEnsureKakaoMapsReady';
+import useEnsureKakaoMapsReady from '../../hooks/course/useEnsureKakaoMapsReady';
 import ConfirmAddressBottomSheet from './components/ConfirmAddressBottomSheet';
 import type { AddressData } from './types';
 
