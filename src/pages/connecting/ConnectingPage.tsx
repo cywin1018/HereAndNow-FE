@@ -4,6 +4,7 @@ import KimHereIcon from '@assets/icons/kim_here.svg';
 import ChoiNowIcon from '@assets/icons/choi_now.svg';
 import { useNavigate } from 'react-router-dom';
 import CardSlider from './components/CardSlider';
+import ConnectingCard from './components/ConnectingCard';
 
 const ConnectingPage = () => {
   const navigate = useNavigate();
@@ -57,7 +58,34 @@ const ConnectingPage = () => {
           <span className="text-s4 text-neutral-6 font-semibold">???</span>
         </div>
       </div>
-      <CardSlider cards={[<div>1</div>, <div>2</div>, <div>3</div>]} />
+      <CardSlider
+        cards={[
+          <ConnectingCard
+            key="card-1"
+            date="2025.11.05"
+            placeCount={4}
+            title="우리의 첫 도쿄"
+            description="엔화 미리 환전할 걸 까먹고 공항에서 했는데 미리..."
+            backgroundClassName="bg-gradient-to-br from-blue-400 to-purple-500"
+          />,
+          <ConnectingCard
+            key="card-2"
+            date="2025.11.03"
+            placeCount={3}
+            title="서울 한강 나들이"
+            description="날씨가 좋아서 한강에서 피크닉을 즐겼어요"
+            backgroundClassName="bg-gradient-to-br from-pink-400 to-orange-500"
+          />,
+          <ConnectingCard
+            key="card-3"
+            date="2025.11.01"
+            placeCount={5}
+            title="부산 여행"
+            description="해운대에서 일출을 보며 시작한 하루"
+            backgroundClassName="bg-gradient-to-br from-cyan-400 to-blue-500"
+          />,
+        ]}
+      />
     </div>
   );
 };
