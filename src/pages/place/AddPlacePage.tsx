@@ -30,7 +30,6 @@ const AddPlacePage = () => {
     latitude: 37.566826,
     longitude: 126.9786567,
   });
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<KakaoPlace[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -84,7 +83,6 @@ const AddPlacePage = () => {
       latitude: Number(place.y),
       longitude: Number(place.x),
     });
-    setIsSearchModalOpen(false);
     setIsBottomSheetOpen(true);
   };
 
@@ -130,102 +128,93 @@ const AddPlacePage = () => {
     <div className="flex w-full flex-col">
       <PageHeader title="장소 추가" />
 
-      <main className="flex flex-col gap-4 py-2">
-        <div className="flex flex-col gap-2">
-          <h2 className="text-s5 text-neutral-8">장소 검색</h2>
-          <button
-            type="button"
-            onClick={() => setIsSearchModalOpen(true)}
-            className="text-d1 text-neutral-8 border-neutral-4 hover:bg-neutral-2 w-full rounded-lg border bg-white px-4 py-3 text-left transition-colors"
-          >
-            {selectedAddress?.fullAddress || '장소를 검색하세요'}
-          </button>
-        </div>
+      <main className="flex flex-col gap-6 px-5 py-6">
+        <section className="flex flex-col gap-3">
+          <h2 className="text-h4 text-neutral-10">주소 검색</h2>
+          <div className="relative flex items-center">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  handleSearch();
+                }
+              }}
+              placeholder="상호명, 주소로 장소를 검색하세요"
+              className="text-b3 placeholder:text-iceblue-6 text-iceblue-8 border-iceblue-3/60 focus:border-pink-6 h-[52px] w-full rounded-[18px] border bg-white px-5 pr-12 shadow-[0_8px_18px_rgba(24,44,70,0.04)] transition-colors outline-none"
+            />
+            <button
+              type="button"
+              onClick={handleSearch}
+              disabled={isSearching}
+              className="absolute right-4 flex h-8 w-8 items-center justify-center"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-iceblue-6">
+                <path
+                  d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </section>
+
+        {/* 검색 결과 */}
+        {isSearching && <div className="text-iceblue-6 text-b3 flex items-center justify-center py-8">검색 중...</div>}
+
+        {!isSearching && searchResults.length > 0 && (
+          <section className="flex flex-col gap-4">
+            <h3 className="text-d1 text-iceblue-8">
+              연관 검색 주소 <span className="text-pink-6">{searchResults.length}</span>
+            </h3>
+            <div className="flex flex-col gap-3">
+              {searchResults.map((place, index) => (
+                <button
+                  key={place.id}
+                  type="button"
+                  onClick={() => handlePlaceSelect(place)}
+                  className="border-iceblue-2 hover:bg-iceblue-1/30 flex flex-col gap-2 border-b pb-4 text-left transition-colors"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="text-d1 text-iceblue-8 mb-1 font-semibold">연관 검색 주소 신주소 {index + 1}</div>
+                      <div className="text-b3 text-iceblue-7 mb-1">{place.place_name}</div>
+                      <div className="text-b4 text-iceblue-6">{place.road_address_name || place.address_name}</div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
         {selectedAddress && !isBottomSheetOpen && (
-          <button
-            type="button"
-            onClick={() => setIsBottomSheetOpen(true)}
-            className="border-neutral-4 hover:bg-neutral-2 flex w-full flex-col gap-2 rounded-lg border bg-white p-4 text-left transition-colors"
-          >
-            <h3 className="text-s6 text-neutral-8">선택된 장소</h3>
-            <div className="flex flex-col gap-1">
-              <div className="text-d1 text-neutral-8">
-                <span className="text-d2 text-neutral-5">장소명: </span>
+          <section className="border-iceblue-3 mt-4 rounded-[18px] border bg-white p-5 shadow-[0_8px_18px_rgba(24,44,70,0.04)]">
+            <h3 className="text-d1 text-iceblue-8 mb-3">선택된 장소</h3>
+            <div className="flex flex-col gap-2">
+              <div className="text-b3 text-iceblue-8">
+                <span className="text-iceblue-6">장소명: </span>
                 {placeName}
               </div>
-              <div className="text-d1 text-neutral-8">
-                <span className="text-d2 text-neutral-5">주소: </span>
+              <div className="text-b3 text-iceblue-8">
+                <span className="text-iceblue-6">주소: </span>
                 {selectedAddress.fullAddress}
               </div>
             </div>
-          </button>
+            <button
+              type="button"
+              onClick={() => setIsBottomSheetOpen(true)}
+              className="bg-pink-6 hover:bg-pink-7 text-d1 mt-4 w-full rounded-[12px] py-3 text-white transition-colors"
+            >
+              이 장소로 등록하기
+            </button>
+          </section>
         )}
       </main>
-
-      {isSearchModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="flex max-h-[80vh] w-full max-w-[500px] flex-col rounded-2xl bg-white p-5 shadow-lg">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-s4 text-neutral-8">장소 검색</h2>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSearchModalOpen(false);
-                  setSearchQuery('');
-                  setSearchResults([]);
-                }}
-                className="text-d1 text-neutral-6 hover:text-neutral-8"
-              >
-                닫기
-              </button>
-            </div>
-
-            <div className="mb-4 flex gap-2">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                onKeyPress={e => e.key === 'Enter' && handleSearch()}
-                placeholder="장소명을 입력하세요"
-                className="border-neutral-4 focus:border-pink-6 flex-1 rounded-lg border bg-white px-4 py-3 outline-none"
-              />
-              <button
-                type="button"
-                onClick={handleSearch}
-                disabled={isSearching}
-                className="bg-pink-6 hover:bg-pink-7 disabled:bg-neutral-4 rounded-lg px-6 py-3 text-white"
-              >
-                {isSearching ? '검색중...' : '검색'}
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto">
-              {searchResults.length > 0 ? (
-                <div className="flex flex-col gap-2">
-                  {searchResults.map(place => (
-                    <button
-                      key={place.id}
-                      type="button"
-                      onClick={() => handlePlaceSelect(place)}
-                      className="border-neutral-3 hover:bg-neutral-1 flex flex-col gap-1 rounded-lg border bg-white p-4 text-left transition-colors"
-                    >
-                      <div className="text-d1 text-neutral-8 font-semibold">{place.place_name}</div>
-                      <div className="text-b4 text-neutral-6">{place.category_name}</div>
-                      <div className="text-b4 text-neutral-6">{place.road_address_name || place.address_name}</div>
-                      {place.phone && <div className="text-b4 text-neutral-6">{place.phone}</div>}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-neutral-6 flex h-40 items-center justify-center">
-                  {isSearching ? '검색 중...' : '장소를 검색해주세요'}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       <ConfirmAddressBottomSheet
         isOpen={isBottomSheetOpen}
