@@ -1,18 +1,24 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DaumPostcode from 'react-daum-postcode';
+import axios from 'axios';
 import PageHeader from '@common/layout/PageHeader';
-import useEnsureKakaoMapsReady from '../../hooks/course/useEnsureKakaoMapsReady';
 import ConfirmAddressBottomSheet from './components/ConfirmAddressBottomSheet';
 import type { AddressData } from './types';
 
-type AddressSearchResultItem = {
-  x: string;
-  y: string;
-  [key: string]: unknown;
-};
-
-type AddressSearchStatus = 'OK' | 'ZERO_RESULT' | 'ERROR';
+interface KakaoPlace {
+  id: string;
+  place_name: string;
+  category_name: string;
+  category_group_code: string;
+  category_group_name: string;
+  phone: string;
+  address_name: string;
+  road_address_name: string;
+  place_url: string;
+  x: string; // 경도
+  y: string; // 위도
+  distance: string;
+}
 
 const AddPlacePage = () => {
   const navigate = useNavigate();
@@ -24,56 +30,62 @@ const AddPlacePage = () => {
     latitude: 37.566826,
     longitude: 126.9786567,
   });
-  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-  const ensureKakaoMapsReady = useEnsureKakaoMapsReady();
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<KakaoPlace[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
-  const handleAddressComplete = (data: any) => {
-    let fullAddress = data.address;
-    let extraAddress = '';
-
-    if (data.addressType === 'R') {
-      if (data.bname !== '') {
-        extraAddress += data.bname;
-      }
-      if (data.buildingName !== '') {
-        extraAddress += extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName;
-      }
-      fullAddress += extraAddress !== '' ? ` (${extraAddress})` : '';
+  // 카카오 로컬 검색 API 호출
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      alert('검색어를 입력해주세요');
+      return;
     }
 
+    setIsSearching(true);
+    try {
+      const response = await axios.get('https://dapi.kakao.com/v2/local/search/keyword.json', {
+        params: {
+          query: searchQuery,
+          size: 15, // 최대 15개
+        },
+        headers: {
+          Authorization: `KakaoAK ${import.meta.env.VITE_KAKAO_RESTAPI_KEY}`,
+        },
+      });
+
+      console.log('[AddPlacePage] 검색 결과:', response.data);
+      setSearchResults(response.data.documents || []);
+    } catch (error) {
+      console.error('[AddPlacePage] 검색 실패:', error);
+      alert('장소 검색에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // 장소 선택
+  const handlePlaceSelect = (place: KakaoPlace) => {
+    console.log('[AddPlacePage] 선택된 장소:', place);
+
+    // AddressData 형식으로 변환
     const formattedData: AddressData = {
-      zonecode: data.zonecode,
-      address: data.address,
-      addressType: data.addressType,
-      bname: data.bname,
-      buildingName: data.buildingName,
-      fullAddress,
+      zonecode: '', // 카카오 검색에서는 우편번호 정보 없음
+      address: place.address_name,
+      addressType: 'R',
+      bname: place.address_name.split(' ')[2] || '', // 대략적인 동네 이름
+      buildingName: place.place_name,
+      fullAddress: place.road_address_name || place.address_name,
     };
 
     setSelectedAddress(formattedData);
-    setPlaceName(data.buildingName || data.address);
-    setIsAddressModalOpen(false);
+    setPlaceName(place.place_name);
+    setCoordinates({
+      latitude: Number(place.y),
+      longitude: Number(place.x),
+    });
+    setIsSearchModalOpen(false);
     setIsBottomSheetOpen(true);
-
-    ensureKakaoMapsReady()
-      .then(() => {
-        if (!window.kakao?.maps?.services) {
-          return;
-        }
-        const geocoder = new window.kakao.maps.services.Geocoder();
-        geocoder.addressSearch(
-          formattedData.fullAddress,
-          (result: AddressSearchResultItem[], status: AddressSearchStatus) => {
-            if (status === 'OK' && result[0]) {
-              const { x, y } = result[0];
-              setCoordinates({ latitude: Number(y), longitude: Number(x) });
-            } else {
-              console.warn('[AddPlacePage] 지오코딩 실패:', status);
-            }
-          },
-        );
-      })
-      .catch(() => {});
   };
 
   const handleCloseBottomSheet = () => {
@@ -85,6 +97,8 @@ const AddPlacePage = () => {
     setSelectedAddress(null);
     setPlaceName('');
     setDetailAddress('');
+    setSearchQuery('');
+    setSearchResults([]);
     setCoordinates({ latitude: 37.566826, longitude: 126.9786567 });
   };
 
@@ -118,13 +132,13 @@ const AddPlacePage = () => {
 
       <main className="flex flex-col gap-4 py-2">
         <div className="flex flex-col gap-2">
-          <h2 className="text-s5 text-neutral-8">주소 검색</h2>
+          <h2 className="text-s5 text-neutral-8">장소 검색</h2>
           <button
             type="button"
-            onClick={() => setIsAddressModalOpen(true)}
+            onClick={() => setIsSearchModalOpen(true)}
             className="text-d1 text-neutral-8 border-neutral-4 hover:bg-neutral-2 w-full rounded-lg border bg-white px-4 py-3 text-left transition-colors"
           >
-            {selectedAddress?.fullAddress || '주소를 검색하세요'}
+            {selectedAddress?.fullAddress || '장소를 검색하세요'}
           </button>
         </div>
 
@@ -134,11 +148,11 @@ const AddPlacePage = () => {
             onClick={() => setIsBottomSheetOpen(true)}
             className="border-neutral-4 hover:bg-neutral-2 flex w-full flex-col gap-2 rounded-lg border bg-white p-4 text-left transition-colors"
           >
-            <h3 className="text-s6 text-neutral-8">검색 결과</h3>
+            <h3 className="text-s6 text-neutral-8">선택된 장소</h3>
             <div className="flex flex-col gap-1">
               <div className="text-d1 text-neutral-8">
-                <span className="text-d2 text-neutral-5">우편번호: </span>
-                {selectedAddress.zonecode}
+                <span className="text-d2 text-neutral-5">장소명: </span>
+                {placeName}
               </div>
               <div className="text-d1 text-neutral-8">
                 <span className="text-d2 text-neutral-5">주소: </span>
@@ -149,25 +163,65 @@ const AddPlacePage = () => {
         )}
       </main>
 
-      {isAddressModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-[402px] rounded-2xl bg-white p-5 shadow-lg">
+      {isSearchModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="flex max-h-[80vh] w-full max-w-[500px] flex-col rounded-2xl bg-white p-5 shadow-lg">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-s4 text-neutral-8">주소 검색</h2>
+              <h2 className="text-s4 text-neutral-8">장소 검색</h2>
               <button
                 type="button"
-                onClick={() => setIsAddressModalOpen(false)}
+                onClick={() => {
+                  setIsSearchModalOpen(false);
+                  setSearchQuery('');
+                  setSearchResults([]);
+                }}
                 className="text-d1 text-neutral-6 hover:text-neutral-8"
               >
                 닫기
               </button>
             </div>
-            <div className="border-neutral-4 overflow-hidden rounded-xl border">
-              <DaumPostcode
-                onComplete={handleAddressComplete}
-                onClose={() => setIsAddressModalOpen(false)}
-                autoClose={false}
+
+            <div className="mb-4 flex gap-2">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onKeyPress={e => e.key === 'Enter' && handleSearch()}
+                placeholder="장소명을 입력하세요"
+                className="border-neutral-4 focus:border-pink-6 flex-1 rounded-lg border bg-white px-4 py-3 outline-none"
               />
+              <button
+                type="button"
+                onClick={handleSearch}
+                disabled={isSearching}
+                className="bg-pink-6 hover:bg-pink-7 disabled:bg-neutral-4 rounded-lg px-6 py-3 text-white"
+              >
+                {isSearching ? '검색중...' : '검색'}
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              {searchResults.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  {searchResults.map(place => (
+                    <button
+                      key={place.id}
+                      type="button"
+                      onClick={() => handlePlaceSelect(place)}
+                      className="border-neutral-3 hover:bg-neutral-1 flex flex-col gap-1 rounded-lg border bg-white p-4 text-left transition-colors"
+                    >
+                      <div className="text-d1 text-neutral-8 font-semibold">{place.place_name}</div>
+                      <div className="text-b4 text-neutral-6">{place.category_name}</div>
+                      <div className="text-b4 text-neutral-6">{place.road_address_name || place.address_name}</div>
+                      {place.phone && <div className="text-b4 text-neutral-6">{place.phone}</div>}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-neutral-6 flex h-40 items-center justify-center">
+                  {isSearching ? '검색 중...' : '장소를 검색해주세요'}
+                </div>
+              )}
             </div>
           </div>
         </div>
