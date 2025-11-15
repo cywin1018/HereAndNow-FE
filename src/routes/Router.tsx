@@ -61,6 +61,8 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/archive" element={<ArchivePage />} />
+          </Route>
+          <Route element={<Layout withBottomNavigation={false} />}>
             <Route path="/connecting" element={<ConnectingPage />} />
           </Route>
         </Route>
