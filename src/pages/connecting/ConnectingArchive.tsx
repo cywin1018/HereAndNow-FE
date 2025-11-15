@@ -1,4 +1,4 @@
-import bigPinkFolder from '@assets/images/bigPinkFolder.png';
+import bigPinkFolder from '@assets/images/BigPinkFolder.png';
 import filterSearchIcon from '@assets/icons/filter_search.svg';
 import filterCancelIcon from '@assets/icons/filter_cancel.svg';
 import smallPinkFolder from '@assets/images/smallPinkFolder.png';
