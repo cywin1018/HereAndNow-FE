@@ -9,6 +9,7 @@ interface PlaceCardProps {
   rating: number;
   reviewCount: number;
   hasSaveButton?: boolean;
+  onSaveButtonClick?: () => void;
 }
 
 const PlaceCard = ({
@@ -20,6 +21,7 @@ const PlaceCard = ({
   rating,
   reviewCount,
   hasSaveButton = false,
+  onSaveButtonClick,
 }: PlaceCardProps) => {
   const renderStars = (rating: number) => {
     const stars = [];
@@ -76,7 +78,10 @@ const PlaceCard = ({
 
       {hasSaveButton && (
         <div className="flex w-full justify-end">
-          <button className="bg-iceblue-2 text-s5 text-iceblue-7 flex h-13.5 w-[98px] cursor-pointer items-center justify-center rounded-[12px]">
+          <button
+            className="bg-iceblue-2 text-s5 text-iceblue-7 flex h-13.5 w-[98px] cursor-pointer items-center justify-center rounded-[12px]"
+            onClick={onSaveButtonClick}
+          >
             저장
           </button>
         </div>
