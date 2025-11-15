@@ -14,6 +14,7 @@ import CourseSubmit from '@pages/place/CourseSubmit';
 import CourseResult from '@pages/place/CoureResult';
 import ArchiveDetailPage from '@pages/archive/ArchiveDetailPage';
 import ArchivePlacePage from '@pages/archive/ArchivePlacePage';
+import ArchiveSavePage from '@pages/archive/ArchiveSavePage';
 import ExplorePage from '@pages/explore/ExplorePage';
 import ExploreCoursePage from '@pages/explore/ExploreCoursePage';
 import ExploreSearchPage from '@pages/explore/ExploreSearchPage';
@@ -41,6 +42,11 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
         {/* 아카이브 검색 페이지 */}
         <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="검색" />}>
           <Route path="/archive/search" element={<ArchiveSearchPage />} />
+        </Route>
+
+        {/* 아카이브 저장 페이지 */}
+        <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="저장" />}>
+          <Route path="/archive/save" element={<ArchiveSavePage />} />
         </Route>
 
         {/* 아카이브 상세 페이지 */}
