@@ -41,22 +41,6 @@ const CardSlider = ({ cards }: CardSliderProps) => {
 
   const visibleCards = getVisibleCards();
 
-  const getCardColor = (index: number) => {
-    const colorPalette = [
-      { bg: 'bg-pink-50', border: 'border-pink-200' },
-      { bg: 'bg-blue-50', border: 'border-blue-200' },
-      { bg: 'bg-purple-50', border: 'border-purple-200' },
-      { bg: 'bg-green-50', border: 'border-green-200' },
-      { bg: 'bg-yellow-50', border: 'border-yellow-200' },
-      { bg: 'bg-orange-50', border: 'border-orange-200' },
-      { bg: 'bg-red-50', border: 'border-red-200' },
-      { bg: 'bg-indigo-50', border: 'border-indigo-200' },
-      { bg: 'bg-teal-50', border: 'border-teal-200' },
-      { bg: 'bg-cyan-50', border: 'border-cyan-200' },
-    ];
-    return colorPalette[index % colorPalette.length];
-  };
-
   return (
     <div className="relative h-[600px] w-full overflow-hidden">
       {visibleCards.map(({ index, position }) => {
@@ -65,14 +49,14 @@ const CardSlider = ({ cards }: CardSliderProps) => {
         const baseX = 0;
         const zIndex = 3 - position;
         const opacity = position === 0 ? 1 : position === 1 ? 0.85 : 0.7;
+        const blur = position * 2; // 뒤로 갈수록 블러 증가 (0px, 2px, 4px)
         const isDraggable = position === 0;
-        const cardColor = getCardColor(index);
 
         return (
           <motion.div
             key={`card-${index}-${position}`}
             layoutId={`card-${index}`}
-            className={`${cardColor.bg} ${cardColor.border} absolute top-[60%] left-1/2 h-[350px] w-[360px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[20px] border-2`}
+            className={`absolute top-[60%] left-1/2 h-[350px] w-[360px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[20px]`}
             style={{
               scale,
               y,
@@ -80,6 +64,7 @@ const CardSlider = ({ cards }: CardSliderProps) => {
               zIndex,
               opacity: isDraggable && isDragging ? opacityWhileDrag : opacity,
               rotate: isDraggable ? rotate : 0,
+              filter: `blur(${blur}px)`,
             }}
             drag={isDraggable ? 'x' : false}
             dragConstraints={{ left: -200, right: 200 }}

@@ -9,7 +9,7 @@ const ConnectingArchive = () => {
   const navigate = useNavigate();
 
   const handleSearchClick = () => {
-    navigate('/connecting/search');
+    navigate('/connecting/course/detail');
   };
 
   return (

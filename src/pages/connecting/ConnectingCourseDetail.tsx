@@ -1,16 +1,11 @@
 import PageHeader from '@common/layout/PageHeader';
 import KakaoMap from '@common/KakaoMap';
-import TagSelector from '@common/components/TagSelector';
-import LabeledTextarea from '@common/components/LabeledTextarea';
-import BottomActionButton from '@common/button/BottomActionButton';
-import { useNavigate } from 'react-router-dom';
+import DetailSection from './components/DetailSection';
 
 const ConnectingCourseDetail = () => {
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen overflow-hidden px-5">
-      <PageHeader title="커넥팅 코스 상세" />
+    <div className="">
+      <PageHeader title="코스 상세" />
       <div className="relative z-0 w-full overflow-hidden rounded-[24px]">
         <KakaoMap latitude={37.566826} longitude={126.9786567} className="h-[292px] w-full" />
 
@@ -22,81 +17,50 @@ const ConnectingCourseDetail = () => {
           </div>
         </div>
       </div>
-      <div className="mt-8 flex flex-col gap-[32px]">
-        <div className="flex flex-col gap-[8px]">
-          <label className="text-d1 text-iceblue-8">
-            분위기는 어땠나요?
-            <span className="text-red-6 ml-1">•</span>
-          </label>
-          <TagSelector
-            options={[
-              '사진 찍기 좋아요',
-              '분위기 맛집',
-              '뷰가 좋아요',
-              '특별한 날 오기 좋아요',
-              '야경이 예뻐요',
-              '이색 데이트',
-              '건물이 멋져요',
-              '로맨틱해요',
-              '기념일에 오기 좋아요',
-              '감성 숙소',
-            ]}
-            maxSelected={5}
-          />
+      <div className="flex w-93 flex-col gap-4 py-[32px]">
+        <div className="flex flex-col gap-2">
+          <img src="/public/dummy_course_detail.png" alt="코스 상세" className="h-full w-full object-cover" />
         </div>
-        <div className="flex flex-col gap-[8px]">
-          <label className="text-d1 text-iceblue-8">
-            시설은 어떠셨나요?
-            <span className="text-red-6 ml-1">•</span>
-          </label>
-          <TagSelector
-            options={[
-              '시설이 깨끗해요',
-              '분위기 맛집',
-              '뷰가 좋아요',
-              '특별한 날 오기 좋아요',
-              '야경이 예뻐요',
-              '이색 데이트',
-              '건물이 멋져요',
-              '로맨틱해요',
-              '기념일에 오기 좋아요',
-              '감성 숙소',
-            ]}
-            maxSelected={5}
-            selectedOptionClassName="bg-blue-6 text-white"
-            optionContainerBgClassName="bg-blue-1"
-          />
+        <span className="text-h5 text-neutral-10">우리의 첫 도쿄</span>
+
+        <span className="text-b4 text-iceblue-8">
+          엔화 미리 환전할 걸 까먹고 공항에서 했는데 미리 하는게 훨씬 낫다는 걸 이제 알았다..괜찮아 배워가는겨
+        </span>
+
+        {/* TODO: 컴포넌트로 분리 */}
+        <div className="flex items-center gap-3 overflow-x-visible">
+          <div
+            className="bg-purple-2 text-purple-8 text-b4 flex h-9 items-center justify-center rounded-sm px-2.5 whitespace-nowrap"
+            style={{ boxShadow: '0px 4px 8px 0px #0000000F' }}
+          >
+            사진 찍기 좋아요
+          </div>
+          <div
+            className="bg-orange-2 text-orange-8 text-b4 flex h-9 items-center justify-center rounded-sm px-2.5 whitespace-nowrap"
+            style={{ boxShadow: '0px 4px 8px 0px #0000000F' }}
+          >
+            음식이 맛있어요
+          </div>
+          <div
+            className="bg-blue-2 text-blue-8 text-b4 flex h-9 items-center justify-center rounded-sm px-2.5 whitespace-nowrap"
+            style={{ boxShadow: '0px 4px 8px 0px #0000000F' }}
+          >
+            시설이 깨끗해요
+          </div>
+          <div
+            className="bg-blue-2 text-blue-8 text-b4 flex h-9 items-center justify-center rounded-sm px-2.5 whitespace-nowrap"
+            style={{ boxShadow: '0px 4px 8px 0px #0000000F' }}
+          >
+            시설이 깨끗해요
+          </div>
+          <div
+            className="bg-blue-2 text-blue-8 text-b4 flex h-9 items-center justify-center rounded-sm px-2.5 whitespace-nowrap"
+            style={{ boxShadow: '0px 4px 8px 0px #0000000F' }}
+          >
+            시설이 깨끗해요
+          </div>
         </div>
-        <div className="flex flex-col gap-[8px]">
-          <label className="text-d1 text-iceblue-8">
-            기타 사항
-            <span className="text-red-6 ml-1">•</span>
-          </label>
-          <TagSelector
-            options={[
-              '친절해요',
-              '분위기 맛집',
-              '뷰가 좋아요',
-              '특별한 날 오기 좋아요',
-              '야경이 예뻐요',
-              '이색 데이트',
-              '건물이 멋져요',
-              '로맨틱해요',
-              '기념일에 오기 좋아요',
-              '감성 숙소',
-            ]}
-            maxSelected={5}
-            selectedOptionClassName="bg-green-6 text-white"
-            optionContainerBgClassName="bg-green-1"
-          />
-        </div>
-        <LabeledTextarea label="어떤 점이 좋았나요?" required maxLength={100} />
-        <LabeledTextarea label="어떤 점이 아쉬웠나요?" required maxLength={100} />
-      </div>{' '}
-      <div className="pt-[80px]">
-        <BottomActionButton type="button" onClick={() => navigate('/place/register')}>
-          세부설명 저장
-        </BottomActionButton>
+        <DetailSection />
       </div>
     </div>
   );
