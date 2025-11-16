@@ -1,4 +1,5 @@
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import StarRatingFilter from '@common/components/StarRatingFilter';
 import PhotoUploader from '@common/components/PhotoUploader';
 import TagSelector from '@common/components/TagSelector';
@@ -6,9 +7,44 @@ import LabeledTextarea from '@common/components/LabeledTextarea';
 import PageHeader from '@common/layout/PageHeader';
 import PlaceCard from '@pages/home/components/PlaceCard';
 import BottomActionButton from '@common/button/BottomActionButton';
+import { useCourseSaveStore } from '@stores/course-save';
 
 const PlaceDetail = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { setPinFiles, pinFiles } = useCourseSaveStore();
+
+  // location.state에서 pinIndex 가져오기 (없으면 새 핀 추가 시 -1)
+  console.log('[PlaceDetail] location.state 확인:', {
+    state: location.state,
+    pinIndex: (location.state as { pinIndex?: number })?.pinIndex,
+    hasState: !!location.state,
+  });
+  const pinIndex = (location.state as { pinIndex?: number })?.pinIndex ?? -1;
+  console.log('[PlaceDetail] 최종 pinIndex:', pinIndex);
+
+  // 현재 핀의 파일 목록 관리
+  const [currentFiles, setCurrentFiles] = useState<File[]>(() => {
+    if (pinIndex >= 0) {
+      return pinFiles[pinIndex] || [];
+    }
+    return [];
+  });
+
+  // 파일이 변경되면 스토어에 저장
+  useEffect(() => {
+    if (pinIndex >= 0) {
+      console.log(`[PlaceDetail] 파일 변경 감지 - 핀 ${pinIndex}:`, {
+        fileCount: currentFiles.length,
+        fileNames: currentFiles.map(f => f.name),
+        pinIndex,
+      });
+      setPinFiles(pinIndex, currentFiles);
+      console.log(`[PlaceDetail] 스토어에 저장 완료 - 핀 ${pinIndex}`);
+    } else {
+      console.warn('[PlaceDetail] pinIndex가 유효하지 않음:', pinIndex);
+    }
+  }, [currentFiles, pinIndex, setPinFiles]);
 
   return (
     <div className="flex w-full flex-col gap-[32px] pb-16">
@@ -27,7 +63,21 @@ const PlaceDetail = () => {
           다녀오신 곳의 사진을 올려주세요
           <span className="text-red-6 ml-1">•</span>
         </label>
-        <PhotoUploader />
+        <PhotoUploader
+          onFilesChange={allFiles => {
+            console.log(`[PlaceDetail] PhotoUploader에서 파일 수신 - 핀 ${pinIndex}:`, {
+              allFilesCount: allFiles.length,
+              allFileNames: allFiles.map(f => f.name),
+              currentFilesCount: currentFiles.length,
+            });
+            // PhotoUploader가 전체 파일 목록을 전달하므로 그대로 사용
+            setCurrentFiles(allFiles);
+            console.log(`[PlaceDetail] 파일 목록 업데이트 - 핀 ${pinIndex}:`, {
+              updatedCount: allFiles.length,
+              updatedFileNames: allFiles.map(f => f.name),
+            });
+          }}
+        />
       </div>
       <div className="flex flex-col gap-[8px]">
         <label className="text-d1 text-iceblue-8">

@@ -7,6 +7,7 @@ interface LabeledTextareaProps {
   maxLength?: number;
   required?: boolean;
   defaultValue?: string;
+  value?: string;
   onChange?: (value: string) => void;
 }
 
@@ -16,11 +17,14 @@ const LabeledTextarea = ({
   maxLength = 100,
   required,
   defaultValue = '',
+  value: controlledValue,
   onChange,
 }: LabeledTextareaProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [value, setValue] = useState(defaultValue);
-  const [charCount, setCharCount] = useState(defaultValue.length);
+  const isControlled = controlledValue !== undefined;
+  const [internalValue, setInternalValue] = useState(defaultValue);
+  const value = isControlled ? controlledValue : internalValue;
+  const [charCount, setCharCount] = useState(isControlled ? controlledValue?.length || 0 : defaultValue.length);
   const MIN_HEIGHT = 24;
   const MAX_HEIGHT = 200;
 
@@ -34,10 +38,18 @@ const LabeledTextarea = ({
 
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const nextValue = event.target.value.slice(0, maxLength);
-    setValue(nextValue);
+    if (!isControlled) {
+      setInternalValue(nextValue);
+    }
     setCharCount(nextValue.length);
     onChange?.(nextValue);
   };
+
+  useEffect(() => {
+    if (isControlled && controlledValue !== undefined) {
+      setCharCount(controlledValue.length);
+    }
+  }, [controlledValue, isControlled]);
 
   useEffect(() => {
     updateTextareaHeight();

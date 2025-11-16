@@ -5,14 +5,13 @@ import BottomActionButton from '@common/button/BottomActionButton';
 import PageHeader from '@common/layout/PageHeader';
 import Modal from '@common/components/Modal';
 import CoupleInviteBottomSheet from '@pages/place/components/CoupleInviteBottomSheet';
+import { useCourseSaveStore } from '@stores/course-save';
 
 type CompanionType = '연인' | '친구' | '혼자' | '가족' | '지인';
 
 const CourseSave = () => {
   const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState<string>('');
-  const [selectedCompanion, setSelectedCompanion] = useState<CompanionType | null>('연인');
-  const [selectedRegion, setSelectedRegion] = useState<string>('');
+  const { courseData, updateCourseData } = useCourseSaveStore();
   const [isFormValid, setIsFormValid] = useState(false);
   const [isCoupleModalOpen, setIsCoupleModalOpen] = useState(false);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
@@ -20,16 +19,21 @@ const CourseSave = () => {
 
   const companionOptions: CompanionType[] = ['연인', '친구', '혼자', '가족', '지인'];
 
+  // 스토어에서 값 가져오기
+  const selectedDate = courseData?.courseVisitDate || '';
+  const selectedCompanion = (courseData?.courseWith as CompanionType) || '연인';
+  const selectedRegion = courseData?.courseRegion || '';
+
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedDate(e.target.value);
+    updateCourseData({ courseVisitDate: e.target.value });
   };
 
   const handleRegionSelect = (region: string) => {
-    setSelectedRegion(region);
+    updateCourseData({ courseRegion: region });
   };
 
   const handleCompanionClick = (option: CompanionType) => {
-    setSelectedCompanion(option);
+    updateCourseData({ courseWith: option });
     if (option === '연인') {
       setIsCoupleModalOpen(true);
     }
