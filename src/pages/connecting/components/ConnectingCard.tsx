@@ -5,6 +5,7 @@ interface ConnectingCardProps {
   description: string;
   backgroundImage?: string;
   backgroundClassName?: string;
+  isBlurred?: boolean; // 블러 처리 여부
 }
 
 const ConnectingCard = ({
@@ -14,9 +15,10 @@ const ConnectingCard = ({
   description,
   backgroundImage,
   backgroundClassName,
+  isBlurred = false,
 }: ConnectingCardProps) => {
   return (
-    <div className="relative h-full w-full overflow-hidden">
+    <div className={`relative h-full w-full overflow-hidden ${isBlurred ? 'blur-[8px]' : ''}`}>
       {/* 배경 이미지 - 사용자가 조절 */}
       {backgroundImage ? (
         <div className="absolute inset-0">

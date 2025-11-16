@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import CardSlider from './components/CardSlider';
 import ConnectingCard from './components/ConnectingCard';
 import ConnectingBottomNavigation from './components/ConnectingBottomNavigation';
+import BottomNavigation from '@common/layout/BottomNavigation';
 import useGetCoupleInfo from '@apis/connecting/useGetCoupleInfo';
 import useGetCoupleBanner from '@apis/connecting/useGetCoupleBanner';
 
@@ -14,13 +15,21 @@ const ConnectingPage = () => {
   const handleDotsClick = () => {
     navigate('/connecting/profile-modify');
   };
-  const { data: coupleInfo } = useGetCoupleInfo();
+
+  // 디버깅용: 잠금 화면 테스트
+  // const { data: coupleInfo } = useGetCoupleInfo(); // 실제 API 호출
+  const coupleInfo: any = { data: {} }; // 빈 데이터 (잠금 상태)
+  // const coupleInfo: any = null; // null (잠금 상태)
+
   // TODO: coupleBanner 데이터 사용 예정
   useGetCoupleBanner({ page: 0, size: 10 });
 
   const handleHomeClick = () => {
     navigate('/');
   };
+
+  // 커플 정보가 없거나 비어있으면 잠금 상태
+  const isLocked = !coupleInfo?.data || Object.keys(coupleInfo.data).length === 0;
 
   return (
     <>
@@ -82,7 +91,10 @@ const ConnectingPage = () => {
             <span className="text-s4 text-neutral-6 font-semibold">{coupleInfo?.data?.member2Name || '???'}</span>
           </div>
         </div>
+
+        {/* 카드 슬라이더 영역 */}
         <CardSlider
+          isLocked={isLocked}
           cards={[
             <ConnectingCard
               key="card-1"
@@ -111,7 +123,9 @@ const ConnectingPage = () => {
           ]}
         />
       </div>
-      <ConnectingBottomNavigation onHomeClick={handleHomeClick} />
+
+      {/* 잠금 상태일 때는 일반 BottomNavigation, 아니면 ConnectingBottomNavigation */}
+      {isLocked ? <BottomNavigation /> : <ConnectingBottomNavigation onHomeClick={handleHomeClick} />}
     </>
   );
 };
