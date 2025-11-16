@@ -46,3 +46,35 @@ export interface CourseCommitResponse {
   data: unknown;
   isSuccess: boolean;
 }
+
+// GET /course/{courseId} 응답 타입
+export interface CourseDetailResponse {
+  timestamp: string;
+  data: {
+    courseId: number;
+    courseWriter: boolean;
+    courseVisitDate: string;
+    courseTitle: string;
+    courseDescription: string;
+    courseTags: string[];
+    pins: Array<{
+      pinIndex: number;
+      placeDetails: {
+        placeId: number;
+        placeName: string;
+        placeCategory: string;
+        placeStreetNameAddress: string;
+        placeLatitude: number;
+        placeLongitude: number;
+        placeRating: number;
+        reviewCount: number;
+        placeUrl: string;
+        scrapped: boolean;
+      };
+      pinImages: string[];
+      pinPositive: string;
+      pinNegative: string;
+    }>;
+  };
+  isSuccess: boolean;
+}

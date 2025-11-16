@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import LoveIcon from '@assets/icons/love.svg';
 import DotsIcon from '@assets/icons/dots.svg';
 import KimHereIcon from '@assets/icons/kim_here.svg';
@@ -7,11 +8,15 @@ import CardSlider from './components/CardSlider';
 import ConnectingCard from './components/ConnectingCard';
 import ConnectingBottomNavigation from './components/ConnectingBottomNavigation';
 import BottomNavigation from '@common/layout/BottomNavigation';
+import CoupleInviteBottomSheet from '@pages/place/components/CoupleInviteBottomSheet';
+import Modal from '@common/components/Modal';
 import useGetCoupleInfo from '@apis/connecting/useGetCoupleInfo';
 import useGetCoupleBanner from '@apis/connecting/useGetCoupleBanner';
 
 const ConnectingPage = () => {
   const navigate = useNavigate();
+  const [isInviteSheetOpen, setIsInviteSheetOpen] = useState(false);
+  const [isInviteCompleteModalOpen, setIsInviteCompleteModalOpen] = useState(false);
   const handleDotsClick = () => {
     navigate('/connecting/profile-modify');
   };
@@ -26,6 +31,17 @@ const ConnectingPage = () => {
 
   const handleHomeClick = () => {
     navigate('/');
+  };
+
+  const handleInviteClick = () => {
+    setIsInviteSheetOpen(true);
+  };
+
+  const handleInvite = (partnerId: string) => {
+    console.log('연인 초대:', partnerId);
+    // TODO: 실제 초대 API 호출
+    setIsInviteSheetOpen(false);
+    setIsInviteCompleteModalOpen(true);
   };
 
   // 커플 정보가 없거나 비어있으면 잠금 상태
@@ -95,6 +111,7 @@ const ConnectingPage = () => {
         {/* 카드 슬라이더 영역 */}
         <CardSlider
           isLocked={isLocked}
+          onInviteClick={handleInviteClick}
           cards={[
             <ConnectingCard
               key="card-1"
@@ -126,6 +143,24 @@ const ConnectingPage = () => {
 
       {/* 잠금 상태일 때는 일반 BottomNavigation, 아니면 ConnectingBottomNavigation */}
       {isLocked ? <BottomNavigation /> : <ConnectingBottomNavigation onHomeClick={handleHomeClick} />}
+
+      {/* 연인 초대 바텀시트 */}
+      <CoupleInviteBottomSheet
+        isOpen={isInviteSheetOpen}
+        onClose={() => setIsInviteSheetOpen(false)}
+        onInvite={handleInvite}
+        myId="@test1234"
+      />
+
+      {/* 초대 완료 모달 */}
+      <Modal
+        isOpen={isInviteCompleteModalOpen}
+        onClose={() => setIsInviteCompleteModalOpen(false)}
+        mainMessage="초대를 완료했어요"
+        subMessage="연인이 수락한 후 다시 이용해주세요"
+        rightButtonText="확인"
+        rightButtonOnClick={() => setIsInviteCompleteModalOpen(false)}
+      />
     </>
   );
 };

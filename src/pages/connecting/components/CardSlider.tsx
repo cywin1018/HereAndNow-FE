@@ -7,9 +7,10 @@ import LockIcon from '@assets/icons/material-symbols_lock.svg';
 interface CardSliderProps {
   cards: React.ReactElement[];
   isLocked?: boolean; // 잠금 상태 (커플 연결 전)
+  onInviteClick?: () => void; // 초대하기 버튼 클릭 핸들러
 }
 
-const CardSlider = ({ cards, isLocked = false }: CardSliderProps) => {
+const CardSlider = ({ cards, isLocked = false, onInviteClick }: CardSliderProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const x = useMotionValue(0);
@@ -67,9 +68,7 @@ const CardSlider = ({ cards, isLocked = false }: CardSliderProps) => {
           <motion.div
             key={`card-${index}-${position}`}
             layoutId={`card-${index}`}
-            className={`absolute top-[60%] left-1/2 h-[350px] w-[360px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[20px] ${
-              isLocked ? 'pointer-events-none' : ''
-            }`}
+            className="absolute top-[60%] left-1/2 h-[350px] w-[360px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[20px]"
             style={{
               scale,
               y,
@@ -122,6 +121,7 @@ const CardSlider = ({ cards, isLocked = false }: CardSliderProps) => {
                   {/* 초대하기 버튼 */}
                   <button
                     type="button"
+                    onClick={onInviteClick}
                     className="bg-pink-6 hover:bg-pink-7 text-s4 flex h-[48px] w-[100px] items-center justify-center rounded-[12px] text-white shadow-lg transition-colors"
                   >
                     초대하기

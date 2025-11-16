@@ -38,7 +38,7 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
           <Route path="/place/add-place" element={<AddPlacePage />} />
           <Route path="/place/course/submit" element={<CourseSubmit />} />
           <Route path="/place/course/result" element={<CourseResult />} />
-          <Route path="/place/detail/:id" element={<PlaceDetail />} />
+          <Route path="/place/detail" element={<PlaceDetail />} />
           <Route path="/connecting/profile-modify" element={<ProfileModifyPage />} />
           <Route path="/connecting/search" element={<ConnectingSearchPage />} />
           <Route path="/connecting/archive" element={<ConnectingArchive />} />

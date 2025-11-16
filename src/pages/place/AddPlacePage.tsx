@@ -116,10 +116,11 @@ const AddPlacePage = () => {
     console.log('[AddPlacePage] PlaceDetail로 이동:', {
       pinIndex,
       placeName,
+      statePayload,
     });
 
     setIsBottomSheetOpen(false);
-    navigate(`/place/detail/${encodeURIComponent(selectedAddress.zonecode)}`, {
+    navigate('/place/detail', {
       state: statePayload,
     });
   };

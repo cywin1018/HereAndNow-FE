@@ -23,7 +23,11 @@ const CourseRegister = () => {
     // PlaceDetail 페이지로 이동 (index를 state로 전달)
     const pin = pinList[index];
     if (pin?.place) {
-      navigate(`/place/detail/${encodeURIComponent(pin.place.placeName)}`, {
+      console.log('[CourseRegister] PlaceDetail로 이동:', {
+        pinIndex: index,
+        placeName: pin.place.placeName,
+      });
+      navigate('/place/detail', {
         state: { pinIndex: index, pin },
       });
     }
