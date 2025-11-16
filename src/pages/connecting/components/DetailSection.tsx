@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import Modal from '@common/components/Modal';
 import ReviewSection from './ReviewSection';
+import CoupleComment from './CoupleComment';
 
 const RightArrowIcon = () => (
   <svg
@@ -174,43 +174,7 @@ const DetailSection = () => {
         </div>
       </div>
 
-      {/* 삭제하기, 공유하기 버튼 */}
-      <div className="mt-[52px] flex gap-2">
-        <button
-          type="button"
-          onClick={() => setIsDeleteModalOpen(true)}
-          className="bg-iceblue-2 text-s5 text-iceblue-7 h-13.5 min-h-13.5 flex-1 cursor-pointer rounded-xl"
-        >
-          삭제하기
-        </button>
-        <button
-          type="button"
-          onClick={() => setIsShareModalOpen(true)}
-          className="bg-pink-6 text-s4 h-13.5 min-h-13.5 flex-1 cursor-pointer rounded-xl text-white"
-        >
-          공유하기
-        </button>
-      </div>
-
-      {/* 삭제하기 모달 */}
-      <Modal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        mainMessage="정말 삭제하시겠어요?"
-        leftButtonText="취소"
-        leftButtonOnClick={() => setIsDeleteModalOpen(false)}
-        rightButtonText="삭제"
-        rightButtonOnClick={handleDelete}
-      />
-
-      {/* 공유하기 모달 */}
-      <Modal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        mainMessage="공유하기"
-        rightButtonText="확인"
-        rightButtonOnClick={handleShare}
-      />
+      <CoupleComment />
     </div>
   );
 };
