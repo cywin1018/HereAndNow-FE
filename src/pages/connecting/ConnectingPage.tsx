@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import LoveIcon from '@assets/icons/love.svg';
 import DotsIcon from '@assets/icons/dots.svg';
 import KimHereIcon from '@assets/icons/kim_here.svg';
@@ -12,18 +12,30 @@ import CoupleInviteBottomSheet from '@pages/place/components/CoupleInviteBottomS
 import Modal from '@common/components/Modal';
 import useGetCoupleInfo from '@apis/connecting/useGetCoupleInfo';
 import useGetCoupleBanner from '@apis/connecting/useGetCoupleBanner';
+import useGetRequestPending from '@apis/connecting/useGetRequestPending';
+import useGetMemberInfo from '@apis/member/useGetMemberInfo';
+import usePostApproveCouple from '@apis/connecting/usePostApproveCouple';
 
 const ConnectingPage = () => {
   const navigate = useNavigate();
   const [isInviteSheetOpen, setIsInviteSheetOpen] = useState(false);
   const [isInviteCompleteModalOpen, setIsInviteCompleteModalOpen] = useState(false);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const handleDotsClick = () => {
     navigate('/connecting/profile-modify');
   };
 
-  // 디버깅용: 잠금 화면 테스트
-  // const { data: coupleInfo } = useGetCoupleInfo(); // 실제 API 호출
-  const coupleInfo: any = { data: {} }; // 빈 데이터 (잠금 상태)
+  // 멤버 정보 조회 (isCouple 여부 확인용)
+  const { data: memberInfo, refetch: refetchMemberInfo } = useGetMemberInfo();
+
+  // 커플 정보 조회 (연결된 상태일 때 상단 정보 표시용)
+  const { data: coupleInfo, refetch: refetchCoupleInfo } = useGetCoupleInfo();
+
+  // 대기 중 커플 요청 조회
+  const { data: requestPending, refetch: refetchRequestPending } = useGetRequestPending();
+  console.log('requestPending', requestPending);
+  const { mutate: approveCouple } = usePostApproveCouple();
+  // const coupleInfo: any = { data: {} }; // 빈 데이터 (잠금 상태)
   // const coupleInfo: any = null; // null (잠금 상태)
 
   // TODO: coupleBanner 데이터 사용 예정
@@ -44,8 +56,41 @@ const ConnectingPage = () => {
     setIsInviteCompleteModalOpen(true);
   };
 
-  // 커플 정보가 없거나 비어있으면 잠금 상태
-  const isLocked = !coupleInfo?.data || Object.keys(coupleInfo.data).length === 0;
+  // 멤버 정보의 isCouple 값으로 잠금 상태 결정
+  // 응답 예시:
+  // data: { username, email, nickname, profileImageUrl, isCouple }
+  const isCouple = memberInfo?.data?.isCouple ?? false;
+  const isLocked = !isCouple;
+
+  // 대기 중인 커플 요청 데이터 (형식: { coupleId, opponentUsername, ... } 가정)
+  const pendingData = (requestPending as any)?.data;
+
+  // isCouple이 false이고 대기 중인 요청이 있을 때 모달 오픈
+  useEffect(() => {
+    if (!isCouple && pendingData) {
+      setIsRequestModalOpen(true);
+    }
+  }, [isCouple, pendingData]);
+
+  const handleApproveRequest = () => {
+    if (!pendingData?.coupleId) {
+      setIsRequestModalOpen(false);
+      return;
+    }
+
+    approveCouple(pendingData.coupleId, {
+      onSuccess: async () => {
+        // 커플 수락 후, 멤버/커플/요청 정보를 최신 상태로 동기화
+        try {
+          await Promise.all([refetchMemberInfo(), refetchCoupleInfo(), refetchRequestPending()]);
+        } catch (error) {
+          console.error('[ConnectingPage] 커플 수락 후 refetch 실패:', error);
+        }
+
+        setIsRequestModalOpen(false);
+      },
+    });
+  };
 
   return (
     <>
@@ -160,6 +205,18 @@ const ConnectingPage = () => {
         subMessage="연인이 수락한 후 다시 이용해주세요"
         rightButtonText="확인"
         rightButtonOnClick={() => setIsInviteCompleteModalOpen(false)}
+      />
+
+      {/* 커플 요청 도착 모달 (isCouple이 false이고, 대기 중 요청이 있을 때) */}
+      <Modal
+        isOpen={isRequestModalOpen}
+        onClose={() => setIsRequestModalOpen(false)}
+        mainMessage={`@${pendingData?.opponentUsername ?? '알수없음'} 님으로부터\n커플 요청이 도착했어요!`}
+        subMessage="알림에서 나중에 확인할 수 있어요"
+        leftButtonText="거절"
+        leftButtonOnClick={() => setIsRequestModalOpen(false)}
+        rightButtonText="수락"
+        rightButtonOnClick={handleApproveRequest}
       />
     </>
   );
