@@ -3,9 +3,19 @@ import exploreBackIcon from '@assets/icons/explore_back.svg';
 import filterCancelIcon from '@assets/icons/filter_cancel.svg';
 import { useNavigate } from 'react-router-dom';
 import CourseCard from '@pages/home/components/CourseCard';
+import { useGetCourseList } from '@apis/explore/explore';
+import { useEffect } from 'react';
 
 const ExploreCoursePage = () => {
   const navigate = useNavigate();
+
+  // API 호출
+  const { data } = useGetCourseList({ page: 0, size: 20 });
+
+  // 데이터 콘솔 출력
+  useEffect(() => {
+    console.log('[ExploreCoursePage] API 응답 데이터:', data);
+  }, [data]);
 
   return (
     <div className="min-h-screen">
@@ -112,17 +122,32 @@ const ExploreCoursePage = () => {
 
         {/* 코스 리스트 */}
         <div className="mt-8 flex w-full flex-col gap-3">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <CourseCard
-              profileImageUrl="/dummy_profile.png"
-              authorName="홍**"
-              title="아직 어색한 사이인 커플을 위한 감성 충만 코스"
-              location="강남"
-              placeCount={5}
-              tags={['음식이 맛있어요', '사진 찍기 좋아요']}
-              hasComments
-            />
-          ))}
+          {data?.data && data.data.length > 0
+            ? data.data.map((item, index) => (
+                <CourseCard
+                  key={item.courseCard.courseId || index}
+                  profileImageUrl={item.courseCard.memberProfileImage}
+                  authorName={item.courseCard.memberNickname}
+                  title={item.courseCard.courseTitle}
+                  location={item.courseCard.courseRegion}
+                  placeCount={item.courseCard.pinCount}
+                  tags={item.courseCard.courseTags}
+                  hasComments={item.comment.count > 0}
+                />
+              ))
+            : // 로딩 중이거나 데이터가 없을 때 더미 데이터 표시
+              Array.from({ length: 5 }).map((_, index) => (
+                <CourseCard
+                  key={index}
+                  profileImageUrl="/dummy_profile.png"
+                  authorName="홍**"
+                  title="아직 어색한 사이인 커플을 위한 감성 충만 코스"
+                  location="강남"
+                  placeCount={5}
+                  tags={['음식이 맛있어요', '사진 찍기 좋아요']}
+                  hasComments
+                />
+              ))}
         </div>
       </div>
     </div>
