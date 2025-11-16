@@ -18,12 +18,13 @@ const CoupleInviteBottomSheet = ({ isOpen, onClose, onInvite, myId }: CoupleInvi
     if (!trimmedId) return;
 
     // 서버에 커플 요청 보내기 (query parameter로 전송)
-    postCoupleRequest(trimmedId);
-
-    // 부모에서 넘겨준 추가 로직 실행 (있다면)
-    onInvite(trimmedId);
-
-    setPartnerId('');
+    // ✅ API 요청이 성공했을 때만 onInvite 호출 및 입력 초기화
+    postCoupleRequest(trimmedId, {
+      onSuccess: () => {
+        onInvite(trimmedId);
+        setPartnerId('');
+      },
+    });
   };
 
   const handleClose = () => {
