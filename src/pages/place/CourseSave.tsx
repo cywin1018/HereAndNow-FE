@@ -46,10 +46,10 @@ const CourseSave = () => {
   }, [selectedDate, selectedCompanion, selectedRegion]);
 
   return (
-    <div className="flex w-full flex-col">
+    <div className="flex min-h-screen w-full flex-col">
       <PageHeader title="코스 등록" />
 
-      <main className="flex flex-col gap-[32px] px-5 pt-[32px]">
+      <main className="flex flex-1 flex-col gap-[32px] px-5 pt-[32px] pb-[32px]">
         {/* 날짜 입력 섹션 */}
 
         <div className="flex flex-col gap-2">
@@ -104,9 +104,11 @@ const CourseSave = () => {
         </div>
       </main>
 
-      <BottomActionButton type="button" disabled={!isFormValid} onClick={() => navigate('/place/add-place')}>
-        장소 추가하기
-      </BottomActionButton>
+      <div className="pb-6">
+        <BottomActionButton type="button" disabled={!isFormValid} onClick={() => navigate('/place/add-place')}>
+          장소 추가하기
+        </BottomActionButton>
+      </div>
 
       <Modal
         isOpen={isCoupleModalOpen}
