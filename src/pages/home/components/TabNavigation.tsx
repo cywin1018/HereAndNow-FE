@@ -6,14 +6,19 @@ type SortType = 'latest' | 'liked' | 'reviewed';
 
 interface TabNavigationProps {
   activeTab?: TabType;
+  selectedSort?: SortType;
   onTabChange?: (tab: TabType) => void;
   onSortChange?: (sort: SortType) => void;
 }
 
-const TabNavigation = ({ activeTab = 'course', onTabChange, onSortChange }: TabNavigationProps) => {
+const TabNavigation = ({
+  activeTab = 'course',
+  selectedSort = 'latest',
+  onTabChange,
+  onSortChange,
+}: TabNavigationProps) => {
   const [selectedTab, setSelectedTab] = useState<TabType>(activeTab);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedSort, setSelectedSort] = useState<SortType>('liked');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleTabClick = (tab: TabType) => {
@@ -22,14 +27,13 @@ const TabNavigation = ({ activeTab = 'course', onTabChange, onSortChange }: TabN
   };
 
   const handleSortClick = (sort: SortType) => {
-    setSelectedSort(sort);
     setIsDropdownOpen(false);
     onSortChange?.(sort);
   };
 
   const sortOptions: { value: SortType; label: string }[] = [
     { value: 'latest', label: '최신 순' },
-    { value: 'liked', label: '찜 많은 순' },
+    { value: 'liked', label: '저장 많은 순' },
     { value: 'reviewed', label: '리뷰 많은 순' },
   ];
 
