@@ -24,26 +24,8 @@ const ExplorePage = () => {
     console.log('[ExplorePage] API 응답 데이터:', data);
   }, [data]);
 
-  // 더미 데이터
-  const dummyData = Array.from({ length: 5 }).map((_, index) => ({
-    placeCard: {
-      placeId: index,
-      placeName: '갓덴스시 강남점',
-      placeCategory: '디저트 카페',
-      placeStreetNameAddress: '서울 강남구 강남대로102길 30 1-3층',
-      placeNumberAddress: '(지번) 역삼동 822-4',
-      placeRating: 4.1,
-      reviewCount: 252,
-      placeImageUrl: '/dummy_placecard.png',
-    },
-    placeMarker: {
-      latitude: 0,
-      longitude: 0,
-    },
-  }));
-
-  // API 데이터가 없으면 더미 데이터 사용
-  const displayData = data?.data && data.data.length > 0 ? data.data : dummyData;
+  // API 데이터가 없으면 빈 배열
+  const displayData = data?.data && data.data.length > 0 ? data.data : [];
 
   return (
     <div className="relative h-screen w-full">
@@ -78,26 +60,28 @@ const ExplorePage = () => {
       </div>
 
       {/* 장소 리스트 */}
-      <div className="absolute right-0 bottom-[127px] left-[20px] z-20 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="flex items-center gap-4 pr-[20px]">
-          {displayData.map((item, index) => (
-            <div
-              key={item.placeCard.placeId || index}
-              className="border-neutral-3 w-[312px] max-w-[312px] min-w-[312px] overflow-hidden rounded-[8px] border whitespace-nowrap"
-            >
-              <PlaceCard
-                imageUrl={item.placeCard.placeImageUrl}
-                name={item.placeCard.placeName}
-                category={item.placeCard.placeCategory}
-                address={item.placeCard.placeStreetNameAddress}
-                addressDetail={item.placeCard.placeNumberAddress}
-                rating={item.placeCard.placeRating}
-                reviewCount={item.placeCard.reviewCount}
-              />
-            </div>
-          ))}
+      {displayData.length > 0 && (
+        <div className="absolute right-0 bottom-[127px] left-[20px] z-20 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex items-center gap-4 pr-[20px]">
+            {displayData.map((item, index) => (
+              <div
+                key={item.placeCard.placeId || index}
+                className="border-neutral-3 w-[312px] max-w-[312px] min-w-[312px] overflow-hidden rounded-[8px] border whitespace-nowrap"
+              >
+                <PlaceCard
+                  imageUrl={item.placeCard.placeImageUrl}
+                  name={item.placeCard.placeName}
+                  category={item.placeCard.placeCategory}
+                  address={item.placeCard.placeStreetNameAddress}
+                  addressDetail={item.placeCard.placeNumberAddress}
+                  rating={item.placeCard.placeRating}
+                  reviewCount={item.placeCard.reviewCount}
+                />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
