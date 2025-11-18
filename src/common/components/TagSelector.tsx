@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import XCircleIcon from '@assets/icons/bxs_x-circle.svg';
 import PlusIcon from '@assets/icons/plus.svg';
 
@@ -26,19 +26,26 @@ const TagSelector = ({
   const [selectedTags, setSelectedTags] = useState<string[]>(initialSelected);
   const [isOptionsOpen, setIsOptionsOpen] = useState(defaultExpanded);
 
+  // selectedTags prop 변경 시 내부 state 동기화
+  useEffect(() => {
+    setSelectedTags(initialSelected);
+  }, [initialSelected]);
+
   const handleTagToggle = (tag: string) => {
     setSelectedTags(prev => {
       const alreadySelected = prev.includes(tag);
       if (alreadySelected) {
         const updated = prev.filter(item => item !== tag);
-        onChange?.(updated);
+        // onChange를 비동기로 호출하여 렌더링 중 상태 업데이트 방지
+        setTimeout(() => onChange?.(updated), 0);
         return updated;
       }
 
       if (maxSelected && prev.length >= maxSelected) return prev;
 
       const updated = [...prev, tag];
-      onChange?.(updated);
+      // onChange를 비동기로 호출하여 렌더링 중 상태 업데이트 방지
+      setTimeout(() => onChange?.(updated), 0);
       return updated;
     });
   };
@@ -46,7 +53,8 @@ const TagSelector = ({
   const handleRemoveTag = (tagToRemove: string) => {
     setSelectedTags(prev => {
       const updated = prev.filter(tag => tag !== tagToRemove);
-      onChange?.(updated);
+      // onChange를 비동기로 호출하여 렌더링 중 상태 업데이트 방지
+      setTimeout(() => onChange?.(updated), 0);
       return updated;
     });
   };

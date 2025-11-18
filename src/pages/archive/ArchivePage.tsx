@@ -2,10 +2,13 @@ import bigFolder from '@assets/images/bigFolder.png';
 import filterSearchIcon from '@assets/icons/filter_search.svg';
 import filterCancelIcon from '@assets/icons/filter_cancel.svg';
 import smallFolder from '@assets/images/smallFolder.png';
-import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { getRecentArchive, getCreatedArchives } from 'src/apis/archive/archive';
+import { useNavigate, useLocation } from 'react-router-dom';
+import useGetRecentArchive from '@apis/archive/query/useGetRecentArchive';
+import useGetCreatedArchives from '@apis/archive/query/useGetCreatedArchives';
+import useSearchArchive from '@apis/archive/query/useSearchArchive';
+import type { ArchiveSearchParams, ArchiveSearchResponse } from '@apis/archive/archive';
 import { useEffect } from 'react';
+import api from '@apis/common/api';
 
 // 날짜 포맷팅 함수: "2025-11-05" -> "2025. 11. 05"
 const formatDate = (dateString: string): string => {
@@ -43,22 +46,111 @@ const getTagColorClass = (index: number): { bg: string; text: string } => {
 
 const ArchivePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // React Query로 최신 아카이빙 폴더 데이터 가져오기
-  const { data: recentArchiveResponse } = useQuery({
-    queryKey: ['recentArchive'],
-    queryFn: getRecentArchive,
-  });
+  // location.state에서 검색 파라미터와 검색 결과 확인
+  const searchState = location.state as
+    | { searchParams: ArchiveSearchParams; searchResult: ArchiveSearchResponse }
+    | null
+    | undefined;
 
+  // 검색 파라미터가 있으면 검색 결과 사용, 없으면 기본 데이터 사용
+  const searchParams = searchState?.searchParams;
+  const { data: searchResponse } = useSearchArchive(searchParams || {}, !!searchParams);
+
+  // 검색 결과 또는 기본 데이터 결정
+  const searchResult = searchState?.searchResult || searchResponse;
+
+  // 검색 결과가 있고 필터링된 코스가 있을 때만 검색 모드
+  const hasSearchResults = searchResult?.data?.filteredCourses && searchResult.data.filteredCourses.length > 0;
+  const isSearchMode = !!searchParams && hasSearchResults;
+
+  // React Query로 최신 아카이빙 폴더 데이터 가져오기 (항상 호출)
+  const { data: recentArchiveResponse } = useGetRecentArchive();
   const recentArchiveData = recentArchiveResponse?.data || null;
 
-  // React Query로 생성한 코스 폴더 리스트 가져오기
-  const { data: createdArchivesResponse } = useQuery({
-    queryKey: ['createdArchives', { page: 0, size: 32 }],
-    queryFn: () => getCreatedArchives({ page: 0, size: 32 }),
-  });
+  // React Query로 생성한 코스 폴더 리스트 가져오기 (항상 호출)
+  const { data: createdArchivesResponse } = useGetCreatedArchives({ page: 0, size: 32 });
+  const defaultArchives = createdArchivesResponse?.data || [];
 
-  const createdArchives = createdArchivesResponse?.data || [];
+  // 표시할 폴더 리스트 결정
+  const displayedArchives = isSearchMode ? searchResult?.data?.filteredCourses || [] : defaultArchives;
+
+  // 검색 필터 정보 (검색 모드일 때만 표시)
+  const selectedFilters = isSearchMode ? searchResult?.data?.selectedFilters : undefined;
+
+  // 필터 삭제 핸들러
+  const handleFilterRemove = async (filterType: keyof ArchiveSearchParams) => {
+    if (!searchParams) return;
+
+    // 필터 제거한 새로운 파라미터 생성
+    const newParams: ArchiveSearchParams = { ...searchParams };
+    delete newParams[filterType];
+
+    // 모든 필터가 제거되었는지 확인
+    const hasAnyFilter = Object.keys(newParams).length > 0;
+
+    if (!hasAnyFilter) {
+      // 모든 필터가 제거되면 기본 모드로 전환
+      navigate('/archive', { replace: true });
+      return;
+    }
+
+    // 새로운 파라미터로 재검색
+    try {
+      const { data } = await api.get<ArchiveSearchResponse>('/archive/search', { params: newParams });
+      if (data.isSuccess) {
+        // 검색 결과가 없으면 기본 모드로 전환
+        if (!data.data?.filteredCourses || data.data.filteredCourses.length === 0) {
+          navigate('/archive', { replace: true });
+        } else {
+          navigate('/archive', { state: { searchParams: newParams, searchResult: data }, replace: true });
+        }
+      }
+    } catch (error) {
+      console.error('필터 삭제 후 재검색 실패:', error);
+    }
+  };
+
+  // 태그 삭제 핸들러
+  const handleTagRemove = async (tagToRemove: string) => {
+    if (!searchParams || !selectedFilters?.tag) return;
+
+    // 태그 배열에서 제거
+    const newTags = selectedFilters.tag.filter(tag => tag !== tagToRemove);
+
+    // 새로운 파라미터 생성
+    const newParams: ArchiveSearchParams = { ...searchParams };
+    if (newTags.length > 0) {
+      newParams.tag = newTags.join(',');
+    } else {
+      delete newParams.tag;
+    }
+
+    // 모든 필터가 제거되었는지 확인
+    const hasAnyFilter = Object.keys(newParams).length > 0;
+
+    if (!hasAnyFilter) {
+      // 모든 필터가 제거되면 기본 모드로 전환
+      navigate('/archive', { replace: true });
+      return;
+    }
+
+    // 새로운 파라미터로 재검색
+    try {
+      const { data } = await api.get<ArchiveSearchResponse>('/archive/search', { params: newParams });
+      if (data.isSuccess) {
+        // 검색 결과가 없으면 기본 모드로 전환
+        if (!data.data?.filteredCourses || data.data.filteredCourses.length === 0) {
+          navigate('/archive', { replace: true });
+        } else {
+          navigate('/archive', { state: { searchParams: newParams, searchResult: data }, replace: true });
+        }
+      }
+    } catch (error) {
+      console.error('태그 삭제 후 재검색 실패:', error);
+    }
+  };
 
   // API 응답 콘솔 출력
   useEffect(() => {
@@ -68,9 +160,12 @@ const ArchivePage = () => {
     }
     if (createdArchivesResponse) {
       console.log('getCreatedArchives API 응답:', createdArchivesResponse);
-      console.log('createdArchives:', createdArchives);
+      console.log('defaultArchives:', defaultArchives);
     }
-  }, [recentArchiveResponse, recentArchiveData, createdArchivesResponse, createdArchives]);
+    if (searchResponse) {
+      console.log('searchArchive API 응답:', searchResponse);
+    }
+  }, [recentArchiveResponse, recentArchiveData, createdArchivesResponse, defaultArchives, searchResponse]);
 
   // 검색바 클릭 핸들러
   const handleSearchClick = () => {
@@ -181,79 +276,159 @@ const ArchivePage = () => {
 
             {/* 필터 리스트 */}
             {/* TODO: 컴포넌트로 분리 */}
-            <div className="flex w-full items-center gap-1 overflow-x-visible">
-              <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
-                {/* 삭제 버튼 */}
-                <div className="flex h-6 w-6 items-center justify-center">
-                  <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
-                </div>
+            {selectedFilters && (
+              <div className="flex w-full items-center gap-1 overflow-x-visible">
+                {/* 별점 필터 */}
+                {selectedFilters.rating !== undefined && selectedFilters.rating > 0 && (
+                  <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
+                    {/* 삭제 버튼 */}
+                    <button
+                      type="button"
+                      className="flex h-6 w-6 items-center justify-center"
+                      onClick={() => handleFilterRemove('rating')}
+                    >
+                      <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
+                    </button>
 
-                {/* 필터 이름 */}
-                <span className="text-d1 text-neutral-4">별점</span>
+                    {/* 필터 이름 */}
+                    <span className="text-d1 text-neutral-4">별점</span>
 
-                {/* 필터 값 */}
-                <span className="text-d1 text-neutral-6">5점</span>
+                    {/* 필터 값 */}
+                    <span className="text-d1 text-neutral-6">{selectedFilters.rating}점</span>
+                  </div>
+                )}
+
+                {/* 날짜 필터 */}
+                {selectedFilters.startDate && (
+                  <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
+                    {/* 삭제 버튼 */}
+                    <button
+                      type="button"
+                      className="flex h-6 w-6 items-center justify-center"
+                      onClick={() => handleFilterRemove('startDate')}
+                    >
+                      <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
+                    </button>
+
+                    {/* 필터 이름 */}
+                    <span className="text-d1 text-neutral-4">언제</span>
+
+                    {/* 필터 값 */}
+                    <span className="text-d1 text-neutral-6">
+                      {selectedFilters.startDate === selectedFilters.endDate
+                        ? formatDate(selectedFilters.startDate)
+                        : `${formatDate(selectedFilters.startDate)} ~ ${selectedFilters.endDate ? formatDate(selectedFilters.endDate) : ''}`}
+                    </span>
+                  </div>
+                )}
+
+                {/* 누구와 필터 */}
+                {selectedFilters.with && (
+                  <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
+                    {/* 삭제 버튼 */}
+                    <button
+                      type="button"
+                      className="flex h-6 w-6 items-center justify-center"
+                      onClick={() => handleFilterRemove('with')}
+                    >
+                      <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
+                    </button>
+
+                    {/* 필터 이름 */}
+                    <span className="text-d1 text-neutral-4">누구와</span>
+
+                    {/* 필터 값 */}
+                    <span className="text-d1 text-neutral-6">{selectedFilters.with}</span>
+                  </div>
+                )}
+
+                {/* 지역 필터 */}
+                {selectedFilters.region && (
+                  <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
+                    {/* 삭제 버튼 */}
+                    <button
+                      type="button"
+                      className="flex h-6 w-6 items-center justify-center"
+                      onClick={() => handleFilterRemove('region')}
+                    >
+                      <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
+                    </button>
+
+                    {/* 필터 이름 */}
+                    <span className="text-d1 text-neutral-4">지역</span>
+
+                    {/* 필터 값 */}
+                    <span className="text-d1 text-neutral-6">{selectedFilters.region}</span>
+                  </div>
+                )}
+
+                {/* 키워드 필터 */}
+                {selectedFilters.keyword && selectedFilters.keyword.length > 0 && (
+                  <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
+                    {/* 삭제 버튼 */}
+                    <button
+                      type="button"
+                      className="flex h-6 w-6 items-center justify-center"
+                      onClick={() => handleFilterRemove('keyword')}
+                    >
+                      <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
+                    </button>
+
+                    {/* 필터 이름 */}
+                    <span className="text-d1 text-neutral-4">키워드</span>
+
+                    {/* 필터 값 */}
+                    <span className="text-d1 text-neutral-6">{selectedFilters.keyword[0]}</span>
+                  </div>
+                )}
+
+                {/* 업종 필터 */}
+                {selectedFilters.placeCode && selectedFilters.placeCode.length > 0 && (
+                  <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
+                    {/* 삭제 버튼 */}
+                    <button
+                      type="button"
+                      className="flex h-6 w-6 items-center justify-center"
+                      onClick={() => handleFilterRemove('placeCode')}
+                    >
+                      <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
+                    </button>
+
+                    {/* 필터 이름 */}
+                    <span className="text-d1 text-neutral-4">업종</span>
+
+                    {/* 필터 값 */}
+                    <span className="text-d1 text-neutral-6">{selectedFilters.placeCode[0]}</span>
+                  </div>
+                )}
               </div>
-              <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
-                {/* 삭제 버튼 */}
-                <div className="flex h-6 w-6 items-center justify-center">
-                  <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
-                </div>
-
-                {/* 필터 이름 */}
-                <span className="text-d1 text-neutral-4">언제</span>
-
-                {/* 필터 값 */}
-                <span className="text-d1 text-neutral-6">2025.09 ~</span>
-              </div>
-              <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
-                {/* 삭제 버튼 */}
-                <div className="flex h-6 w-6 items-center justify-center">
-                  <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
-                </div>
-
-                {/* 필터 이름 */}
-                <span className="text-d1 text-neutral-4">누구와</span>
-
-                {/* 필터 값 */}
-                <span className="text-d1 text-neutral-6">친구</span>
-              </div>
-              <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
-                {/* 삭제 버튼 */}
-                <div className="flex h-6 w-6 items-center justify-center">
-                  <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
-                </div>
-
-                {/* 필터 이름 */}
-                <span className="text-d1 text-neutral-4">누구와</span>
-
-                {/* 필터 값 */}
-                <span className="text-d1 text-neutral-6">친구</span>
-              </div>
-            </div>
+            )}
 
             {/* 태그 리스트 */}
-            <div className="flex w-full items-center gap-2 overflow-x-visible">
-              <div className="bg-purple-2 text-d1 text-purple-8 flex h-8 items-center justify-center rounded-sm px-2.5 whitespace-nowrap">
-                사진 찍기 좋아요
+            {selectedFilters?.tag && selectedFilters.tag.length > 0 && (
+              <div className="flex w-full items-center gap-2 overflow-x-visible">
+                {selectedFilters.tag.map((tag, index) => {
+                  const colorClass = getTagColorClass(index);
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      className={`${colorClass.bg} ${colorClass.text} text-d1 flex h-8 items-center justify-center rounded-sm px-2.5 whitespace-nowrap`}
+                      onClick={() => handleTagRemove(tag)}
+                    >
+                      {tag}
+                    </button>
+                  );
+                })}
               </div>
-              <div className="bg-orange-2 text-d1 text-orange-8 flex h-8 items-center justify-center rounded-sm px-2.5 whitespace-nowrap">
-                음식이 맛있어요
-              </div>
-              <div className="bg-blue-2 text-d1 text-blue-8 flex h-8 items-center justify-center rounded-sm px-2.5 whitespace-nowrap">
-                시설이 깨끗해요
-              </div>
-              <div className="bg-green-2 text-d1 text-green-8 flex h-8 items-center justify-center rounded-sm px-2.5 whitespace-nowrap">
-                친절해요
-              </div>
-            </div>
+            )}
           </div>
 
           {/* 폴더 리스트 */}
           {/* TODO: 컴포넌트로 분리 */}
-          {createdArchives.length > 0 && (
+          {displayedArchives.length > 0 && (
             <div className="flex w-full flex-wrap gap-x-5 gap-y-8 px-1.75">
-              {createdArchives.map(course => (
+              {displayedArchives.map(course => (
                 <div
                   key={course.id}
                   className="flex h-26 w-18 cursor-pointer flex-col"
