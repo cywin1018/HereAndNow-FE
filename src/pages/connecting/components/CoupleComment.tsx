@@ -4,6 +4,7 @@ import SendIcon from '@assets/icons/mingcute_send-fill_img.svg';
 import ImgIcon from '@assets/icons/mdi_image_pink.svg';
 import { getPresignedUrls, uploadFile } from '@apis/common/usePresignedUpload';
 import usePostCommentImg from '@apis/connecting/usePostCommentImg';
+import usePostCommentText from '@apis/connecting/usePostCommentText';
 
 interface Comment {
   id: string;
@@ -23,34 +24,64 @@ const CoupleComment = ({ courseId = 17, comments = [], onSendComment }: CoupleCo
   const [commentText, setCommentText] = useState('');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const postCommentImgMutation = usePostCommentImg();
+  const postCommentTextMutation = usePostCommentText();
 
-  const handleSend = () => {
-    if (!commentText.trim()) return;
+  const handleSend = async () => {
+    if (!commentText.trim() || isUploading || isSending) return;
+
+    const trimmedText = commentText.trim();
 
     console.log('[댓글 전송] 시작:', {
-      commentText: commentText.trim(),
+      commentText: trimmedText,
       hasSelectedImage: !!selectedImage,
       selectedImageName: selectedImage?.name,
       courseId,
     });
 
-    // 댓글 전송 (이미지는 이미 업로드 완료된 상태)
-    if (onSendComment) {
-      onSendComment(commentText.trim());
-      console.log('[댓글 전송] 콜백 호출 완료');
-    } else {
-      console.warn('[댓글 전송] onSendComment 콜백이 없습니다.');
-    }
+    setIsSending(true);
 
-    // 초기화
-    setCommentText('');
-    setSelectedImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+    try {
+      // 댓글 텍스트 등록 API 호출
+      const requestData = {
+        courseId,
+        content: trimmedText,
+      };
+
+      console.log('[댓글 전송] API 요청:', requestData);
+
+      await postCommentTextMutation.mutateAsync(requestData);
+
+      console.log('[댓글 전송] API 응답 성공: 200 OK');
+
+      // 콜백 호출 (옵션)
+      if (onSendComment) {
+        onSendComment(trimmedText);
+        console.log('[댓글 전송] 콜백 호출 완료');
+      }
+
+      // 초기화
+      setCommentText('');
+      setSelectedImage(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      console.log('[댓글 전송] 초기화 완료');
+    } catch (error) {
+      console.error('[댓글 전송] 실패:', {
+        error,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        errorStack: error instanceof Error ? error.stack : undefined,
+        courseId,
+        commentText: trimmedText,
+      });
+      alert('댓글 전송에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSending(false);
+      console.log('[댓글 전송] 상태 초기화 완료');
     }
-    console.log('[댓글 전송] 초기화 완료');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -190,13 +221,13 @@ const CoupleComment = ({ courseId = 17, comments = [], onSendComment }: CoupleCo
             onChange={e => setCommentText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="댓글을 남겨보세요!"
-            disabled={isUploading}
+            disabled={isUploading || isSending}
             className="text-b3 placeholder:text-pink-4 text-pink-4 flex-1 bg-transparent outline-none disabled:opacity-50"
           />
           <button
             type="button"
             onClick={handleSend}
-            disabled={!commentText.trim() || isUploading}
+            disabled={!commentText.trim() || isUploading || isSending}
             className="ml-2 flex flex-shrink-0 items-center justify-center disabled:opacity-50"
             aria-label="전송"
           >
@@ -206,7 +237,7 @@ const CoupleComment = ({ courseId = 17, comments = [], onSendComment }: CoupleCo
         <button
           type="button"
           onClick={handleImageSelect}
-          disabled={isUploading}
+          disabled={isUploading || isSending}
           className="border-pink-3 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border bg-white disabled:opacity-50"
           aria-label="이미지 업로드"
         >
