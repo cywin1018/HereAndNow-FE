@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import ReviewSection from './ReviewSection';
 import CoupleComment from './CoupleComment';
+import type { CourseDetailResponse } from '@apis/course/types';
 
 const RightArrowIcon = () => (
   <svg
@@ -14,6 +15,32 @@ const RightArrowIcon = () => (
     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
   </svg>
 );
+
+// 별점 렌더링 함수
+const renderStars = (rating: number) => {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+  return (
+    <div className="flex text-yellow-400">
+      {Array.from({ length: fullStars }).map((_, i) => (
+        <span key={i}>★</span>
+      ))}
+      {hasHalfStar && <span className="opacity-50">★</span>}
+      {Array.from({ length: emptyStars }).map((_, i) => (
+        <span key={i} className="text-gray-300">
+          ★
+        </span>
+      ))}
+    </div>
+  );
+};
+
+interface DetailSectionProps {
+  pins?: CourseDetailResponse['data']['pins'];
+}
+
 // 임시 댓글 데이터
 const commentList = [
   {
@@ -31,17 +58,8 @@ const commentList = [
   },
   { id: 4, user: '김**', img: 'https://placehold.co/32x32/E8D5A0/333?text=김', comment: '좋아요 눌러요~^^' },
 ];
-// 임시 사진 데이터 (이 부분은 실제 데이터로 대체하셔야 합니다)
-const photoList = [
-  'https://placehold.co/80x80/a9d1a0/333?text=Seoul+1',
-  'https://placehold.co/80x80/d4a0a0/333?text=Deer',
-  'https://placehold.co/80x80/a0c0d4/333?text=Statue',
-  'https://placehold.co/80x80/d4c7a0/333?text=City',
-  'https://placehold.co/80x80/d4a0c5/333?text=Flower',
-  'https://placehold.co/80x80/a0d4c7/333?text=More',
-];
 
-const DetailSection = () => {
+const DetailSection = ({ pins = [] }: DetailSectionProps) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
@@ -57,92 +75,99 @@ const DetailSection = () => {
     setIsShareModalOpen(false);
   };
 
+  if (pins.length === 0) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <span className="text-iceblue-8">장소 정보가 없습니다.</span>
+      </div>
+    );
+  }
+
   return (
-    <div className="">
-      {/* --- 새로 추가된 헤더 (이미지 참고) --- */}
-      <div className="mb-4 flex items-center gap-2">
-        <span className="text-d2 flex h-[20px] w-[20px] items-center justify-center rounded-full bg-pink-500 text-white">
-          1
-        </span>
-        {/* 커스텀 텍스트 클래스 대신 표준 Tailwind 클래스를 사용합니다. */}
-        <span className="text-d1 text-neutral-8 font-bold">서울숲</span>
-      </div>
-      <div className="flex flex-row gap-[12px]">
-        {/* --- 1. 메인 이미지 --- */}
-        {/* 'border-iceblue-4'는 tailwind.config.js에 정의되어 있어야 합니다. */}
-        <div className="border-iceblue-4 h-[173px] w-[173px] flex-shrink-0 rounded-[8px] border-2">
-          <img
-            src="/public/dummy_course_detail.png"
-            alt="코스 상세"
-            className="h-full w-full rounded-[6px] object-cover" //
-          />
-        </div>
+    <div className="flex flex-col gap-8">
+      {pins.map((pin, index) => {
+        const place = pin.placeDetails;
+        const mainImage = pin.pinImages && pin.pinImages.length > 0 ? pin.pinImages[0] : '/dummy_course_detail.png';
 
-        {/* --- 2. 정보 (레이아웃 수정을 위해 flex-1 flex-col 추가) --- */}
-
-        <div className="flex flex-1 flex-col">
-          <div className="flex flex-col gap-1">
-            {/* text-b3, text-d2, text-d1 등은 tailwind.config.js에 정의되어 있어야 합니다. */}
-            <span className="text-b3 text-neutral-10">서울숲</span>
-            <span className="text-d2 text-iceblue-8">도시근린공원</span>
-            <span className="text-d1 text-iceblue-8">서울 성동구 성수동1가 678-1</span>
-
-            {/* 평점 및 리뷰 */}
-            <div className="mt-1 flex flex-wrap items-center gap-2">
-              <span className="text-b5 font-bold text-yellow-500">4.7</span>
-              {/* 별 아이콘 (임시) */}
-              <div className="flex text-yellow-400">
-                <span>★</span>
-                <span>★</span>
-                <span>★</span>
-                <span>★</span>
-                <span className="text-gray-300">★</span>
-              </div>
-              <span className="text-b5 text-iceblue-8">리뷰 531건</span>
+        return (
+          <div key={pin.pinIndex} className="flex flex-col gap-4">
+            {/* --- 헤더 --- */}
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-d2 flex h-[20px] w-[20px] items-center justify-center rounded-full bg-pink-500 text-white">
+                {pin.pinIndex}
+              </span>
+              <span className="text-d1 text-neutral-8 font-bold">{place.placeName}</span>
             </div>
+
+            <div className="flex flex-row gap-[12px]">
+              {/* --- 1. 메인 이미지 --- */}
+              <div className="border-iceblue-4 h-[173px] w-[173px] flex-shrink-0 rounded-[8px] border-2">
+                <img src={mainImage} alt={place.placeName} className="h-full w-full rounded-[6px] object-cover" />
+              </div>
+
+              {/* --- 2. 정보 --- */}
+              <div className="flex flex-1 flex-col">
+                <div className="flex flex-col gap-1">
+                  <span className="text-b3 text-neutral-10">{place.placeName}</span>
+                  <span className="text-d2 text-iceblue-8">{place.placeCategory}</span>
+                  <span className="text-d1 text-iceblue-8">{place.placeStreetNameAddress}</span>
+
+                  {/* 평점 및 리뷰 */}
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    <span className="text-b5 font-bold text-yellow-500">{place.placeRating.toFixed(1)}</span>
+                    {renderStars(place.placeRating)}
+                    <span className="text-b5 text-iceblue-8">리뷰 {place.reviewCount}건</span>
+                  </div>
+                </div>
+
+                <div className="mt-auto">
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-between rounded-lg bg-gray-100 p-4 transition-colors hover:bg-gray-200"
+                  >
+                    <span className="font-medium text-gray-800">자세히</span>
+                    <RightArrowIcon />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* --- 포토 슬라이드 영역 --- */}
+            {pin.pinImages && pin.pinImages.length > 0 && (
+              <div
+                className="hide-scrollbar mt-3 mb-3 overflow-x-auto whitespace-nowrap"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                }}
+              >
+                <style>{`.hide-scrollbar::-webkit-scrollbar { display: none; }`}</style>
+                <div className="flex flex-row gap-2">
+                  {pin.pinImages.map((src, imgIndex) => (
+                    <img
+                      key={imgIndex}
+                      src={src}
+                      alt={`${place.placeName} 이미지 ${imgIndex + 1}`}
+                      className="border-iceblue-4 h-[80px] w-[80px] flex-shrink-0 rounded-lg border-2 object-cover"
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* --- 리뷰 섹션 --- */}
+            <div className="flex flex-col gap-[20px]">
+              {pin.pinPositive && <ReviewSection title="좋았던 점" content={pin.pinPositive} />}
+              {pin.pinNegative && <ReviewSection title="아쉬웠던 점" content={pin.pinNegative} />}
+            </div>
+
+            {/* 마지막 pin이 아니면 구분선 추가 */}
+            {index < pins.length - 1 && <div className="border-t border-gray-200 pt-6"></div>}
           </div>
+        );
+      })}
 
-          <div className="mt-auto">
-            <button
-              type="button"
-              className="flex w-full items-center justify-between rounded-lg bg-gray-100 p-4 transition-colors hover:bg-gray-200"
-            >
-              <span className="font-medium text-gray-800">자세히</span>
-
-              <RightArrowIcon />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* --- 포토 슬라이드 영역 (수정됨) --- */}
-      <div
-        className="hide-scrollbar mt-3 mb-3 overflow-x-auto whitespace-nowrap"
-        style={{
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
-      >
-        <style>{`.hide-scrollbar::-webkit-scrollbar { display: none; }`}</style>
-        <div className="flex flex-row gap-2">
-          {photoList.map((src, index) => (
-            <img
-              key={index}
-              src={src}
-              alt={`Photo slide ${index + 1}`}
-              className="border-iceblue-4 h-[80px] w-[80px] flex-shrink-0 rounded-lg border-2 object-cover"
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-[20px]">
-        <ReviewSection
-          title="좋았던 점"
-          content="입장료가 무료라서 좋다. 그리고 내부 꽃사슴도 볼 수 있고, 멋있는 조형물도 보는 재미가 있다. 평야에서 사람들이 돗자리 깔고 여유를 즐기는 모습을 바라보는 풍경도 평화로워!"
-        />
-        <ReviewSection title="아쉬웠던 점" content="무료라서 막 엄청 보고 즐길 건 없는 듯?" />
-      </div>
+      {/* 댓글 섹션 (마지막에 한 번만 표시) */}
       <div className="mt-6 border-t border-gray-200 pt-6">
         {/* 댓글 헤더 */}
         <h3 className="text-lg font-semibold text-gray-900">댓글 {commentList.length}개</h3>
