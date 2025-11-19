@@ -12,7 +12,7 @@ import { useCourseSaveStore } from '@stores/course-save';
 const PlaceDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { setPinFiles, pinFiles } = useCourseSaveStore();
+  const { setPinFiles, pinFiles, courseData, updatePin } = useCourseSaveStore();
 
   // location.state에서 pinIndex 가져오기 (없으면 새 핀 추가 시 -1)
   console.log('[PlaceDetail] location.state 확인:', {
@@ -22,6 +22,20 @@ const PlaceDetail = () => {
   });
   const pinIndex = (location.state as { pinIndex?: number })?.pinIndex ?? -1;
   console.log('[PlaceDetail] 최종 pinIndex:', pinIndex);
+
+  // store에서 현재 pin 정보 가져오기
+  const currentPin = pinIndex >= 0 && courseData?.pinList?.[pinIndex] ? courseData.pinList[pinIndex] : null;
+  const currentPlace = currentPin?.place;
+
+  // 별점 상태 관리 (store의 pinRating 또는 기본값 0)
+  const [rating, setRating] = useState<number>(currentPin?.pinRating || 0);
+
+  // pin 정보가 변경되면 별점 업데이트
+  useEffect(() => {
+    if (currentPin?.pinRating !== undefined) {
+      setRating(currentPin.pinRating);
+    }
+  }, [currentPin?.pinRating]);
 
   // 현재 핀의 파일 목록 관리
   const [currentFiles, setCurrentFiles] = useState<File[]>(() => {
@@ -46,17 +60,26 @@ const PlaceDetail = () => {
     }
   }, [currentFiles, pinIndex, setPinFiles]);
 
+  // 별점 변경 핸들러
+  const handleRatingChange = (newRating: number) => {
+    setRating(newRating);
+    if (pinIndex >= 0) {
+      updatePin(pinIndex, { pinRating: newRating });
+      console.log(`[PlaceDetail] 별점 업데이트 - 핀 ${pinIndex}:`, newRating);
+    }
+  };
+
   return (
     <div className="flex w-full flex-col gap-[32px] pb-16">
       <PageHeader title="장소 세부설명" />
       <PlaceCard
-        imageUrl="/dummy_placecard.png"
-        name="갓덴스시 강남점"
-        category="디저트 카페"
-        address="서울 강남구 강남대로102길 30 1-3층"
-        addressDetail="(지번) 역삼동 822-4"
-        rating={4.1}
-        reviewCount={252}
+        imageUrl={currentPlace?.placeUrl || '/dummy_placecard.png'}
+        name={currentPlace?.placeName || '장소 이름'}
+        category={currentPlace?.placeCategory || '장소'}
+        address={currentPlace?.placeStreetNameAddress || ''}
+        addressDetail={currentPlace?.placeNumberAddress || ''}
+        rating={rating}
+        reviewCount={0}
       />
       <div className="flex flex-col gap-[8px]">
         <label className="text-d1 text-iceblue-8">
@@ -80,11 +103,7 @@ const PlaceDetail = () => {
         />
       </div>
       <div className="flex flex-col gap-[8px]">
-        <label className="text-d1 text-iceblue-8">
-          별점을 매겨본다면?
-          <span className="text-red-6 ml-1">•</span>
-        </label>
-        <StarRatingFilter rating={4.1} onRatingChange={() => {}} title="별점을 매겨본다면?" />
+        <StarRatingFilter rating={rating} onRatingChange={handleRatingChange} title="별점을 매겨본다면?" />
       </div>
       <div className="flex flex-col gap-[8px]">
         <label className="text-d1 text-iceblue-8">
