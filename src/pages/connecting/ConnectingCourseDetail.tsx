@@ -102,7 +102,7 @@ const ConnectingCourseDetail = () => {
             ))}
           </div>
         )}
-        <DetailSection pins={course.data.pins} />
+        <DetailSection pins={course.data.pins} courseId={course.data.courseId} />
       </div>
     </div>
   );
