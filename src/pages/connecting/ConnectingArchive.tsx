@@ -4,9 +4,30 @@ import filterCancelIcon from '@assets/icons/filter_cancel.svg';
 import smallPinkFolder from '@assets/images/smallPinkFolder.png';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '@common/layout/PageHeader';
+import useGetConnectingSearch from '@apis/connecting/useGetConnectingSearch';
+import useGetConnectingRecent from '@apis/connecting/useGetConnectingRecent';
+import { useEffect } from 'react';
 
 const ConnectingArchive = () => {
   const navigate = useNavigate();
+
+  const { data: connectingSearchResponse } = useGetConnectingSearch();
+  const { data: connectingRecentResponse } = useGetConnectingRecent();
+  const connectingSearchData = connectingSearchResponse?.data || null;
+  const connectingRecentData = connectingRecentResponse?.data || null;
+
+  useEffect(() => {
+    if (connectingSearchResponse) {
+      console.log('getConnectingSearch API 응답:', connectingSearchResponse);
+      console.log('connectingSearchData:', connectingSearchData);
+    }
+    if (connectingRecentResponse) {
+      console.log('getConnectingRecent API 응답:', connectingRecentResponse);
+      console.log('connectingRecentData:', connectingRecentData);
+    }
+  }, [connectingSearchResponse, connectingSearchData, connectingRecentResponse, connectingRecentData]);
+
+  console.log('connectingSearchData:', connectingSearchData);
 
   const handleSearchClick = () => {
     navigate('/connecting/course/detail');
