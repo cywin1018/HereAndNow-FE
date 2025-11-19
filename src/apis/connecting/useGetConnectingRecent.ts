@@ -5,7 +5,7 @@ const useGetConnectingRecent = () => {
   return useQuery({
     queryKey: ['connectingRecent'],
     queryFn: async () => {
-      const res = await api.get('/couple/recent');
+      const res = await api.get('/couple/search/recent');
       return res.data;
     },
     enabled: !!localStorage.getItem('accessToken'),
