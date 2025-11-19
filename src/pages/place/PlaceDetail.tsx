@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import StarRatingFilter from '@common/components/StarRatingFilter';
 import PhotoUploader from '@common/components/PhotoUploader';
@@ -8,6 +8,7 @@ import PageHeader from '@common/layout/PageHeader';
 import PlaceCard from '@pages/home/components/PlaceCard';
 import BottomActionButton from '@common/button/BottomActionButton';
 import { useCourseSaveStore } from '@stores/course-save';
+import { getCategoryTags } from '@utils/categoryTags';
 
 const PlaceDetail = () => {
   const navigate = useNavigate();
@@ -26,6 +27,23 @@ const PlaceDetail = () => {
   // store에서 현재 pin 정보 가져오기
   const currentPin = pinIndex >= 0 && courseData?.pinList?.[pinIndex] ? courseData.pinList[pinIndex] : null;
   const currentPlace = currentPin?.place;
+
+  // 카테고리 정보 디버깅
+  useEffect(() => {
+    console.log('[PlaceDetail] ===== 카테고리 정보 디버깅 =====');
+    console.log('[PlaceDetail] currentPlace 전체:', currentPlace);
+    console.log('[PlaceDetail] 카테고리 코드 (placeGroupCode):', currentPlace?.placeGroupCode);
+    console.log('[PlaceDetail] 카테고리 이름 (placeCategory):', currentPlace?.placeCategory);
+    console.log('[PlaceDetail] 장소 이름 (placeName):', currentPlace?.placeName);
+    console.log('[PlaceDetail] 카테고리 코드 타입:', typeof currentPlace?.placeGroupCode);
+    console.log('[PlaceDetail] 카테고리 코드 존재 여부:', !!currentPlace?.placeGroupCode);
+    if (currentPlace?.placeGroupCode) {
+      console.log('[PlaceDetail] ✅ 카테고리 코드가 존재합니다:', currentPlace.placeGroupCode);
+    } else {
+      console.warn('[PlaceDetail] ⚠️ 카테고리 코드가 없습니다!');
+    }
+    console.log('[PlaceDetail] =================================');
+  }, [currentPlace]);
 
   // 별점 상태 관리 (store의 pinRating 또는 기본값 0)
   const [rating, setRating] = useState<number>(currentPin?.pinRating || 0);
@@ -69,6 +87,24 @@ const PlaceDetail = () => {
     }
   };
 
+  // 카테고리 코드에 따른 태그 옵션 가져오기
+  const categoryTags = useMemo(() => {
+    const categoryCode = currentPlace?.placeGroupCode;
+    console.log('[PlaceDetail] ===== 태그 옵션 가져오기 =====');
+    console.log('[PlaceDetail] 입력된 카테고리 코드:', categoryCode);
+    const tags = getCategoryTags(categoryCode);
+    console.log('[PlaceDetail] 반환된 태그 옵션:', {
+      atmosphere: tags.atmosphere,
+      atmosphereCount: tags.atmosphere.length,
+      facility: tags.facility,
+      facilityCount: tags.facility.length,
+      etc: tags.etc,
+      etcCount: tags.etc.length,
+    });
+    console.log('[PlaceDetail] =============================');
+    return tags;
+  }, [currentPlace?.placeGroupCode]);
+
   return (
     <div className="flex w-full flex-col gap-[32px] pb-16">
       <PageHeader title="장소 세부설명" />
@@ -105,73 +141,43 @@ const PlaceDetail = () => {
       <div className="flex flex-col gap-[8px]">
         <StarRatingFilter rating={rating} onRatingChange={handleRatingChange} title="별점을 매겨본다면?" />
       </div>
-      <div className="flex flex-col gap-[8px]">
-        <label className="text-d1 text-iceblue-8">
-          분위기는 어땠나요?
-          <span className="text-red-6 ml-1">•</span>
-        </label>
-        <TagSelector
-          options={[
-            '사진 찍기 좋아요',
-            '분위기 맛집',
-            '뷰가 좋아요',
-            '특별한 날 오기 좋아요',
-            '야경이 예뻐요',
-            '이색 데이트',
-            '건물이 멋져요',
-            '로맨틱해요',
-            '기념일에 오기 좋아요',
-            '감성 숙소',
-          ]}
-          maxSelected={5}
-        />
-      </div>
-      <div className="flex flex-col gap-[8px]">
-        <label className="text-d1 text-iceblue-8">
-          시설은 어떠셨나요?
-          <span className="text-red-6 ml-1">•</span>
-        </label>
-        <TagSelector
-          options={[
-            '시설이 깨끗해요',
-            '분위기 맛집',
-            '뷰가 좋아요',
-            '특별한 날 오기 좋아요',
-            '야경이 예뻐요',
-            '이색 데이트',
-            '건물이 멋져요',
-            '로맨틱해요',
-            '기념일에 오기 좋아요',
-            '감성 숙소',
-          ]}
-          maxSelected={5}
-          selectedOptionClassName="bg-blue-6 text-white"
-          optionContainerBgClassName="bg-blue-1"
-        />
-      </div>
-      <div className="flex flex-col gap-[8px]">
-        <label className="text-d1 text-iceblue-8">
-          기타 사항
-          <span className="text-red-6 ml-1">•</span>
-        </label>
-        <TagSelector
-          options={[
-            '친절해요',
-            '분위기 맛집',
-            '뷰가 좋아요',
-            '특별한 날 오기 좋아요',
-            '야경이 예뻐요',
-            '이색 데이트',
-            '건물이 멋져요',
-            '로맨틱해요',
-            '기념일에 오기 좋아요',
-            '감성 숙소',
-          ]}
-          maxSelected={5}
-          selectedOptionClassName="bg-green-6 text-white"
-          optionContainerBgClassName="bg-green-1"
-        />
-      </div>
+      {categoryTags.atmosphere.length > 0 && (
+        <div className="flex flex-col gap-[8px]">
+          <label className="text-d1 text-iceblue-8">
+            분위기는 어땠나요?
+            <span className="text-red-6 ml-1">•</span>
+          </label>
+          <TagSelector options={categoryTags.atmosphere} maxSelected={5} />
+        </div>
+      )}
+      {categoryTags.facility.length > 0 && (
+        <div className="flex flex-col gap-[8px]">
+          <label className="text-d1 text-iceblue-8">
+            시설은 어떠셨나요?
+            <span className="text-red-6 ml-1">•</span>
+          </label>
+          <TagSelector
+            options={categoryTags.facility}
+            maxSelected={5}
+            selectedOptionClassName="bg-blue-6 text-white"
+            optionContainerBgClassName="bg-blue-1"
+          />
+        </div>
+      )}
+      {categoryTags.etc.length > 0 && (
+        <div className="flex flex-col gap-[8px]">
+          <label className="text-d1 text-iceblue-8">
+            기타 사항
+            <span className="text-red-6 ml-1">•</span>
+          </label>
+          <TagSelector
+            options={categoryTags.etc}
+            maxSelected={5}
+            selectedOptionClassName="bg-green-6 text-white"
+            optionContainerBgClassName="bg-green-1"
+          />
+        </div>
+      )}
       <LabeledTextarea label="어떤 점이 좋았나요?" required maxLength={100} />
       <LabeledTextarea label="어떤 점이 아쉬웠나요?" required maxLength={100} />
       <div className="pt-[80px]">

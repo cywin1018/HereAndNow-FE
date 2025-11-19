@@ -22,7 +22,7 @@ const CoupleInviteBottomSheet = ({ isOpen, onClose, onInvite, myId }: CoupleInvi
     postCoupleRequest(trimmedId, {
       onSuccess: () => {
         onInvite(trimmedId);
-        setPartnerId('');
+    setPartnerId('');
       },
     });
   };
