@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import BottomSheet from '@common/BottomSheet';
+import { usePostCoupleRequest } from '@apis/connecting/usePostCoupleRequest';
 
 interface CoupleInviteBottomSheetProps {
   isOpen: boolean;
@@ -10,11 +11,20 @@ interface CoupleInviteBottomSheetProps {
 
 const CoupleInviteBottomSheet = ({ isOpen, onClose, onInvite, myId }: CoupleInviteBottomSheetProps) => {
   const [partnerId, setPartnerId] = useState('');
+  const { mutate: postCoupleRequest, isPending } = usePostCoupleRequest();
 
   const handleInviteClick = () => {
-    if (!partnerId.trim()) return;
-    onInvite(partnerId.trim());
-    setPartnerId('');
+    const trimmedId = partnerId.trim();
+    if (!trimmedId) return;
+
+    // 서버에 커플 요청 보내기 (query parameter로 전송)
+    // ✅ API 요청이 성공했을 때만 onInvite 호출 및 입력 초기화
+    postCoupleRequest(trimmedId, {
+      onSuccess: () => {
+        onInvite(trimmedId);
+        setPartnerId('');
+      },
+    });
   };
 
   const handleClose = () => {
@@ -55,9 +65,9 @@ const CoupleInviteBottomSheet = ({ isOpen, onClose, onInvite, myId }: CoupleInvi
           <button
             type="button"
             onClick={handleInviteClick}
-            disabled={!partnerId.trim()}
+            disabled={!partnerId.trim() || isPending}
             className={`text-b3 flex-1 rounded-2xl py-4 text-white transition-colors ${
-              partnerId.trim() ? 'bg-pink-6 hover:bg-pink-7' : 'bg-neutral-3 cursor-not-allowed'
+              !partnerId.trim() || isPending ? 'bg-neutral-3 cursor-not-allowed' : 'bg-pink-6 hover:bg-pink-7'
             }`}
           >
             초대하기
