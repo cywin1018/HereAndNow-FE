@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import ReviewSection from './ReviewSection';
 import CoupleComment from './CoupleComment';
 import type { CourseDetailResponse } from '@apis/course/types';
@@ -43,7 +44,16 @@ interface DetailSectionProps {
 }
 
 const DetailSection = ({ pins = [], courseId }: DetailSectionProps) => {
+  const navigate = useNavigate();
   const { data: commentData, isLoading: isCommentLoading } = useGetCourseComment(courseId || 0);
+
+  const handleNavigateToArchive = () => {
+    // TODO: 추후 제공 - courseId를 사용하여 아카이브 상세 페이지로 이동
+    // navigate(`/archive/${courseId}`);
+
+    // 현재는 아카이브 메인 페이지로 이동
+    navigate('/archive');
+  };
 
   if (pins.length === 0) {
     return (
@@ -144,11 +154,21 @@ const DetailSection = ({ pins = [], courseId }: DetailSectionProps) => {
 
         {/* 댓글 입력창 */}
         <div className="mt-4">
-          <input
-            type="text"
-            placeholder="댓글을 남겨보세요!"
-            className="w-full rounded-lg border border-gray-300 p-4 text-base placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-          />
+          <div className="bg-iceblue-2 relative flex items-center rounded-lg p-4">
+            <input
+              type="text"
+              placeholder="아카이빙에서 댓글을 달 수 있어요"
+              readOnly
+              className="text-iceblue-8 placeholder-iceblue-7 text-b4 flex-1 bg-transparent focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={handleNavigateToArchive}
+              className="text-d1 text-neutral-8 hover:text-neutral-10 underline"
+            >
+              바로가기
+            </button>
+          </div>
         </div>
 
         {/* 댓글 목록 */}
