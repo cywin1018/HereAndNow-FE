@@ -6,12 +6,17 @@ import type { CourseSaveRequest, CourseSaveResponse, CourseCommitRequest, Course
 // 1. 코스 저장
 const saveCourse = async (data: CourseSaveRequest): Promise<CourseSaveResponse> => {
   try {
+    // 전송되는 데이터에서 ID 필드 확인
+    const requestData = { ...data };
     console.log('[코스 저장] 요청 시작:', {
       courseTitle: data.courseTitle,
       pinCount: data.pinList.length,
       courseData: data,
+      hasId: 'id' in requestData || 'courseId' in requestData,
+      allKeys: Object.keys(requestData),
+      requestDataStringified: JSON.stringify(requestData, null, 2),
     });
-  const response = await api.post<CourseSaveResponse>('/course/save', data);
+    const response = await api.post<CourseSaveResponse>('/course/save', data);
     console.log('[코스 저장] 응답 성공:', {
       courseKey: response.data.data.courseKey,
       courseKeyLength: response.data.data.courseKey?.length,
@@ -22,7 +27,7 @@ const saveCourse = async (data: CourseSaveRequest): Promise<CourseSaveResponse> 
       // 전체 응답 구조 확인을 위한 로그
       allKeys: Object.keys(response.data.data || {}),
     });
-  return response.data;
+    return response.data;
   } catch (error) {
     console.error('[코스 저장] 실패:', error);
     throw error;
@@ -45,7 +50,7 @@ const commitCourse = async (courseUuid: string, data: CourseCommitRequest): Prom
     const response = await api.post<CourseCommitResponse>(commitUrl, data);
     console.log('[코스 커밋] 응답 성공:', response.data);
     return response.data;
-    } catch (error) {
+  } catch (error) {
     console.error('[코스 커밋] 실패:', {
       courseUuid,
       commitUrl: `/course/${courseUuid}/commit`,
@@ -54,7 +59,7 @@ const commitCourse = async (courseUuid: string, data: CourseCommitRequest): Prom
       errorStatus: (error as any)?.response?.status,
     });
     throw error;
-    }
+  }
 };
 
 interface CourseSaveWithFilesParams {
@@ -68,10 +73,10 @@ export const useCourseSave = () => {
       console.log('=== 코스 저장 프로세스 시작 ===');
 
       try {
-      // 1. 코스 저장
+        // 1. 코스 저장
         console.log('[1단계] 코스 저장 시작...');
-      const saveResponse = await saveCourse(courseData);
-      const { courseKey, pinDirname } = saveResponse.data;
+        const saveResponse = await saveCourse(courseData);
+        const { courseKey, pinDirname } = saveResponse.data;
 
         if (!courseKey) {
           throw new Error('서버 응답에 courseKey가 없습니다.');
@@ -112,7 +117,7 @@ export const useCourseSave = () => {
           willUse: actualCourseId,
         });
 
-      // 2. 파일 업로드
+        // 2. 파일 업로드
         console.log('[2단계] 파일 업로드 시작...');
         console.log('[2단계] 입력 데이터 확인:', {
           pinDirnameCount: pinDirname.length,
@@ -152,8 +157,20 @@ export const useCourseSave = () => {
 
           try {
             // Presigned URL 발급
+            // HEIC 파일은 JPEG로 변환되므로 확장자를 .jpg로 변경
             const filenames = files.map((file, idx) => {
-              const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+              let ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+              // HEIC 파일인 경우 jpg로 변경
+              const fileName = file.name.toLowerCase();
+              const fileType = file.type.toLowerCase();
+              if (
+                fileName.endsWith('.heic') ||
+                fileName.endsWith('.heif') ||
+                fileType === 'image/heic' ||
+                fileType === 'image/heif'
+              ) {
+                ext = 'jpg';
+              }
               return `${Date.now()}_${idx}.${ext}`;
             });
 
@@ -208,11 +225,11 @@ export const useCourseSave = () => {
           pinImageObjectKeyList,
         });
 
-      // 3. 코스 커밋
+        // 3. 코스 커밋
         console.log('[3단계] 코스 커밋 시작...');
         const commitResponse = await commitCourse(actualCourseId, {
-        pinImageObjectKeyList,
-      });
+          pinImageObjectKeyList,
+        });
 
         console.log('=== 코스 저장 완료 ===');
         return { courseKey: actualCourseId, commitResponse };
