@@ -1,13 +1,14 @@
 import bigFolder from '@assets/images/bigFolder.png';
 import filterSearchIcon from '@assets/icons/filter_search.svg';
-import filterCancelIcon from '@assets/icons/filter_cancel.svg';
-import smallFolder from '@assets/images/smallFolder.png';
 import { useNavigate, useLocation } from 'react-router-dom';
 import useGetRecentArchive from '@apis/archive/query/useGetRecentArchive';
 import useSearchArchive from '@apis/archive/query/useSearchArchive';
 import type { ArchiveSearchParams, ArchiveSearchResponse } from '@apis/archive/archive';
 import { useEffect } from 'react';
 import api from '@apis/common/api';
+import SelectedFiltersChips from './components/SelectedFilters';
+import SelectedTagList from './components/SelectedTagList';
+import ArchiveFolderList from './components/ArchiveFolderList';
 
 // 날짜 포맷팅 함수: "2025-11-05" -> "2025. 11. 05"
 const formatDate = (dateString: string): string => {
@@ -274,186 +275,22 @@ const ArchivePage = () => {
             </div>
 
             {/* 필터 리스트 */}
-            {/* TODO: 컴포넌트로 분리 */}
             {selectedFilters && (
-              <div className="flex w-full items-center gap-1 overflow-x-visible">
-                {/* 별점 필터 */}
-                {selectedFilters.rating !== undefined && selectedFilters.rating > 0 && (
-                  <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
-                    {/* 삭제 버튼 */}
-                    <button
-                      type="button"
-                      className="flex h-6 w-6 items-center justify-center"
-                      onClick={() => handleFilterRemove('rating')}
-                    >
-                      <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
-                    </button>
-
-                    {/* 필터 이름 */}
-                    <span className="text-d1 text-neutral-4">별점</span>
-
-                    {/* 필터 값 */}
-                    <span className="text-d1 text-neutral-6">{selectedFilters.rating}점</span>
-                  </div>
-                )}
-
-                {/* 날짜 필터 */}
-                {selectedFilters.startDate && (
-                  <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
-                    {/* 삭제 버튼 */}
-                    <button
-                      type="button"
-                      className="flex h-6 w-6 items-center justify-center"
-                      onClick={() => handleFilterRemove('startDate')}
-                    >
-                      <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
-                    </button>
-
-                    {/* 필터 이름 */}
-                    <span className="text-d1 text-neutral-4">언제</span>
-
-                    {/* 필터 값 */}
-                    <span className="text-d1 text-neutral-6">
-                      {selectedFilters.startDate === selectedFilters.endDate
-                        ? formatDate(selectedFilters.startDate)
-                        : `${formatDate(selectedFilters.startDate)} ~ ${selectedFilters.endDate ? formatDate(selectedFilters.endDate) : ''}`}
-                    </span>
-                  </div>
-                )}
-
-                {/* 누구와 필터 */}
-                {selectedFilters.with && (
-                  <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
-                    {/* 삭제 버튼 */}
-                    <button
-                      type="button"
-                      className="flex h-6 w-6 items-center justify-center"
-                      onClick={() => handleFilterRemove('with')}
-                    >
-                      <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
-                    </button>
-
-                    {/* 필터 이름 */}
-                    <span className="text-d1 text-neutral-4">누구와</span>
-
-                    {/* 필터 값 */}
-                    <span className="text-d1 text-neutral-6">{selectedFilters.with}</span>
-                  </div>
-                )}
-
-                {/* 지역 필터 */}
-                {selectedFilters.region && (
-                  <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
-                    {/* 삭제 버튼 */}
-                    <button
-                      type="button"
-                      className="flex h-6 w-6 items-center justify-center"
-                      onClick={() => handleFilterRemove('region')}
-                    >
-                      <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
-                    </button>
-
-                    {/* 필터 이름 */}
-                    <span className="text-d1 text-neutral-4">지역</span>
-
-                    {/* 필터 값 */}
-                    <span className="text-d1 text-neutral-6">{selectedFilters.region}</span>
-                  </div>
-                )}
-
-                {/* 키워드 필터 */}
-                {selectedFilters.keyword && selectedFilters.keyword.length > 0 && (
-                  <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
-                    {/* 삭제 버튼 */}
-                    <button
-                      type="button"
-                      className="flex h-6 w-6 items-center justify-center"
-                      onClick={() => handleFilterRemove('keyword')}
-                    >
-                      <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
-                    </button>
-
-                    {/* 필터 이름 */}
-                    <span className="text-d1 text-neutral-4">키워드</span>
-
-                    {/* 필터 값 */}
-                    <span className="text-d1 text-neutral-6">{selectedFilters.keyword[0]}</span>
-                  </div>
-                )}
-
-                {/* 업종 필터 */}
-                {selectedFilters.placeCode && selectedFilters.placeCode.length > 0 && (
-                  <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
-                    {/* 삭제 버튼 */}
-                    <button
-                      type="button"
-                      className="flex h-6 w-6 items-center justify-center"
-                      onClick={() => handleFilterRemove('placeCode')}
-                    >
-                      <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
-                    </button>
-
-                    {/* 필터 이름 */}
-                    <span className="text-d1 text-neutral-4">업종</span>
-
-                    {/* 필터 값 */}
-                    <span className="text-d1 text-neutral-6">{selectedFilters.placeCode[0]}</span>
-                  </div>
-                )}
-              </div>
+              <SelectedFiltersChips
+                selectedFilters={selectedFilters}
+                onRemove={handleFilterRemove}
+                formatDate={formatDate}
+              />
             )}
 
             {/* 태그 리스트 */}
             {selectedFilters?.tag && selectedFilters.tag.length > 0 && (
-              <div className="flex w-full items-center gap-2 overflow-x-visible">
-                {selectedFilters.tag.map((tag, index) => {
-                  const colorClass = getTagColorClass(index);
-                  return (
-                    <button
-                      key={index}
-                      type="button"
-                      className={`${colorClass.bg} ${colorClass.text} text-d1 flex h-8 items-center justify-center rounded-sm px-2.5 whitespace-nowrap`}
-                      onClick={() => handleTagRemove(tag)}
-                    >
-                      {tag}
-                    </button>
-                  );
-                })}
-              </div>
+              <SelectedTagList tags={selectedFilters.tag} onRemove={handleTagRemove} />
             )}
           </div>
 
           {/* 폴더 리스트 */}
-          {/* TODO: 컴포넌트로 분리 */}
-          {displayedArchives.length > 0 && (
-            <div className="flex w-full flex-wrap gap-x-5 gap-y-8 px-1.75">
-              {displayedArchives.map(course => (
-                <div
-                  key={course.id}
-                  className="flex h-26 w-18 cursor-pointer flex-col"
-                  onClick={() => handleFolderClick(course.id)}
-                >
-                  {/* 폴더 */}
-                  <div className="relative flex h-18 w-18 items-center justify-center">
-                    <img src={smallFolder} alt="폴더" className="h-full w-full object-cover" />
-
-                    {/* 개수 */}
-                    <div className="bg-pink-6 text-d4 absolute top-2.5 right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full text-white">
-                      {course.commentCount}
-                    </div>
-                  </div>
-
-                  {/* 타이틀 */}
-                  <div className="flex w-full flex-col gap-0.5">
-                    <span className="text-d2 text-neutral-10 line-clamp-1 w-17 text-center">{course.courseTitle}</span>
-                    <span className="text-d3 text-neutral-5 line-clamp-1 w-17 text-center">
-                      {formatDate(course.courseVisitDate)}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <ArchiveFolderList archives={displayedArchives} onFolderClick={handleFolderClick} formatDate={formatDate} />
         </div>
       </div>
     </div>
