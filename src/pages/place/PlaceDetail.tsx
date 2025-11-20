@@ -55,6 +55,28 @@ const PlaceDetail = () => {
     }
   }, [currentPin?.pinRating]);
 
+  // 핀의 좋았던 점, 아쉬웠던 점 상태 관리
+  const [positiveDescription, setPositiveDescription] = useState<string>(currentPin?.pinPositiveDescription || '');
+  const [negativeDescription, setNegativeDescription] = useState<string>(currentPin?.pinNegativeDescription || '');
+
+  // pin 정보가 변경되면 설명 업데이트
+  useEffect(() => {
+    if (currentPin) {
+      setPositiveDescription(currentPin.pinPositiveDescription || '');
+      setNegativeDescription(currentPin.pinNegativeDescription || '');
+    }
+  }, [currentPin?.pinPositiveDescription, currentPin?.pinNegativeDescription]);
+
+  // 태그 상태 관리
+  const [selectedTags, setSelectedTags] = useState<string[]>(currentPin?.pinTagNames || []);
+
+  // pin 정보가 변경되면 태그 업데이트
+  useEffect(() => {
+    if (currentPin?.pinTagNames) {
+      setSelectedTags(currentPin.pinTagNames);
+    }
+  }, [currentPin?.pinTagNames]);
+
   // 현재 핀의 파일 목록 관리
   const [currentFiles, setCurrentFiles] = useState<File[]>(() => {
     if (pinIndex >= 0) {
@@ -147,7 +169,20 @@ const PlaceDetail = () => {
             분위기는 어땠나요?
             <span className="text-red-6 ml-1">•</span>
           </label>
-          <TagSelector options={categoryTags.atmosphere} maxSelected={5} />
+          <TagSelector
+            options={categoryTags.atmosphere}
+            maxSelected={5}
+            selectedTags={selectedTags.filter(tag => categoryTags.atmosphere.includes(tag))}
+            onChange={tags => {
+              // 기존 태그에서 atmosphere 태그를 제거하고 새로운 태그 추가
+              const otherTags = selectedTags.filter(tag => !categoryTags.atmosphere.includes(tag));
+              const newTags = [...otherTags, ...tags];
+              setSelectedTags(newTags);
+              if (pinIndex >= 0) {
+                updatePin(pinIndex, { pinTagNames: newTags });
+              }
+            }}
+          />
         </div>
       )}
       {categoryTags.facility.length > 0 && (
@@ -159,6 +194,16 @@ const PlaceDetail = () => {
           <TagSelector
             options={categoryTags.facility}
             maxSelected={5}
+            selectedTags={selectedTags.filter(tag => categoryTags.facility.includes(tag))}
+            onChange={tags => {
+              // 기존 태그에서 facility 태그를 제거하고 새로운 태그 추가
+              const otherTags = selectedTags.filter(tag => !categoryTags.facility.includes(tag));
+              const newTags = [...otherTags, ...tags];
+              setSelectedTags(newTags);
+              if (pinIndex >= 0) {
+                updatePin(pinIndex, { pinTagNames: newTags });
+              }
+            }}
             selectedOptionClassName="bg-blue-6 text-white"
             optionContainerBgClassName="bg-blue-1"
           />
@@ -173,13 +218,45 @@ const PlaceDetail = () => {
           <TagSelector
             options={categoryTags.etc}
             maxSelected={5}
+            selectedTags={selectedTags.filter(tag => categoryTags.etc.includes(tag))}
+            onChange={tags => {
+              // 기존 태그에서 etc 태그를 제거하고 새로운 태그 추가
+              const otherTags = selectedTags.filter(tag => !categoryTags.etc.includes(tag));
+              const newTags = [...otherTags, ...tags];
+              setSelectedTags(newTags);
+              if (pinIndex >= 0) {
+                updatePin(pinIndex, { pinTagNames: newTags });
+              }
+            }}
             selectedOptionClassName="bg-green-6 text-white"
             optionContainerBgClassName="bg-green-1"
           />
         </div>
       )}
-      <LabeledTextarea label="어떤 점이 좋았나요?" required maxLength={100} />
-      <LabeledTextarea label="어떤 점이 아쉬웠나요?" required maxLength={100} />
+      <LabeledTextarea
+        label="어떤 점이 좋았나요?"
+        required
+        maxLength={100}
+        value={positiveDescription}
+        onChange={value => {
+          setPositiveDescription(value);
+          if (pinIndex >= 0) {
+            updatePin(pinIndex, { pinPositiveDescription: value });
+          }
+        }}
+      />
+      <LabeledTextarea
+        label="어떤 점이 아쉬웠나요?"
+        required
+        maxLength={100}
+        value={negativeDescription}
+        onChange={value => {
+          setNegativeDescription(value);
+          if (pinIndex >= 0) {
+            updatePin(pinIndex, { pinNegativeDescription: value });
+          }
+        }}
+      />
       <div className="pt-[80px]">
         <BottomActionButton type="button" onClick={() => navigate('/place/register')}>
           세부설명 저장
