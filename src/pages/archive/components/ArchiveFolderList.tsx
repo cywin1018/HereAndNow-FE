@@ -5,10 +5,20 @@ interface ArchiveFolderListProps {
   archives: CourseItem[];
   onFolderClick: (courseId: number) => void;
   formatDate: (dateString: string) => string;
+  showEmptyMessage?: boolean;
 }
 
-const ArchiveFolderList = ({ archives, onFolderClick, formatDate }: ArchiveFolderListProps) => {
-  if (archives.length === 0) return null;
+const ArchiveFolderList = ({ archives, onFolderClick, formatDate, showEmptyMessage = false }: ArchiveFolderListProps) => {
+  if (archives.length === 0) {
+    if (showEmptyMessage) {
+      return (
+        <div className="bg-neutral-2 text-b3 text-neutral-5 flex h-32 w-full items-center justify-center rounded-2xl">
+          검색 결과가 없습니다
+        </div>
+      );
+    }
+    return null;
+  }
 
   return (
     <div className="flex w-full flex-wrap gap-x-5 gap-y-8 px-1.75">

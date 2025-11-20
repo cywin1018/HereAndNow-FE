@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import useGetRecentArchive from '@apis/archive/query/useGetRecentArchive';
 import useSearchArchive from '@apis/archive/query/useSearchArchive';
 import type { ArchiveSearchParams, ArchiveSearchResponse } from '@apis/archive/archive';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import api from '@apis/common/api';
 import SelectedFiltersChips from './components/SelectedFilters';
 import SelectedTagList from './components/SelectedTagList';
@@ -44,26 +44,43 @@ const getTagColorClass = (index: number): { bg: string; text: string } => {
   return colors[index % colors.length];
 };
 
+type ArchiveLocationState = {
+  searchParams: ArchiveSearchParams;
+  searchResult: ArchiveSearchResponse;
+};
+
 const ArchivePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // location.state에서 검색 파라미터와 검색 결과 확인
-  const searchState = location.state as
-    | { searchParams: ArchiveSearchParams; searchResult: ArchiveSearchResponse }
-    | null
-    | undefined;
+  const [searchState, setSearchState] = useState<ArchiveLocationState | null>(() => {
+    const initialState = location.state as ArchiveLocationState | null | undefined;
+    return initialState ?? null;
+  });
+
+  useEffect(() => {
+    if (location.state) {
+      setSearchState(location.state as ArchiveLocationState);
+    }
+  }, [location.state]);
+
+  const updateSearchState = (nextState: ArchiveLocationState | null) => {
+    setSearchState(nextState);
+    if (nextState) {
+      navigate('/archive', { state: nextState, replace: true });
+    } else {
+      navigate('/archive', { replace: true });
+    }
+  };
 
   // 검색 파라미터가 있으면 검색 결과 사용, 없으면 기본 데이터 사용
   const searchParams = searchState?.searchParams;
   const { data: searchResponse } = useSearchArchive(searchParams || {}, !!searchParams);
 
   // 검색 결과 또는 기본 데이터 결정
-  const searchResult = searchState?.searchResult || searchResponse;
+  const searchResult = searchResponse || searchState?.searchResult;
 
-  // 검색 결과가 있고 필터링된 코스가 있을 때만 검색 모드
-  const hasSearchResults = searchResult?.data?.filteredCourses && searchResult.data.filteredCourses.length > 0;
-  const isSearchMode = !!searchParams && hasSearchResults;
+  const isSearchMode = !!searchParams;
 
   // React Query로 최신 아카이빙 폴더 데이터 가져오기 (항상 호출)
   const { data: recentArchiveResponse } = useGetRecentArchive();
@@ -81,10 +98,10 @@ const ArchivePage = () => {
 
   // 필터 삭제 핸들러
   const handleFilterRemove = async (filterType: keyof ArchiveSearchParams) => {
-    if (!searchParams) return;
+    if (!searchState?.searchParams) return;
 
     // 필터 제거한 새로운 파라미터 생성
-    const newParams: ArchiveSearchParams = { ...searchParams };
+    const newParams: ArchiveSearchParams = { ...searchState.searchParams };
     delete newParams[filterType];
 
     // 모든 필터가 제거되었는지 확인
@@ -92,7 +109,7 @@ const ArchivePage = () => {
 
     if (!hasAnyFilter) {
       // 모든 필터가 제거되면 기본 모드로 전환
-      navigate('/archive', { replace: true });
+      updateSearchState(null);
       return;
     }
 
@@ -100,12 +117,7 @@ const ArchivePage = () => {
     try {
       const { data } = await api.get<ArchiveSearchResponse>('/archive/search', { params: newParams });
       if (data.isSuccess) {
-        // 검색 결과가 없으면 기본 모드로 전환
-        if (!data.data?.filteredCourses || data.data.filteredCourses.length === 0) {
-          navigate('/archive', { replace: true });
-        } else {
-          navigate('/archive', { state: { searchParams: newParams, searchResult: data }, replace: true });
-        }
+        updateSearchState({ searchParams: newParams, searchResult: data });
       }
     } catch (error) {
       console.error('필터 삭제 후 재검색 실패:', error);
@@ -114,13 +126,13 @@ const ArchivePage = () => {
 
   // 태그 삭제 핸들러
   const handleTagRemove = async (tagToRemove: string) => {
-    if (!searchParams || !selectedFilters?.tag) return;
+    if (!searchState?.searchParams || !selectedFilters?.tag) return;
 
     // 태그 배열에서 제거
     const newTags = selectedFilters.tag.filter(tag => tag !== tagToRemove);
 
     // 새로운 파라미터 생성
-    const newParams: ArchiveSearchParams = { ...searchParams };
+    const newParams: ArchiveSearchParams = { ...searchState.searchParams };
     if (newTags.length > 0) {
       newParams.tag = newTags.join(',');
     } else {
@@ -132,7 +144,7 @@ const ArchivePage = () => {
 
     if (!hasAnyFilter) {
       // 모든 필터가 제거되면 기본 모드로 전환
-      navigate('/archive', { replace: true });
+      updateSearchState(null);
       return;
     }
 
@@ -140,12 +152,7 @@ const ArchivePage = () => {
     try {
       const { data } = await api.get<ArchiveSearchResponse>('/archive/search', { params: newParams });
       if (data.isSuccess) {
-        // 검색 결과가 없으면 기본 모드로 전환
-        if (!data.data?.filteredCourses || data.data.filteredCourses.length === 0) {
-          navigate('/archive', { replace: true });
-        } else {
-          navigate('/archive', { state: { searchParams: newParams, searchResult: data }, replace: true });
-        }
+        updateSearchState({ searchParams: newParams, searchResult: data });
       }
     } catch (error) {
       console.error('태그 삭제 후 재검색 실패:', error);
@@ -290,7 +297,12 @@ const ArchivePage = () => {
           </div>
 
           {/* 폴더 리스트 */}
-          <ArchiveFolderList archives={displayedArchives} onFolderClick={handleFolderClick} formatDate={formatDate} />
+          <ArchiveFolderList
+            archives={displayedArchives}
+            onFolderClick={handleFolderClick}
+            formatDate={formatDate}
+            showEmptyMessage={isSearchMode}
+          />
         </div>
       </div>
     </div>
