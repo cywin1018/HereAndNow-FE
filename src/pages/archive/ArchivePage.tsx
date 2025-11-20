@@ -4,7 +4,6 @@ import filterCancelIcon from '@assets/icons/filter_cancel.svg';
 import smallFolder from '@assets/images/smallFolder.png';
 import { useNavigate, useLocation } from 'react-router-dom';
 import useGetRecentArchive from '@apis/archive/query/useGetRecentArchive';
-import useGetCreatedArchives from '@apis/archive/query/useGetCreatedArchives';
 import useSearchArchive from '@apis/archive/query/useSearchArchive';
 import type { ArchiveSearchParams, ArchiveSearchResponse } from '@apis/archive/archive';
 import { useEffect } from 'react';
@@ -69,9 +68,9 @@ const ArchivePage = () => {
   const { data: recentArchiveResponse } = useGetRecentArchive();
   const recentArchiveData = recentArchiveResponse?.data || null;
 
-  // React Query로 생성한 코스 폴더 리스트 가져오기 (항상 호출)
-  const { data: createdArchivesResponse } = useGetCreatedArchives({ page: 0, size: 32 });
-  const defaultArchives = createdArchivesResponse?.data || [];
+  // React Query로 생성한 코스 폴더 리스트 가져오기 (검색 API 재사용)
+  const { data: defaultArchiveResponse } = useSearchArchive({ page: 0, size: 32 });
+  const defaultArchives = defaultArchiveResponse?.data?.filteredCourses || [];
 
   // 표시할 폴더 리스트 결정
   const displayedArchives = isSearchMode ? searchResult?.data?.filteredCourses || [] : defaultArchives;
@@ -158,14 +157,14 @@ const ArchivePage = () => {
       console.log('getRecentArchive API 응답:', recentArchiveResponse);
       console.log('recentArchiveData:', recentArchiveData);
     }
-    if (createdArchivesResponse) {
-      console.log('getCreatedArchives API 응답:', createdArchivesResponse);
+    if (defaultArchiveResponse) {
+      console.log('searchArchive API 응답 (default):', defaultArchiveResponse);
       console.log('defaultArchives:', defaultArchives);
     }
     if (searchResponse) {
       console.log('searchArchive API 응답:', searchResponse);
     }
-  }, [recentArchiveResponse, recentArchiveData, createdArchivesResponse, defaultArchives, searchResponse]);
+  }, [recentArchiveResponse, recentArchiveData, defaultArchiveResponse, defaultArchives, searchResponse]);
 
   // 검색바 클릭 핸들러
   const handleSearchClick = () => {
