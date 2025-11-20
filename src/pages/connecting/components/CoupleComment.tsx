@@ -151,7 +151,18 @@ const CoupleComment = ({ courseId = 17, comments = [], onSendComment }: CoupleCo
 
     try {
       // 1. Presigned URL 발급
-      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+      // HEIC 파일은 JPEG로 변환되므로 확장자를 .jpg로 변경
+      let ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+      const fileName = file.name.toLowerCase();
+      const fileType = file.type.toLowerCase();
+      if (
+        fileName.endsWith('.heic') ||
+        fileName.endsWith('.heif') ||
+        fileType === 'image/heic' ||
+        fileType === 'image/heif'
+      ) {
+        ext = 'jpg';
+      }
       const filename = `${Date.now()}.${ext}`;
       const dirname = `course/${courseId}/couple/comment`;
 

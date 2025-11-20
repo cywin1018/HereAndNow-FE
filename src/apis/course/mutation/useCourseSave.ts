@@ -157,8 +157,20 @@ export const useCourseSave = () => {
 
           try {
             // Presigned URL 발급
+            // HEIC 파일은 JPEG로 변환되므로 확장자를 .jpg로 변경
             const filenames = files.map((file, idx) => {
-              const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+              let ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+              // HEIC 파일인 경우 jpg로 변경
+              const fileName = file.name.toLowerCase();
+              const fileType = file.type.toLowerCase();
+              if (
+                fileName.endsWith('.heic') ||
+                fileName.endsWith('.heif') ||
+                fileType === 'image/heic' ||
+                fileType === 'image/heif'
+              ) {
+                ext = 'jpg';
+              }
               return `${Date.now()}_${idx}.${ext}`;
             });
 
