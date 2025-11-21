@@ -134,7 +134,6 @@ const CourseSave = () => {
           setIsBottomSheetOpen(false);
           setIsInviteCompleteModalOpen(true);
         }}
-        myId="@hereandnow"
       />
 
       <Modal

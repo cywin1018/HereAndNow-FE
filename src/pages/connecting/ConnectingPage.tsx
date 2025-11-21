@@ -194,7 +194,6 @@ const ConnectingPage = () => {
         isOpen={isInviteSheetOpen}
         onClose={() => setIsInviteSheetOpen(false)}
         onInvite={handleInvite}
-        myId="@test1234"
       />
 
       {/* 초대 완료 모달 */}

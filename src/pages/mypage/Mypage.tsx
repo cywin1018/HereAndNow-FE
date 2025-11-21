@@ -3,11 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import PageHeader from '@common/layout/PageHeader';
 import { AlarmModal, dummyAlarms } from '@common/alarm';
 import Modal from '@common/components/Modal';
+import useGetMemberInfo from '@apis/member/useGetMemberInfo';
 
 const Mypage = () => {
   const navigate = useNavigate();
   const [isAlarmOpen, setIsAlarmOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  const { data: memberInfo } = useGetMemberInfo();
+
+  console.log('[Mypage] memberInfo:', memberInfo);
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
@@ -46,11 +51,19 @@ const Mypage = () => {
         {/* 프로필 섹션 */}
         <div className="flex items-center gap-4 px-5">
           <div className="h-20 w-20 overflow-hidden rounded-full">
-            <img src="/dummy_profile.png" alt="프로필" className="h-full w-full object-cover" />
+            <img
+              src={memberInfo?.data?.profileImageUrl || '/dummy_profile.png'}
+              alt="프로필"
+              className="h-full w-full object-cover"
+            />
           </div>
           <div className="flex flex-col gap-1">
-            <span className="text-s1 text-neutral-8">홍** 님</span>
-            <span className="text-b5 text-pink-6">@hereandnow</span>
+            <span className="text-s1 text-neutral-8">
+              {memberInfo?.data?.nickname ? `${memberInfo.data.nickname} 님` : '사용자 님'}
+            </span>
+            <span className="text-b5 text-pink-6">
+              {memberInfo?.data?.username ? `@${memberInfo.data.username}` : '@username'}
+            </span>
           </div>
         </div>
 

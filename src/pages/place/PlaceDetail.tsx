@@ -32,11 +32,12 @@ const PlaceDetail = () => {
   useEffect(() => {
     console.log('[PlaceDetail] ===== 카테고리 정보 디버깅 =====');
     console.log('[PlaceDetail] currentPlace 전체:', currentPlace);
-    console.log('[PlaceDetail] 카테고리 코드 (placeGroupCode):', currentPlace?.placeGroupCode);
-    console.log('[PlaceDetail] 카테고리 이름 (placeCategory):', currentPlace?.placeCategory);
-    console.log('[PlaceDetail] 장소 이름 (placeName):', currentPlace?.placeName);
-    console.log('[PlaceDetail] 카테고리 코드 타입:', typeof currentPlace?.placeGroupCode);
-    console.log('[PlaceDetail] 카테고리 코드 존재 여부:', !!currentPlace?.placeGroupCode);
+    console.log('[PlaceDetail] currentPin 전체:', currentPin);
+    // console.log('[PlaceDetail] 카테고리 코드 (placeGroupCode):', currentPlace?.placeGroupCode);
+    // console.log('[PlaceDetail] 카테고리 이름 (placeCategory):', currentPlace?.placeCategory);
+    // console.log('[PlaceDetail] 장소 이름 (placeName):', currentPlace?.placeName);
+    // console.log('[PlaceDetail] 카테고리 코드 타입:', typeof currentPlace?.placeGroupCode);
+    // console.log('[PlaceDetail] 카테고리 코드 존재 여부:', !!currentPlace?.placeGroupCode);
     if (currentPlace?.placeGroupCode) {
       console.log('[PlaceDetail] ✅ 카테고리 코드가 존재합니다:', currentPlace.placeGroupCode);
     } else {
