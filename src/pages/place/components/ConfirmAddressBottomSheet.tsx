@@ -224,7 +224,7 @@ const ConfirmAddressBottomSheet = ({
             type="text"
             value={detailAddress}
             onChange={handleDetailChange}
-            placeholder="1-3층"
+            placeholder="상세주소를 입력해주세요"
             className="border-iceblue-3 bg-iceblue-2 text-d1 text-neutral-8 placeholder:text-neutral-5 focus:border-pink-6 rounded-lg border px-4 py-3 outline-none"
           />
         </div>
