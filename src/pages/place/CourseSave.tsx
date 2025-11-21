@@ -49,7 +49,7 @@ const CourseSave = () => {
     <div className="flex min-h-screen w-full flex-col">
       <PageHeader title="코스 등록" />
 
-      <main className="flex flex-1 flex-col gap-[32px] px-5 pt-[32px] pb-[32px]">
+      <main className="flex flex-1 flex-col gap-[32px] pt-[32px] pb-[32px]">
         {/* 날짜 입력 섹션 */}
 
         <div className="flex flex-col gap-2">
@@ -134,7 +134,6 @@ const CourseSave = () => {
           setIsBottomSheetOpen(false);
           setIsInviteCompleteModalOpen(true);
         }}
-        myId="@hereandnow"
       />
 
       <Modal

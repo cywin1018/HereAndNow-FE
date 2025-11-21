@@ -38,8 +38,8 @@ const ConnectingPage = () => {
   // const coupleInfo: any = { data: {} }; // 빈 데이터 (잠금 상태)
   // const coupleInfo: any = null; // null (잠금 상태)
 
-  // TODO: coupleBanner 데이터 사용 예정
-  useGetCoupleBanner({ page: 0, size: 10 });
+  // 커플 배너 조회
+  const { data: coupleBanner } = useGetCoupleBanner({ page: 0, size: 10 });
 
   const handleHomeClick = () => {
     navigate('/');
@@ -137,7 +137,9 @@ const ConnectingPage = () => {
                 className="relative z-10 h-[72px] w-[72px] rounded-full object-cover"
               />
             </div>
-            <span className="text-s4 text-neutral-6 font-semibold">{coupleInfo?.data?.member1Name || '???'}</span>
+            <span className="text-s4 text-neutral-6 font-semibold">
+              {coupleInfo?.data?.member1Name || memberInfo?.data?.nickname || '???'}
+            </span>
           </div>
 
           <div className="flex flex-col items-center gap-4">
@@ -157,32 +159,48 @@ const ConnectingPage = () => {
         <CardSlider
           isLocked={isLocked}
           onInviteClick={handleInviteClick}
-          cards={[
-            <ConnectingCard
-              key="card-1"
-              date="2025.11.05"
-              placeCount={4}
-              title="우리의 첫 도쿄"
-              description="엔화 미리 환전할 걸 까먹고 공항에서 했는데 미리..."
-              backgroundClassName="bg-gradient-to-br from-blue-400 to-purple-500"
-            />,
-            <ConnectingCard
-              key="card-2"
-              date="2025.11.03"
-              placeCount={3}
-              title="서울 한강 나들이"
-              description="날씨가 좋아서 한강에서 피크닉을 즐겼어요"
-              backgroundClassName="bg-gradient-to-br from-pink-400 to-orange-500"
-            />,
-            <ConnectingCard
-              key="card-3"
-              date="2025.11.01"
-              placeCount={5}
-              title="부산 여행"
-              description="해운대에서 일출을 보며 시작한 하루"
-              backgroundClassName="bg-gradient-to-br from-cyan-400 to-blue-500"
-            />,
-          ]}
+          cards={
+            coupleBanner?.data?.content && coupleBanner.data.content.length > 0
+              ? coupleBanner.data.content.map((banner: any, index: number) => (
+                  <ConnectingCard
+                    key={`banner-${banner.courseId || index}`}
+                    date={banner.startDate || ''}
+                    placeCount={banner.placeCount || 0}
+                    title={banner.courseTitle || ''}
+                    description={banner.courseDescription || ''}
+                    backgroundImage={banner.thumbnailImageLink}
+                    backgroundClassName={
+                      !banner.thumbnailImageLink ? 'bg-gradient-to-br from-blue-400 to-purple-500' : undefined
+                    }
+                  />
+                ))
+              : [
+                  <ConnectingCard
+                    key="card-1"
+                    date="2025.11.05"
+                    placeCount={4}
+                    title="우리의 첫 도쿄"
+                    description="엔화 미리 환전할 걸 까먹고 공항에서 했는데 미리..."
+                    backgroundClassName="bg-gradient-to-br from-blue-400 to-purple-500"
+                  />,
+                  <ConnectingCard
+                    key="card-2"
+                    date="2025.11.03"
+                    placeCount={3}
+                    title="서울 한강 나들이"
+                    description="날씨가 좋아서 한강에서 피크닉을 즐겼어요"
+                    backgroundClassName="bg-gradient-to-br from-pink-400 to-orange-500"
+                  />,
+                  <ConnectingCard
+                    key="card-3"
+                    date="2025.11.01"
+                    placeCount={5}
+                    title="부산 여행"
+                    description="해운대에서 일출을 보며 시작한 하루"
+                    backgroundClassName="bg-gradient-to-br from-cyan-400 to-blue-500"
+                  />,
+                ]
+          }
         />
       </div>
 
@@ -194,7 +212,6 @@ const ConnectingPage = () => {
         isOpen={isInviteSheetOpen}
         onClose={() => setIsInviteSheetOpen(false)}
         onInvite={handleInvite}
-        myId="@test1234"
       />
 
       {/* 초대 완료 모달 */}

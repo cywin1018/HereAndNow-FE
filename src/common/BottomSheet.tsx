@@ -26,12 +26,12 @@ const BottomSheet = ({ isOpen, onClose, children }: BottomSheetProps) => {
   return (
     <>
       {/* 오버레이 */}
-      <div className="fixed inset-0 z-50 bg-black/40 transition-opacity" onClick={onClose} />
+      <div className="fixed inset-0 z-[500001] bg-black/40 transition-opacity" onClick={onClose} />
 
       {/* 바텀시트 */}
       <div
         ref={sheetRef}
-        className="fixed right-0 bottom-0 left-0 z-50 mx-auto max-h-[90vh] w-full max-w-md rounded-t-2xl bg-white shadow-lg"
+        className="fixed right-0 bottom-0 left-0 z-[500001] mx-auto max-h-[90vh] w-full max-w-md rounded-t-2xl bg-white shadow-lg"
       >
         {/* 드래그 핸들 */}
         <div className="flex justify-center pt-[16px]"></div>

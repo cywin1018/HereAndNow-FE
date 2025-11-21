@@ -1,17 +1,20 @@
 import { useState } from 'react';
 import BottomSheet from '@common/BottomSheet';
 import { usePostCoupleRequest } from '@apis/connecting/usePostCoupleRequest';
+import useGetMemberInfo from '@apis/member/useGetMemberInfo';
 
 interface CoupleInviteBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onInvite: (partnerId: string) => void;
-  myId: string;
 }
 
-const CoupleInviteBottomSheet = ({ isOpen, onClose, onInvite, myId }: CoupleInviteBottomSheetProps) => {
+const CoupleInviteBottomSheet = ({ isOpen, onClose, onInvite }: CoupleInviteBottomSheetProps) => {
   const [partnerId, setPartnerId] = useState('');
   const { mutate: postCoupleRequest, isPending } = usePostCoupleRequest();
+  const { data: memberInfo } = useGetMemberInfo();
+
+  const myId = memberInfo?.data?.username ? `@${memberInfo.data.username}` : '@username';
 
   const handleInviteClick = () => {
     const trimmedId = partnerId.trim();
@@ -22,7 +25,7 @@ const CoupleInviteBottomSheet = ({ isOpen, onClose, onInvite, myId }: CoupleInvi
     postCoupleRequest(trimmedId, {
       onSuccess: () => {
         onInvite(trimmedId);
-    setPartnerId('');
+        setPartnerId('');
       },
     });
   };
