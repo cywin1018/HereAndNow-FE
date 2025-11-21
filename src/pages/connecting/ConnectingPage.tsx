@@ -137,7 +137,9 @@ const ConnectingPage = () => {
                 className="relative z-10 h-[72px] w-[72px] rounded-full object-cover"
               />
             </div>
-            <span className="text-s4 text-neutral-6 font-semibold">{coupleInfo?.data?.member1Name || '???'}</span>
+            <span className="text-s4 text-neutral-6 font-semibold">
+              {coupleInfo?.data?.member1Name || memberInfo?.data?.nickname || '???'}
+            </span>
           </div>
 
           <div className="flex flex-col items-center gap-4">
