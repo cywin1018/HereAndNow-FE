@@ -1,21 +1,143 @@
 import exploreSearchIcon from '@assets/icons/explore_search.svg';
 import exploreBackIcon from '@assets/icons/explore_back.svg';
-import filterCancelIcon from '@assets/icons/filter_cancel.svg';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import CourseCard from '@pages/home/components/CourseCard';
-import { useGetCourseList } from '@apis/explore/explore';
-import { useEffect } from 'react';
+import { useGetCourseList, useSearchCourseList } from '@apis/explore/explore';
+import type { CourseSearchParams, CourseSearchResponse } from '@apis/explore/explore';
+import { useEffect, useState } from 'react';
+import api from '@apis/common/api';
+import SelectedFiltersChips from '@pages/archive/components/SelectedFilters';
+import SelectedTagList from '@pages/archive/components/SelectedTagList';
+
+// 날짜 포맷팅 함수: "2025-11-05" -> "2025. 11. 05"
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}. ${month}. ${day}`;
+};
+
+type CourseLocationState = {
+  searchParams: CourseSearchParams;
+  searchResult: CourseSearchResponse;
+};
 
 const ExploreCoursePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // API 호출
-  const { data } = useGetCourseList({ page: 0, size: 20 });
+  const [searchState, setSearchState] = useState<CourseLocationState | null>(() => {
+    const initialState = location.state as CourseLocationState | null | undefined;
+    return initialState ?? null;
+  });
 
-  // 데이터 콘솔 출력
   useEffect(() => {
-    console.log('[ExploreCoursePage] API 응답 데이터:', data);
-  }, [data]);
+    if (location.state) {
+      setSearchState(location.state as CourseLocationState);
+    }
+  }, [location.state]);
+
+  const updateSearchState = (nextState: CourseLocationState | null) => {
+    setSearchState(nextState);
+    if (nextState) {
+      navigate('/explore/course', { state: nextState, replace: true });
+    } else {
+      navigate('/explore/course', { replace: true });
+    }
+  };
+
+  // 검색 파라미터가 있으면 검색 결과 사용, 없으면 기본 데이터 사용
+  const searchParams = searchState?.searchParams;
+  const { data: searchResponse } = useSearchCourseList(searchParams || {}, !!searchParams);
+
+  // 검색 결과 또는 기본 데이터 결정
+  const searchResult = searchResponse || searchState?.searchResult;
+
+  const isSearchMode = !!searchParams;
+
+  // 기본 코스 리스트 데이터 가져오기 (항상 호출)
+  const { data: defaultCourseResponse } = useGetCourseList({ page: 0, size: 20 });
+  const defaultCourses = defaultCourseResponse?.data || [];
+
+  // 표시할 코스 리스트 결정
+  const displayedCourses = isSearchMode ? searchResult?.data?.filteredCourses || [] : defaultCourses;
+
+  // 검색 필터 정보 (검색 모드일 때만 표시)
+  const selectedFilters = isSearchMode ? searchResult?.data?.selectedFilters : undefined;
+
+  // 필터 삭제 핸들러
+  const handleFilterRemove = async (filterType: keyof CourseSearchParams) => {
+    if (!searchState?.searchParams) return;
+
+    // 필터 제거한 새로운 파라미터 생성
+    const newParams: CourseSearchParams = { ...searchState.searchParams };
+    delete newParams[filterType];
+
+    // 모든 필터가 제거되었는지 확인
+    const hasAnyFilter = Object.keys(newParams).length > 0;
+
+    if (!hasAnyFilter) {
+      // 모든 필터가 제거되면 기본 모드로 전환
+      updateSearchState(null);
+      return;
+    }
+
+    // 새로운 파라미터로 재검색
+    try {
+      const { data } = await api.get<CourseSearchResponse>('/discover/course/search', { params: newParams });
+      if (data.isSuccess) {
+        updateSearchState({ searchParams: newParams, searchResult: data });
+      }
+    } catch (error) {
+      console.error('필터 삭제 후 재검색 실패:', error);
+    }
+  };
+
+  // 태그 삭제 핸들러
+  const handleTagRemove = async (tagToRemove: string) => {
+    if (!searchState?.searchParams || !selectedFilters?.tag) return;
+
+    // 태그 배열에서 제거
+    const newTags = selectedFilters.tag.filter(tag => tag !== tagToRemove);
+
+    // 새로운 파라미터 생성
+    const newParams: CourseSearchParams = { ...searchState.searchParams };
+    if (newTags.length > 0) {
+      newParams.tag = newTags.join(',');
+    } else {
+      delete newParams.tag;
+    }
+
+    // 모든 필터가 제거되었는지 확인
+    const hasAnyFilter = Object.keys(newParams).length > 0;
+
+    if (!hasAnyFilter) {
+      // 모든 필터가 제거되면 기본 모드로 전환
+      updateSearchState(null);
+      return;
+    }
+
+    // 새로운 파라미터로 재검색
+    try {
+      const { data } = await api.get<CourseSearchResponse>('/discover/course/search', { params: newParams });
+      if (data.isSuccess) {
+        updateSearchState({ searchParams: newParams, searchResult: data });
+      }
+    } catch (error) {
+      console.error('태그 삭제 후 재검색 실패:', error);
+    }
+  };
+
+  // API 응답 콘솔 출력
+  useEffect(() => {
+    if (defaultCourseResponse) {
+      console.log('getCourseList API 응답 (default):', defaultCourseResponse);
+    }
+    if (searchResponse) {
+      console.log('searchCourseList API 응답:', searchResponse);
+    }
+  }, [defaultCourseResponse, searchResponse]);
 
   return (
     <div className="min-h-screen">
@@ -51,81 +173,27 @@ const ExploreCoursePage = () => {
           </div>
 
           {/* 필터 리스트 */}
-          {/* TODO: 컴포넌트로 분리 */}
-          <div className="flex w-full items-center gap-1 overflow-x-visible">
-            <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
-              {/* 삭제 버튼 */}
-              <div className="flex h-6 w-6 items-center justify-center">
-                <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
-              </div>
-
-              {/* 필터 이름 */}
-              <span className="text-d1 text-neutral-4">별점</span>
-
-              {/* 필터 값 */}
-              <span className="text-d1 text-neutral-6">5점</span>
-            </div>
-            <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
-              {/* 삭제 버튼 */}
-              <div className="flex h-6 w-6 items-center justify-center">
-                <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
-              </div>
-
-              {/* 필터 이름 */}
-              <span className="text-d1 text-neutral-4">언제</span>
-
-              {/* 필터 값 */}
-              <span className="text-d1 text-neutral-6">2025.09 ~</span>
-            </div>
-            <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
-              {/* 삭제 버튼 */}
-              <div className="flex h-6 w-6 items-center justify-center">
-                <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
-              </div>
-
-              {/* 필터 이름 */}
-              <span className="text-d1 text-neutral-4">누구와</span>
-
-              {/* 필터 값 */}
-              <span className="text-d1 text-neutral-6">친구</span>
-            </div>
-            <div className="border-neutral-3 flex h-9 items-center gap-1 rounded-[50px] border-[0.5px] border-solid bg-white pr-3 pl-1.5 whitespace-nowrap">
-              {/* 삭제 버튼 */}
-              <div className="flex h-6 w-6 items-center justify-center">
-                <img src={filterCancelIcon} alt="삭제" className="h-6 w-6" />
-              </div>
-
-              {/* 필터 이름 */}
-              <span className="text-d1 text-neutral-4">누구와</span>
-
-              {/* 필터 값 */}
-              <span className="text-d1 text-neutral-6">친구</span>
-            </div>
-          </div>
+          {selectedFilters && (
+            <SelectedFiltersChips
+              selectedFilters={selectedFilters}
+              onRemove={handleFilterRemove}
+              formatDate={formatDate}
+            />
+          )}
 
           {/* 태그 리스트 */}
-          <div className="flex w-full items-center gap-2 overflow-x-visible">
-            <div className="bg-purple-2 text-d1 text-purple-8 flex h-8 items-center justify-center rounded-sm px-2.5 whitespace-nowrap">
-              사진 찍기 좋아요
-            </div>
-            <div className="bg-orange-2 text-d1 text-orange-8 flex h-8 items-center justify-center rounded-sm px-2.5 whitespace-nowrap">
-              음식이 맛있어요
-            </div>
-            <div className="bg-blue-2 text-d1 text-blue-8 flex h-8 items-center justify-center rounded-sm px-2.5 whitespace-nowrap">
-              시설이 깨끗해요
-            </div>
-            <div className="bg-green-2 text-d1 text-green-8 flex h-8 items-center justify-center rounded-sm px-2.5 whitespace-nowrap">
-              친절해요
-            </div>
-          </div>
+          {selectedFilters?.tag && selectedFilters.tag.length > 0 && (
+            <SelectedTagList tags={selectedFilters.tag} onRemove={handleTagRemove} />
+          )}
         </div>
 
         {/* 코스 리스트 */}
         <div className="mt-8 flex w-full flex-col gap-3">
-          {data?.data && data.data.length > 0
-            ? data.data.map((item, index) => (
+          {displayedCourses.length > 0
+            ? displayedCourses.map((item, index) => (
                 <CourseCard
                   key={item.courseCard.courseId || index}
+                  courseId={item.courseCard.courseId}
                   profileImageUrl={item.courseCard.memberProfileImage}
                   authorName={item.courseCard.memberNickname}
                   title={item.courseCard.courseTitle}
@@ -135,19 +203,12 @@ const ExploreCoursePage = () => {
                   hasComments={item.comment.count > 0}
                 />
               ))
-            : // 로딩 중이거나 데이터가 없을 때 더미 데이터 표시
-              Array.from({ length: 5 }).map((_, index) => (
-                <CourseCard
-                  key={index}
-                  profileImageUrl="/dummy_profile.png"
-                  authorName="홍**"
-                  title="아직 어색한 사이인 커플을 위한 감성 충만 코스"
-                  location="강남"
-                  placeCount={5}
-                  tags={['음식이 맛있어요', '사진 찍기 좋아요']}
-                  hasComments
-                />
-              ))}
+            : // 검색 모드에서 결과가 없을 때
+              isSearchMode && (
+                <div className="flex w-full items-center justify-center py-20">
+                  <span className="text-b3 text-neutral-6">검색 결과가 없습니다.</span>
+                </div>
+              )}
         </div>
       </div>
     </div>

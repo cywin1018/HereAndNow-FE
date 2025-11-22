@@ -140,6 +140,7 @@ const HomePage = () => {
             {recommendedCourses.map(course => (
               <CourseCard
                 key={course.courseId}
+                courseId={course.courseId}
                 profileImageUrl={course.memberProfileImage}
                 authorName={course.memberNickname}
                 title={course.courseTitle}

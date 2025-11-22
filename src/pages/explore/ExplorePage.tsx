@@ -10,8 +10,8 @@ const ExplorePage = () => {
   const navigate = useNavigate();
 
   // 지도 위치 (현재 하드코딩된 값)
-  const latitude = 37.566826;
-  const longitude = 126.9786567;
+  const latitude = 37.5489244653904;
+  const longitude = 127.051211006716;
 
   // API 호출
   const { data } = useGetPlaceAds({
@@ -37,13 +37,14 @@ const ExplorePage = () => {
       {/* 검색 바 */}
       <div className="absolute top-[54px] left-1/2 z-20 flex h-12 max-h-12 min-h-12 w-[362px] -translate-x-1/2 items-center gap-4">
         <div
-          className="flex h-full flex-1 items-center justify-between rounded-[44px] bg-white px-4"
+          className="flex h-full flex-1 cursor-pointer items-center justify-between rounded-[44px] bg-white px-4"
           style={{ boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.1)' }}
+          onClick={() => navigate('/explore/search')}
         >
           <input
             type="text"
             placeholder="찾고 싶은 장소가 있나요?"
-            className="text-b4 placeholder:text-neutral-4 h-full w-full focus:outline-none"
+            className="text-b4 placeholder:text-neutral-4 h-full w-full cursor-pointer focus:outline-none"
           />
           <button className="flex h-7 w-7 cursor-pointer items-center justify-center">
             <img src={exploreSearchIcon} alt="검색" className="h-7 w-7" />
