@@ -136,7 +136,7 @@ const HomePage = () => {
         />
 
         <TabNavigation activeTab={activeTab} selectedSort={sort} onTabChange={setActiveTab} onSortChange={setSort} />
-        <CourseCard
+        {/* <CourseCard
           key={1}
           courseId={1}
           profileImageUrl={'/dummy_profile.png'}
@@ -146,7 +146,7 @@ const HomePage = () => {
           placeCount={3}
           tags={['Tag1', 'Tag2', 'Tag3']}
           onClick={() => navigate(`/archive/1`)}
-        />
+        /> */}
         {activeTab === 'course' && recommendedCourses.length > 0 && (
           <div className="flex flex-col gap-4">
             {recommendedCourses.map(course => (
