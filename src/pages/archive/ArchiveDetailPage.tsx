@@ -1,94 +1,131 @@
+import { useMemo, useState, type ReactNode } from 'react';
+import { useParams } from 'react-router-dom';
 import KakaoMap from '@common/KakaoMap';
 import ArchivePlaceItem from '@common/components/ArchivePlaceItem';
 import CommentItem from './components/CommentItem';
 import Modal from '@common/components/Modal';
-import { useState } from 'react';
+import useGetCourse from '@apis/course/query/useGetCourse';
+import useGetCourseComment from '@apis/course/query/useGetCourseComment';
+import usePostCourseComment from '@apis/course/mutation/usePostCourseComment';
 
-const PLACES = [
-  {
-    title: 1,
-    thumbnail: '/public/dummy_placecard.png',
-    placeName: '서울숲',
-    category: '도시근린공원',
-    roadAddress: '서울 성동구 성수동1가 678-1',
-    rating: 4.7,
-    reviewCount: 531,
-    photos: Array.from({ length: 6 }).map(() => '/public/dummy_placecard.png'),
-    goodPoints:
-      '입장료가 무료라서 좋다. 그리고 내부 꽃사슴도 볼 수 있고, 멋있는 조형물도 보는 재미가 있다. 평야에서 사람들이 돗자리 깔고 여유를 즐기는 모습을 바라보는 풍경도 평화로워!',
-    badPoints: '무료라서 막 엄청 보고 즐길 건 없는 듯?',
-  },
-  {
-    title: 2,
-    thumbnail: '/public/dummy_placecard.png',
-    placeName: '5to7',
-    category: '카페',
-    roadAddress: '서울 성동구 서울숲2길 44-13 1-2층',
-    rating: 3.8,
-    reviewCount: 188,
-    photos: Array.from({ length: 6 }).map(() => '/public/dummy_placecard.png'),
-    goodPoints: '수플레 존맛.. 또 먹고 싶음!! 거울 셀카도 겟~~!',
-    badPoints: '사람이 쫌 만타',
-  },
-  {
-    title: 3,
-    thumbnail: '/public/dummy_placecard.png',
-    placeName: '북악스카이웨이',
-    category: '드라이브코스',
-    roadAddress: '서울 종로구 평창동 산 6-94',
-    rating: 4.3,
-    reviewCount: 177,
-    photos: Array.from({ length: 6 }).map(() => '/public/dummy_placecard.png'),
-    goodPoints:
-      '진짜 숨은 명소 인 듯! 밤에 오면 서울 야경이 다 보여서 속이 뻥 뜰리는 느낌! 아직 그렇게 안 추워서 지금 오기 딱 좋은 것 같다. 드라이브 코스도 좋고 팔각정도 예뻐요.',
-  },
-];
+const DEFAULT_PLACE_IMAGE = '/dummy_placecard.png';
+const DEFAULT_MAP_CENTER = {
+  latitude: 37.566826,
+  longitude: 126.9786567,
+};
 
-const COMMENTS = [
-  {
-    profileImage: '/public/dummy_profile.png',
-    userName: '홍**',
-    content: '우와! 성수동에서 북한산까지 가셨군요? 좋아요 누르고 갑니당!!',
-  },
-  {
-    profileImage: '/public/dummy_profile.png',
-    userName: '문**',
-    content: '리뷰 넘 귀여워용 💕',
-  },
-  {
-    profileImage: '/public/dummy_profile.png',
-    userName: '마**',
-    content: '저도 성수동 잘 안 가봤는데 코스 참고할게요 ㅎㅎ 감사합니다~!',
-  },
-  {
-    profileImage: '/public/dummy_profile.png',
-    userName: '김**',
-    content: '좋아요 눌러요~^^',
-  },
-];
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  return {
+    day: days[date.getDay()],
+    month: months[date.getMonth()],
+    date: date.getDate(),
+  };
+};
+
+const getTagColorClass = (index: number): string => {
+  const colors = ['bg-purple-2 text-purple-8', 'bg-orange-2 text-orange-8', 'bg-blue-2 text-blue-8'];
+  return colors[index % colors.length];
+};
 
 const ArchiveDetailPage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [isDeleteCompleteModalOpen, setIsDeleteCompleteModalOpen] = useState<boolean>(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
+  const [commentInput, setCommentInput] = useState<string>('');
+  const { id } = useParams<{ id: string }>();
 
-  return (
-    <>
+  const parsedCourseId = Number(id);
+  const isCourseIdValid = Number.isFinite(parsedCourseId) && parsedCourseId > 0;
+  const { data: course, isLoading, isError } = useGetCourse(isCourseIdValid ? parsedCourseId : 0);
+  const {
+    data: commentData,
+    isLoading: isCommentLoading,
+    isError: isCommentError,
+    refetch: refetchComments,
+  } = useGetCourseComment(isCourseIdValid ? parsedCourseId : 0);
+  const { mutate: postCourseComment } = usePostCourseComment();
+
+  const handleSubmitComment = () => {
+    if (!isCourseIdValid) return;
+
+    const trimmed = commentInput.trim();
+    if (!trimmed) return;
+
+    postCourseComment(
+      {
+        courseId: parsedCourseId,
+        content: trimmed,
+      },
+      {
+        onSuccess: () => {
+          setCommentInput('');
+          refetchComments();
+        },
+      },
+    );
+  };
+
+  const formattedDate = useMemo(() => {
+    if (!course?.data?.courseVisitDate) return null;
+    return formatDate(course.data.courseVisitDate);
+  }, [course?.data?.courseVisitDate]);
+
+  const mapCenter = useMemo(() => {
+    if (!course?.data?.pins || course.data.pins.length === 0) {
+      return DEFAULT_MAP_CENTER;
+    }
+
+    const firstPin = course.data.pins[0];
+    return {
+      latitude: firstPin.placeDetails.placeLatitude,
+      longitude: firstPin.placeDetails.placeLongitude,
+    };
+  }, [course?.data?.pins]);
+
+  let pageBody: ReactNode = null;
+
+  if (!isCourseIdValid) {
+    pageBody = (
+      <div className="flex h-full w-full items-center justify-center p-8">
+        <span className="text-iceblue-8">잘못된 코스 ID입니다.</span>
+      </div>
+    );
+  } else if (isLoading) {
+    pageBody = (
+      <div className="flex h-full w-full items-center justify-center p-8">
+        <span className="text-iceblue-8">코스를 불러오는 중입니다...</span>
+      </div>
+    );
+  } else if (isError || !course?.data) {
+    pageBody = (
+      <div className="flex h-full w-full items-center justify-center p-8">
+        <span className="text-iceblue-8">코스 정보를 불러올 수 없습니다.</span>
+      </div>
+    );
+  } else if (course?.data) {
+    const courseData = course.data;
+    pageBody = (
       <div className="flex w-full flex-col items-center gap-8">
         {/* 지도 */}
         {/* TODO: 지도 커스텀 해야함 */}
         <div className="relative flex h-[438px] w-[402px] min-w-[402px] items-center justify-center">
           {/* 날짜 */}
-          <div className="bg-iceblue-2 border-iceblue-2 absolute top-0 left-1/2 z-10 flex -translate-x-1/2 items-center justify-center gap-6 rounded-[50px] border border-solid px-10 py-3">
-            <span className="text-s2 text-iceblue-8">Wed</span>
-            <span className="text-s2 text-iceblue-8">Nov</span>
-            <span className="text-s2 text-iceblue-8">5</span>
-          </div>
+          {formattedDate && (
+            <div className="bg-iceblue-2 border-iceblue-2 absolute top-0 left-1/2 z-10 flex -translate-x-1/2 items-center justify-center gap-6 rounded-[50px] border border-solid px-10 py-3">
+              <span className="text-s2 text-iceblue-8">{formattedDate.day}</span>
+              <span className="text-s2 text-iceblue-8">{formattedDate.month}</span>
+              <span className="text-s2 text-iceblue-8">{formattedDate.date}</span>
+            </div>
+          )}
 
           {/* 지도 */}
           <KakaoMap
-            latitude={37.566826}
-            longitude={126.9786567}
+            latitude={mapCenter.latitude}
+            longitude={mapCenter.longitude}
             showMarker
             showHeartButton={false}
             className="h-full w-full"
@@ -98,92 +135,110 @@ const ArchiveDetailPage = () => {
         {/* 타이틀 / 설명 / 태그 */}
         <div className="flex w-93 flex-col gap-4">
           {/* 타이틀 */}
-          <span className="text-h5 text-neutral-10 w-[322px]">성수동 주말, 오랜만에 만난 친구와 완벽한 하루</span>
+          <span className="text-h5 text-neutral-10 w-[322px]">{courseData.courseTitle}</span>
 
           {/* 설명 */}
-          <span className="text-b4 text-iceblue-8 w-[322px]">
-            처음 가본 성수동은 신기한 동네다. 한국인데 해외같고, 음식도 다 맛있어서 또 오고 싶어!
-          </span>
+          <span className="text-b4 text-iceblue-8 w-[322px]">{courseData.courseDescription}</span>
 
           {/* 태그 */}
-          {/* TODO: 컴포넌트로 분리 */}
-          <div className="flex items-center gap-3 overflow-x-visible">
-            <div
-              className="bg-purple-2 text-purple-8 text-b4 flex h-9 items-center justify-center rounded-sm px-2.5 whitespace-nowrap"
-              style={{ boxShadow: '0px 4px 8px 0px #0000000F' }}
-            >
-              사진 찍기 좋아요
+          {courseData.courseTags && courseData.courseTags.length > 0 && (
+            <div className="flex items-center gap-3 overflow-x-visible">
+              {courseData.courseTags.map((tag, index) => (
+                <div
+                  key={`${tag}-${index}`}
+                  className={`${getTagColorClass(index)} text-b4 flex h-9 items-center justify-center rounded-sm px-2.5 whitespace-nowrap`}
+                  style={{ boxShadow: '0px 4px 8px 0px #0000000F' }}
+                >
+                  {tag}
+                </div>
+              ))}
             </div>
-            <div
-              className="bg-orange-2 text-orange-8 text-b4 flex h-9 items-center justify-center rounded-sm px-2.5 whitespace-nowrap"
-              style={{ boxShadow: '0px 4px 8px 0px #0000000F' }}
-            >
-              음식이 맛있어요
-            </div>
-            <div
-              className="bg-blue-2 text-blue-8 text-b4 flex h-9 items-center justify-center rounded-sm px-2.5 whitespace-nowrap"
-              style={{ boxShadow: '0px 4px 8px 0px #0000000F' }}
-            >
-              시설이 깨끗해요
-            </div>
-            <div
-              className="bg-blue-2 text-blue-8 text-b4 flex h-9 items-center justify-center rounded-sm px-2.5 whitespace-nowrap"
-              style={{ boxShadow: '0px 4px 8px 0px #0000000F' }}
-            >
-              시설이 깨끗해요
-            </div>
-            <div
-              className="bg-blue-2 text-blue-8 text-b4 flex h-9 items-center justify-center rounded-sm px-2.5 whitespace-nowrap"
-              style={{ boxShadow: '0px 4px 8px 0px #0000000F' }}
-            >
-              시설이 깨끗해요
-            </div>
-          </div>
+          )}
         </div>
 
         {/* 아카이브 리스트 */}
         <div className="flex w-full flex-col gap-11">
-          {PLACES.map(place => (
-            <ArchivePlaceItem
-              key={place.title}
-              title={place.title}
-              thumbnail={place.thumbnail}
-              placeName={place.placeName}
-              category={place.category}
-              roadAddress={place.roadAddress}
-              rating={place.rating}
-              reviewCount={place.reviewCount}
-              photos={place.photos}
-              goodPoints={place.goodPoints}
-              badPoints={place.badPoints}
-            />
-          ))}
+          {courseData.pins.length > 0 ? (
+            courseData.pins.map((pin, index) => {
+              const photos = pin.pinImages && pin.pinImages.length > 0 ? pin.pinImages : [DEFAULT_PLACE_IMAGE];
+
+              return (
+                <ArchivePlaceItem
+                  key={`${pin.placeDetails.placeId}-${index}`}
+                  title={index + 1}
+                  thumbnail={photos[0]}
+                  placeName={pin.placeDetails.placeName}
+                  category={pin.placeDetails.placeCategory}
+                  roadAddress={pin.placeDetails.placeStreetNameAddress}
+                  rating={pin.placeDetails.placeRating}
+                  reviewCount={pin.placeDetails.reviewCount}
+                  photos={photos}
+                  goodPoints={pin.pinPositive}
+                  badPoints={pin.pinNegative}
+                />
+              );
+            })
+          ) : (
+            <div className="border-iceblue-3 flex w-full items-center justify-center rounded-lg border border-dashed py-10">
+              <span className="text-b4 text-iceblue-7">등록된 장소가 없습니다.</span>
+            </div>
+          )}
         </div>
 
         {/* 댓글 */}
         <div className="flex w-full flex-col gap-4">
           {/* 댓글 작성 폼 */}
           <div className="flex w-full flex-col gap-2">
-            <span className="text-d1 text-iceblue-8">댓글 4개</span>
-            <div className="border-iceblue-2 flex h-12 w-full items-center justify-center rounded-[8px] border px-5 py-3">
+            <span className="text-d1 text-iceblue-8">댓글 {commentData?.data?.count ?? 0}개</span>
+            <div className="border-iceblue-2 flex h-12 w-full items-center gap-2 rounded-[8px] border px-3 py-2">
               <input
                 type="text"
-                className="placeholder:text-iceblue-7 placeholder:text-b4 h-full w-full bg-transparent outline-none"
+                className="placeholder:text-iceblue-7 placeholder:text-b4 h-full flex-1 bg-transparent outline-none"
                 placeholder="댓글을 남겨보세요!"
+                value={commentInput}
+                onChange={e => setCommentInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSubmitComment();
+                  }
+                }}
               />
+              <button
+                type="button"
+                className="bg-pink-6 text-b5 flex h-8 items-center justify-center rounded-[8px] px-3 text-white"
+                onClick={handleSubmitComment}
+                disabled={!commentInput.trim() || !isCourseIdValid}
+              >
+                등록
+              </button>
             </div>
           </div>
 
           {/* 댓글 리스트 */}
           <div className="flex w-full flex-col gap-4">
-            {COMMENTS.map((comment, index) => (
-              <CommentItem
-                key={index}
-                profileImage={comment.profileImage}
-                userName={comment.userName}
-                content={comment.content}
-              />
-            ))}
+            {isCommentLoading ? (
+              <div className="flex w-full items-center justify-center py-4">
+                <span className="text-b4 text-iceblue-7">댓글을 불러오는 중...</span>
+              </div>
+            ) : isCommentError || !commentData?.data?.comments ? (
+              <div className="flex w-full items-center justify-center py-4">
+                <span className="text-b4 text-iceblue-7">댓글을 불러올 수 없습니다.</span>
+              </div>
+            ) : commentData.data.comments.length === 0 ? (
+              <div className="flex w-full items-center justify-center py-4">
+                <span className="text-b4 text-iceblue-7">아직 댓글이 없습니다.</span>
+              </div>
+            ) : (
+              commentData.data.comments.map(comment => (
+                <CommentItem
+                  key={comment.commentId}
+                  profileImage={comment.profileImage}
+                  userName={comment.nickName}
+                  content={comment.content}
+                />
+              ))
+            )}
           </div>
         </div>
 
@@ -205,6 +260,12 @@ const ArchiveDetailPage = () => {
           </button>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <>
+      {pageBody}
 
       {/* 삭제 모달 */}
       <Modal
