@@ -4,6 +4,9 @@ import TagSelector from '@common/components/TagSelector';
 import Modal from '@common/components/Modal';
 import { useNavigate } from 'react-router-dom';
 import RegionDropdown from '@common/RegionDropdown';
+import useSearchArchive from '@apis/archive/query/useSearchArchive';
+import type { ArchiveSearchParams } from '@apis/archive/archive';
+import { convertPlaceNamesToCodeString } from '@common/placeCodeMapping';
 
 type CompanionType = '연인' | '친구' | '혼자' | '가족' | '지인';
 
@@ -16,6 +19,14 @@ const ArchiveSearchPage = () => {
   const [selectedCompanion, setSelectedCompanion] = useState<CompanionType | null>('연인');
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [isCoupleModalOpen, setIsCoupleModalOpen] = useState(false);
+
+  // TagSelector state들
+  const [keywordTags, setKeywordTags] = useState<string[]>([]);
+  const [placeTags, setPlaceTags] = useState<string[]>([]);
+  const [atmosphereTags, setAtmosphereTags] = useState<string[]>([]);
+  const [foodTags, setFoodTags] = useState<string[]>([]);
+  const [facilityTags, setFacilityTags] = useState<string[]>([]);
+  const [etcTags, setEtcTags] = useState<string[]>([]);
 
   // 언제 다녀오셨나요? 선택 핸들러
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,6 +46,71 @@ const ArchiveSearchPage = () => {
     setSelectedRegion(region);
   };
 
+  // 검색 파라미터 변환 함수
+  const buildSearchParams = (): ArchiveSearchParams => {
+    const params: ArchiveSearchParams = {};
+
+    // rating → string 변환
+    if (rating > 0) {
+      params.rating = rating.toString();
+    }
+
+    // keywordTags → keyword (첫 번째 값 사용)
+    if (keywordTags.length > 0) {
+      params.keyword = keywordTags[0];
+    }
+
+    // placeTags → placeCode 변환
+    const placeCode = convertPlaceNamesToCodeString(placeTags);
+    if (placeCode) {
+      params.placeCode = placeCode;
+    }
+
+    // 나머지 태그들 → tag (쉼표로 구분)
+    const allTags = [...atmosphereTags, ...foodTags, ...facilityTags, ...etcTags];
+    if (allTags.length > 0) {
+      params.tag = allTags.join(',');
+    }
+
+    // selectedDate → startDate/endDate 처리
+    if (selectedDate) {
+      params.startDate = selectedDate;
+      // endDate는 선택된 날짜로 설정 (필요시 수정 가능)
+      params.endDate = selectedDate;
+    }
+
+    // selectedCompanion → with 변환
+    if (selectedCompanion) {
+      params.with = selectedCompanion;
+    }
+
+    // selectedRegion → region
+    if (selectedRegion) {
+      params.region = selectedRegion;
+    }
+
+    return params;
+  };
+
+  // 검색 파라미터
+  const searchParams = buildSearchParams();
+
+  // useSearchArchive hook (enabled: false로 초기 설정)
+  const { refetch: searchArchive } = useSearchArchive(searchParams, false);
+
+  // 검색 버튼 클릭 핸들러
+  const handleSearchClick = async () => {
+    try {
+      const result = await searchArchive();
+      if (result.data?.isSuccess) {
+        // 검색 성공 시 ArchivePage로 navigate (location.state로 검색 파라미터 전달)
+        navigate('/archive', { state: { searchParams, searchResult: result.data } });
+      }
+    } catch (error) {
+      console.error('검색 실패:', error);
+    }
+  };
+
   return (
     <div className="bg-neutral-1 flex min-h-screen flex-col">
       <span className="text-h4 text-neutral-10 py-8">찾고 싶은 추억이 있나요?</span>
@@ -52,7 +128,12 @@ const ArchiveSearchPage = () => {
           <span className="text-d1 text-iceblue-8">생각나는 키워드가 있나요?</span>
 
           {/* TODO: 퍼블리싱 새로 해야함 (현재는 빠른 개발을 위해 일단 넘어감) */}
-          <TagSelector options={['선물', '추억', '기념일', '연인', '친구']} maxSelected={3} />
+          <TagSelector
+            options={['선물', '추억', '기념일', '연인', '친구']}
+            maxSelected={3}
+            selectedTags={keywordTags}
+            onChange={setKeywordTags}
+          />
         </div>
 
         {/* 언제 다녀오셨나요? */}
@@ -122,6 +203,8 @@ const ArchiveSearchPage = () => {
               '은행',
             ]}
             maxSelected={3}
+            selectedTags={placeTags}
+            onChange={setPlaceTags}
           />
         </div>
 
@@ -142,13 +225,20 @@ const ArchiveSearchPage = () => {
               '감성 숙소',
             ]}
             maxSelected={3}
+            selectedTags={atmosphereTags}
+            onChange={setAtmosphereTags}
           />
         </div>
 
         {/* 음식/가격은 어떠셨나요? */}
         <div className="flex w-full flex-col gap-2">
           <span className="text-d1 text-iceblue-8">음식/가격은 어떠셨나요?</span>
-          <TagSelector options={['음식이 맛있어요', '메뉴가 다양해요', '특별한 메뉴가 있어요']} maxSelected={3} />
+          <TagSelector
+            options={['음식이 맛있어요', '메뉴가 다양해요', '특별한 메뉴가 있어요']}
+            maxSelected={3}
+            selectedTags={foodTags}
+            onChange={setFoodTags}
+          />
         </div>
 
         {/* 시설은 어떠셨나요? */}
@@ -168,6 +258,8 @@ const ArchiveSearchPage = () => {
               '감성 숙소',
             ]}
             maxSelected={3}
+            selectedTags={facilityTags}
+            onChange={setFacilityTags}
           />
         </div>
 
@@ -188,6 +280,8 @@ const ArchiveSearchPage = () => {
               '감성 숙소',
             ]}
             maxSelected={3}
+            selectedTags={etcTags}
+            onChange={setEtcTags}
           />
         </div>
       </div>
@@ -197,7 +291,7 @@ const ArchiveSearchPage = () => {
         <button
           type="button"
           className="bg-pink-6 text-s5 flex h-13.5 w-full items-center justify-center rounded-[12px] text-white"
-          onClick={() => navigate('/archive/1')}
+          onClick={handleSearchClick}
         >
           검색하기
         </button>
