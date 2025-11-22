@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import KakaoMap from '@common/KakaoMap';
 import AddCourse from './components/AddCourse';
 import TabNavigation from './components/TabNavigation';
@@ -25,6 +26,7 @@ const mapSortTypeToApi = (sort: SortType): 'RECENT' | 'REVIEWS' | 'SCRAPS' => {
 };
 
 const HomePage = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('course');
   const [sort, setSort] = useState<SortType>('latest'); // 기본값: 최신 순
 
@@ -147,6 +149,7 @@ const HomePage = () => {
                 location={course.courseRegion}
                 placeCount={course.pinCount}
                 tags={course.courseTags}
+                onClick={() => navigate(`/archive/${course.courseId}`)}
               />
             ))}
           </div>
@@ -164,6 +167,7 @@ const HomePage = () => {
                 addressDetail={place.placeNumberAddress}
                 rating={place.placeRating}
                 reviewCount={place.reviewCount}
+                onClick={() => navigate(`/archive/place/${place.placeId}`)}
               />
             ))}
           </div>
