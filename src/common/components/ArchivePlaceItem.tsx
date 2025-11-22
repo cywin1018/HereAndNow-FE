@@ -1,5 +1,8 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Star from '@pages/home/components/Star';
 import moreArrowIcon from '@assets/icons/more_arrow.svg';
+import usePostPlaceScrap from '@apis/place/mutation/usePostPlaceScrap';
 import placeSaveIcon from '@assets/icons/place_save.svg';
 
 interface ArchivePlaceItemProps {
@@ -15,7 +18,9 @@ interface ArchivePlaceItemProps {
   goodPoints?: string;
   badPoints?: string;
   placeId?: number;
+  scrapped?: boolean;
   onDetailClick?: () => void;
+  onScrapChange?: (placeId: number, newScrapStatus: boolean) => void;
 }
 
 const ArchivePlaceItem = ({
@@ -31,8 +36,40 @@ const ArchivePlaceItem = ({
   goodPoints,
   badPoints,
   placeId,
+  scrapped = false,
   onDetailClick,
+  onScrapChange,
 }: ArchivePlaceItemProps) => {
+  const navigate = useNavigate();
+  const [isScrapped, setIsScrapped] = useState(scrapped);
+  const { mutate: postPlaceScrap, isPending } = usePostPlaceScrap();
+
+  const handleScrapClick = () => {
+    if (!placeId || isPending) return;
+
+    // 낙관적 업데이트
+    const previousScrapStatus = isScrapped;
+    setIsScrapped(!isScrapped);
+
+    postPlaceScrap(placeId, {
+      onSuccess: response => {
+        const newScrapStatus = !response.data.deleted;
+        setIsScrapped(newScrapStatus);
+        onScrapChange?.(placeId, newScrapStatus);
+
+        // 스크랩 성공 시 저장 페이지로 이동 (장소 탭)
+        if (newScrapStatus) {
+          navigate('/archive/save', { state: { activeTab: 'place' } });
+        }
+      },
+      onError: error => {
+        // 실패 시 롤백
+        setIsScrapped(previousScrapStatus);
+        console.error('[장소 스크랩] 실패:', error);
+      },
+    });
+  };
+
   const renderStars = (rating: number) => {
     const stars = [];
 
@@ -107,9 +144,13 @@ const ArchivePlaceItem = ({
               </div>
             </button>
 
-            {/* 좋아요 버튼 */}
-            <button className="border-iceblue-2 flex h-12 w-12 cursor-pointer items-center justify-center rounded-[4px] border bg-transparent">
-              <img src={placeSaveIcon} alt="좋아요" className="h-8 w-8" />
+            {/* 스크랩 버튼 */}
+            <button
+              className="border-iceblue-2 flex h-12 w-12 cursor-pointer items-center justify-center rounded-[4px] border bg-transparent disabled:cursor-not-allowed disabled:opacity-50"
+              onClick={handleScrapClick}
+              disabled={!placeId}
+            >
+              <img src={placeSaveIcon} alt="스크랩" className="h-8 w-8" />
             </button>
           </div>
         </div>

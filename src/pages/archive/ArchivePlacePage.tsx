@@ -155,8 +155,8 @@ const ArchivePlacePage = () => {
         {/* 지도 */}
         <div className="mt-6 h-60 max-h-60 min-h-60 w-[362px]">
           <KakaoMap
-            latitude={37.566826}
-            longitude={126.9786567}
+            latitude={placeInfo.lat}
+            longitude={placeInfo.lon}
             showMarker
             showHeartButton={false}
             className="h-full w-full"
