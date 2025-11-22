@@ -34,60 +34,65 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
   return (
     <BrowserRouter>
       <Routes>
+        {/* 퍼블릭 라우트 (인증 불필요) */}
         <Route element={<Layout withHeader={false} withBottomNavigation={false} />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/oauth/kakao" element={<KakaoCallback />} />
           <Route path="/auth/callback" element={<KakaoCallback />} />
-          <Route path="/place/save-place" element={<CourseSave />} />
-          <Route path="/place/register" element={<CourseRegister />} />
-          <Route path="/place/add-place" element={<AddPlacePage />} />
-          <Route path="/place/course/submit" element={<CourseSubmit />} />
-          <Route path="/place/course/result" element={<CourseResult />} />
-          <Route path="/place/detail" element={<PlaceDetail />} />
-          <Route path="/connecting/profile-modify" element={<ProfileModifyPage />} />
-          <Route path="/connecting/search" element={<ConnectingSearchPage />} />
-          <Route path="/connecting/archive" element={<ConnectingArchive />} />
-          <Route path="/connecting/course/detail" element={<ConnectingCourseDetail />} />
-          <Route path="/mypage" element={<Mypage />} />
-          <Route path="/setting" element={<SettingPage />} />
         </Route>
 
-        {/* 아카이브 검색 페이지 */}
-        <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="검색" />}>
-          <Route path="/archive/search" element={<ArchiveSearchPage />} />
-        </Route>
-
-        {/* 아카이브 저장 페이지 */}
-        <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="저장" />}>
-          <Route path="/archive/save" element={<ArchiveSavePage />} />
-        </Route>
-
-        {/* 아카이브 상세 페이지 */}
-        <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="아카이빙" />}>
-          <Route path="/archive/:id" element={<ArchiveDetailPage />} />
-        </Route>
-
-        {/* 아카이브 상세 페이지 - 장소 */}
-        <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="아카이빙" />}>
-          <Route path="/archive/place/:id" element={<ArchivePlacePage />} />
-        </Route>
-
-        {/* 둘러보기 페이지 */}
-        <Route element={<Layout withHeader={false} withBottomNavigation={true} />}>
-          <Route path="/explore" element={<ExplorePage />} />
-        </Route>
-
-        {/* 둘러보기 - 코스 */}
-        <Route element={<Layout withHeader={false} withBottomNavigation={false} />}>
-          <Route path="/explore/course" element={<ExploreCoursePage />} />
-        </Route>
-
-        {/* 둘러보기 - 검색 */}
-        <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="검색" />}>
-          <Route path="/explore/search" element={<ExploreSearchPage />} />
-        </Route>
-
+        {/* 보호된 라우트 (인증 필요) */}
         <Route element={<ProtectedRoute enabled={enableAuthCheck} />}>
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} />}>
+            <Route path="/place/save-place" element={<CourseSave />} />
+            <Route path="/place/register" element={<CourseRegister />} />
+            <Route path="/place/add-place" element={<AddPlacePage />} />
+            <Route path="/place/course/submit" element={<CourseSubmit />} />
+            <Route path="/place/course/result" element={<CourseResult />} />
+            <Route path="/place/detail" element={<PlaceDetail />} />
+            <Route path="/connecting/profile-modify" element={<ProfileModifyPage />} />
+            <Route path="/connecting/search" element={<ConnectingSearchPage />} />
+            <Route path="/connecting/archive" element={<ConnectingArchive />} />
+            <Route path="/connecting/course/detail" element={<ConnectingCourseDetail />} />
+            <Route path="/mypage" element={<Mypage />} />
+            <Route path="/setting" element={<SettingPage />} />
+          </Route>
+
+          {/* 아카이브 검색 페이지 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="검색" />}>
+            <Route path="/archive/search" element={<ArchiveSearchPage />} />
+          </Route>
+
+          {/* 아카이브 저장 페이지 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="저장" />}>
+            <Route path="/archive/save" element={<ArchiveSavePage />} />
+          </Route>
+
+          {/* 아카이브 상세 페이지 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="아카이빙" />}>
+            <Route path="/archive/:id" element={<ArchiveDetailPage />} />
+          </Route>
+
+          {/* 아카이브 상세 페이지 - 장소 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="아카이빙" />}>
+            <Route path="/archive/place/:id" element={<ArchivePlacePage />} />
+          </Route>
+
+          {/* 둘러보기 페이지 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={true} />}>
+            <Route path="/explore" element={<ExplorePage />} />
+          </Route>
+
+          {/* 둘러보기 - 코스 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} />}>
+            <Route path="/explore/course" element={<ExploreCoursePage />} />
+          </Route>
+
+          {/* 둘러보기 - 검색 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="검색" />}>
+            <Route path="/explore/search" element={<ExploreSearchPage />} />
+          </Route>
+
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/archive" element={<ArchivePage />} />
