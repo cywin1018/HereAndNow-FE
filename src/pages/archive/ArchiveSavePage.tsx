@@ -144,7 +144,7 @@ const ArchiveSavePage = () => {
                   reviewCount={place.reviewCount}
                   hasSaveButton
                   onSaveButtonClick={() => handleSaveButtonClick(place.placeId, 'place')}
-                  onClick={() => navigate(`/place/${place.placeId}`)}
+                  onClick={() => navigate(`/archive/place/${place.placeId}`)}
                 />
               ))}
           </div>
