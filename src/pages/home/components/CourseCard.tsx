@@ -7,6 +7,7 @@ import CommentItem from '@pages/archive/components/CommentItem';
 import useGetCourseComment from '@apis/course/query/useGetCourseComment';
 import usePostCourseComment from '@apis/course/mutation/usePostCourseComment';
 import usePostCourseScrap from '@apis/course/mutation/usePostCourseScrap';
+import CircularImagePoints from '@common/Ccw';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,6 +19,7 @@ interface CourseCardProps {
   location: string;
   placeCount: number;
   tags: string[];
+  courseImages?: string[];
   hasComments?: boolean;
   onClick?: () => void;
 }
@@ -30,6 +32,7 @@ const CourseCard = ({
   location,
   placeCount,
   tags,
+  courseImages,
   hasComments,
   onClick,
 }: CourseCardProps) => {
@@ -123,8 +126,8 @@ const CourseCard = ({
             </div>
           </div>
 
-          <div className="bg-iceblue-3 relative h-[128px] w-[128px] flex-shrink-0 rounded-lg">
-            <img src="/public/dummy_course_preview.png" />
+          <div className="bg-iceblue-3 relative h-[128px] w-[128px] flex-shrink-0 overflow-hidden rounded-lg">
+            <CircularImagePoints pointCount={placeCount} pointImages={courseImages} className="h-full w-full" />
             <button
               onClick={handleCourseSave}
               className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md transition-all hover:scale-110"
