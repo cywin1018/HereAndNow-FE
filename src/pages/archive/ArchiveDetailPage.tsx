@@ -177,6 +177,7 @@ const ArchiveDetailPage = () => {
                   goodPoints={pin.pinPositive}
                   badPoints={pin.pinNegative}
                   placeId={pin.placeDetails.placeId}
+                  scrapped={pin.placeDetails.scrapped}
                   onDetailClick={() => navigate(`/archive/place/${pin.placeDetails.placeId}`)}
                 />
               );

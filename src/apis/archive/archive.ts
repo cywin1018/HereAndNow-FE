@@ -65,3 +65,51 @@ export interface CreatedArchiveResponse {
   data: CourseItem[];
   isSuccess: boolean;
 }
+
+// 저장한 코스 관련 타입
+export interface SavedCourseItem {
+  courseId: number;
+  memberProfileImage: string;
+  memberNickname: string;
+  courseTitle: string;
+  courseRegion: string;
+  pinCount: number;
+  courseTags: string[];
+  courseImages: string[];
+}
+
+export interface SavedCoursesParams {
+  page?: number;
+  size?: number;
+  sort?: 'RECENT' | 'REVIEWS' | 'SCRAPS';
+}
+
+export interface SavedCoursesResponse {
+  timestamp: string;
+  data: SavedCourseItem[];
+  isSuccess: boolean;
+}
+
+// 저장한 장소 관련 타입
+export interface SavedPlaceItem {
+  placeId: number;
+  placeName: string;
+  placeCategory: string;
+  placeStreetNameAddress: string;
+  placeNumberAddress: string;
+  placeRating: number;
+  reviewCount: number;
+  placeImageUrl: string;
+}
+
+export interface SavedPlacesParams {
+  page?: number;
+  size?: number;
+  sort?: 'RECENT' | 'REVIEWS' | 'SCRAPS';
+}
+
+export interface SavedPlacesResponse {
+  timestamp: string;
+  data: SavedPlaceItem[];
+  isSuccess: boolean;
+}

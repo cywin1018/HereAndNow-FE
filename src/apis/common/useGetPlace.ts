@@ -13,6 +13,8 @@ export interface PlaceCardResponseDto {
   placeRating: number;
   reviewCount: number;
   placeImageUrl: string;
+  lat: number;
+  lon: number;
 }
 
 /**
