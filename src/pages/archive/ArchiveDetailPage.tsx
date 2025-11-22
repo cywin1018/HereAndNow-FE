@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import KakaoMap from '@common/KakaoMap';
 import ArchivePlaceItem from '@common/components/ArchivePlaceItem';
 import CommentItem from './components/CommentItem';
@@ -37,6 +37,7 @@ const ArchiveDetailPage = () => {
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
   const [commentInput, setCommentInput] = useState<string>('');
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   const parsedCourseId = Number(id);
   const isCourseIdValid = Number.isFinite(parsedCourseId) && parsedCourseId > 0;
@@ -175,6 +176,8 @@ const ArchiveDetailPage = () => {
                   photos={photos}
                   goodPoints={pin.pinPositive}
                   badPoints={pin.pinNegative}
+                  placeId={pin.placeDetails.placeId}
+                  onDetailClick={() => navigate(`/archive/place/${pin.placeDetails.placeId}`)}
                 />
               );
             })

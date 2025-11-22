@@ -68,6 +68,7 @@ const ExplorePage = () => {
               <div
                 key={item.placeCard.placeId || index}
                 className="border-neutral-3 w-[312px] max-w-[312px] min-w-[312px] overflow-hidden rounded-[8px] border whitespace-nowrap"
+                onClick={() => navigate(`/archive/place/${item.placeCard.placeId}`)}
               >
                 <PlaceCard
                   imageUrl={item.placeCard.placeImageUrl}

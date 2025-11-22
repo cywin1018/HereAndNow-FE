@@ -14,6 +14,8 @@ interface ArchivePlaceItemProps {
   photos: string[];
   goodPoints?: string;
   badPoints?: string;
+  placeId?: number;
+  onDetailClick?: () => void;
 }
 
 const ArchivePlaceItem = ({
@@ -28,6 +30,8 @@ const ArchivePlaceItem = ({
   photos,
   goodPoints,
   badPoints,
+  placeId,
+  onDetailClick,
 }: ArchivePlaceItemProps) => {
   const renderStars = (rating: number) => {
     const stars = [];
@@ -93,7 +97,10 @@ const ArchivePlaceItem = ({
           {/* 버튼 */}
           <div className="mt-3 flex gap-2.5">
             {/* 자세히 버튼 */}
-            <button className="bg-iceblue-2 flex h-12 min-h-12 w-[115px] cursor-pointer items-center justify-between rounded-[8px] px-4">
+            <button
+              className="bg-iceblue-2 flex h-12 min-h-12 w-[115px] cursor-pointer items-center justify-between rounded-[8px] px-4"
+              onClick={onDetailClick}
+            >
               <span className="text-b4 text-iceblue-8">자세히</span>
               <div className="flex h-6 w-6 items-center justify-center">
                 <img src={moreArrowIcon} alt="자세히" className="h-6 w-6" />
