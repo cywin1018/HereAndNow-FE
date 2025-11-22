@@ -14,6 +14,7 @@ interface CourseCardProps {
   placeCount: number;
   tags: string[];
   hasComments?: boolean;
+  onClick?: () => void;
 }
 
 const CourseCard = ({
@@ -25,13 +26,14 @@ const CourseCard = ({
   placeCount,
   tags,
   hasComments,
+  onClick,
 }: CourseCardProps) => {
   // 실제 댓글 데이터 가져오기
   const { data: commentData } = useGetCourseComment(courseId);
   const comments = commentData?.data?.comments || [];
   const commentCount = commentData?.data?.count || 0;
   return (
-    <div className="flex w-full rounded-lg bg-white p-4 shadow-sm">
+    <div className="flex w-full rounded-lg bg-white p-4 shadow-sm cursor-pointer" onClick={onClick}>
       <div className="flex w-full flex-col gap-3">
         {/* 코스 정보 */}
         <div className="flex w-full gap-2">

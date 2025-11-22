@@ -201,6 +201,7 @@ const ExploreCoursePage = () => {
                   placeCount={item.courseCard.pinCount}
                   tags={item.courseCard.courseTags}
                   hasComments={item.comment.count > 0}
+                  onClick={() => navigate(`/archive/${item.courseCard.courseId}`)}
                 />
               ))
             : // 검색 모드에서 결과가 없을 때
