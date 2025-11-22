@@ -2,20 +2,44 @@ import { useQuery } from '@tanstack/react-query';
 import api from './api';
 
 /**
- * Place 상세 정보 응답 타입
+ * Place 카드 정보 타입
  */
-export interface PlaceDetailData {
+export interface PlaceCardResponseDto {
   placeId: number;
   placeName: string;
   placeCategory: string;
   placeStreetNameAddress: string;
-  placeNumberAddress?: string;
-  placeLatitude: number;
-  placeLongitude: number;
+  placeNumberAddress: string;
   placeRating: number;
   reviewCount: number;
-  placeUrl: string;
-  scrapped?: boolean;
+  placeImageUrl: string;
+}
+
+/**
+ * 코스 정보 타입
+ */
+export interface CourseInfo {
+  courseId: number;
+  memberProfileImage: string;
+  memberNickname: string;
+  courseTitle: string;
+  courseRegion: string;
+  pinCount: number;
+  courseTags: string[];
+  courseImages: string[];
+}
+
+/**
+ * Place 상세 정보 응답 타입
+ */
+export interface PlaceDetailData {
+  placeCardResponseDto: PlaceCardResponseDto;
+  placeTagList: string[];
+  bannerImageList: string[];
+  placeInfoImageList: string[];
+  placePositiveList: string[];
+  placeNegativeList: string[];
+  courseList: CourseInfo[];
 }
 
 export interface PlaceDetailResponse {
@@ -37,8 +61,8 @@ const getPlace = async (placeId: number): Promise<PlaceDetailResponse> => {
   const response = await api.get<PlaceDetailResponse>(`/place/${placeId}`);
 
   console.log('[getPlace] 응답 수신:', {
-    placeId: response.data.data.placeId,
-    placeName: response.data.data.placeName,
+    placeId: response.data.data.placeCardResponseDto.placeId,
+    placeName: response.data.data.placeCardResponseDto.placeName,
     fullResponse: response.data,
   });
 

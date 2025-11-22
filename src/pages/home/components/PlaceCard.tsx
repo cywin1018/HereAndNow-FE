@@ -10,6 +10,7 @@ interface PlaceCardProps {
   reviewCount: number;
   hasSaveButton?: boolean;
   onSaveButtonClick?: () => void;
+  onClick?: () => void;
 }
 
 const PlaceCard = ({
@@ -22,6 +23,7 @@ const PlaceCard = ({
   reviewCount,
   hasSaveButton = false,
   onSaveButtonClick,
+  onClick,
 }: PlaceCardProps) => {
   const renderStars = (rating: number) => {
     const stars = [];
@@ -44,7 +46,7 @@ const PlaceCard = ({
 
   return (
     <div className="flex w-full flex-col gap-1 overflow-hidden rounded-lg bg-white shadow-sm">
-      <div className="flex w-full bg-transparent">
+      <div className={`flex w-full bg-transparent ${onClick ? 'cursor-pointer' : ''}`} onClick={onClick}>
         <div className="h-[120px] w-[120px] flex-shrink-0">
           <img src={imageUrl} alt={name} className="h-full w-full object-cover" />
         </div>
