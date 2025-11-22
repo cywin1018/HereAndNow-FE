@@ -187,6 +187,7 @@ const ArchivePlacePage = () => {
                 <div className="w-[362px] max-w-[362px] min-w-[362px]">
                   <CourseCard
                     key={index}
+                    courseId={index}
                     profileImageUrl="/dummy_profile.png"
                     authorName="홍**"
                     title="아직 어색한 사이인 커플을 위한 감성 충만 코스"

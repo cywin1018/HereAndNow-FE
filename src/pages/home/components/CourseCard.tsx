@@ -3,21 +3,10 @@ import MapIcon from '@assets/icons/map.svg';
 import placeSaveIcon from '@assets/icons/place_save.svg';
 import Tag from '@common/Tag';
 import CommentItem from '@pages/archive/components/CommentItem';
-
-const COMMENTS = [
-  {
-    profileImage: '/dummy_profile.png',
-    userName: '문**',
-    content: '리뷰 넘 귀여워용 💕',
-  },
-  {
-    profileImage: '/dummy_profile.png',
-    userName: '마**',
-    content: '저도 성수동 잘 안 가봤는데 코스 참고할게요 ㅎㅎ 감사합니다~!',
-  },
-];
+import useGetCourseComment from '@apis/course/query/useGetCourseComment';
 
 interface CourseCardProps {
+  courseId: number;
   profileImageUrl: string;
   authorName: string;
   title: string;
@@ -28,6 +17,7 @@ interface CourseCardProps {
 }
 
 const CourseCard = ({
+  courseId,
   profileImageUrl,
   authorName,
   title,
@@ -36,6 +26,10 @@ const CourseCard = ({
   tags,
   hasComments,
 }: CourseCardProps) => {
+  // 실제 댓글 데이터 가져오기
+  const { data: commentData } = useGetCourseComment(courseId);
+  const comments = commentData?.data?.comments || [];
+  const commentCount = commentData?.data?.count || 0;
   return (
     <div className="flex w-full rounded-lg bg-white p-4 shadow-sm">
       <div className="flex w-full flex-col gap-3">
@@ -82,11 +76,11 @@ const CourseCard = ({
         </div>
 
         {/* 댓글 */}
-        {hasComments && (
+        {hasComments && commentCount > 0 && (
           <div className="flex w-full flex-col gap-4">
             {/* 댓글 작성 폼 */}
             <div className="flex w-full flex-col gap-2">
-              <span className="text-d1 text-iceblue-8">댓글 4개</span>
+              <span className="text-d1 text-iceblue-8">댓글 {commentCount}개</span>
               <div className="flex w-full items-center gap-[10px]">
                 <div className="border-iceblue-2 flex h-12 flex-1 items-center justify-center rounded-[8px] border px-5 py-3">
                   <input
@@ -103,11 +97,11 @@ const CourseCard = ({
 
             {/* 댓글 리스트 */}
             <div className="flex w-full flex-col gap-4">
-              {COMMENTS.map((comment, index) => (
+              {comments.map((comment, index) => (
                 <CommentItem
-                  key={index}
+                  key={comment.commentId || index}
                   profileImage={comment.profileImage}
-                  userName={comment.userName}
+                  userName={comment.nickName}
                   content={comment.content}
                 />
               ))}

@@ -76,6 +76,40 @@ export interface UseGetCourseListParams {
   size?: number;
 }
 
+// 코스 검색 관련 타입 정의
+export interface CourseSearchParams {
+  page?: number;
+  size?: number;
+  rating?: string;
+  keyword?: string;
+  startDate?: string;
+  endDate?: string;
+  with?: string;
+  region?: string;
+  placeCode?: string;
+  tag?: string;
+}
+
+export interface SelectedFilters {
+  rating?: number;
+  keyword?: string[];
+  startDate?: string;
+  endDate?: string;
+  with?: string;
+  region?: string;
+  placeCode?: string[];
+  tag?: string[];
+}
+
+export interface CourseSearchResponse {
+  timestamp: string;
+  data: {
+    selectedFilters: SelectedFilters;
+    filteredCourses: CourseListItem[];
+  };
+  isSuccess: boolean;
+}
+
 // API 호출 함수
 const getPlaceAds = async (params: UseGetPlaceAdsParams): Promise<PlaceAdsResponse> => {
   const { lat = 37.566585446882, lon = 126.978203640984 } = params;
@@ -121,5 +155,23 @@ export const useGetCourseList = (params: UseGetCourseListParams = {}) => {
   return useQuery({
     queryKey: ['courseList', page, size],
     queryFn: () => getCourseList(params),
+  });
+};
+
+// 코스 검색 API 호출 함수
+const searchCourseList = async (params: CourseSearchParams): Promise<CourseSearchResponse> => {
+  const response = await api.get<CourseSearchResponse>('/discover/course/search', {
+    params,
+  });
+
+  return response.data;
+};
+
+// 코스 검색 React Query 훅
+export const useSearchCourseList = (params: CourseSearchParams = {}, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: ['courseSearch', params],
+    queryFn: () => searchCourseList(params),
+    enabled,
   });
 };

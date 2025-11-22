@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import XCircleIcon from '@assets/icons/bxs_x-circle.svg';
 import PlusIcon from '@assets/icons/plus.svg';
 
@@ -15,7 +15,7 @@ interface TagSelectorProps {
 
 const TagSelector = ({
   placeholder = '원하는 태그를 선택해보세요',
-  selectedTags: initialSelected = [],
+  selectedTags: externalSelectedTags,
   options,
   maxSelected,
   onChange,
@@ -23,40 +23,37 @@ const TagSelector = ({
   optionContainerBgClassName = 'bg-purple-1',
   defaultExpanded = true,
 }: TagSelectorProps) => {
-  const [selectedTags, setSelectedTags] = useState<string[]>(initialSelected);
+  const [internalSelectedTags, setInternalSelectedTags] = useState<string[]>([]);
   const [isOptionsOpen, setIsOptionsOpen] = useState(defaultExpanded);
 
-  // selectedTags prop 변경 시 내부 state 동기화
-  useEffect(() => {
-    setSelectedTags(initialSelected);
-  }, [initialSelected]);
+  // 제어 컴포넌트인지 비제어 컴포넌트인지 결정
+  const isControlled = externalSelectedTags !== undefined;
+  const selectedTags = isControlled ? externalSelectedTags : internalSelectedTags;
 
   const handleTagToggle = (tag: string) => {
-    setSelectedTags(prev => {
-      const alreadySelected = prev.includes(tag);
-      if (alreadySelected) {
-        const updated = prev.filter(item => item !== tag);
-        // onChange를 비동기로 호출하여 렌더링 중 상태 업데이트 방지
-        setTimeout(() => onChange?.(updated), 0);
-        return updated;
-      }
+    const alreadySelected = selectedTags.includes(tag);
+    let updated: string[];
 
-      if (maxSelected && prev.length >= maxSelected) return prev;
+    if (alreadySelected) {
+      updated = selectedTags.filter(item => item !== tag);
+    } else {
+      if (maxSelected && selectedTags.length >= maxSelected) return;
+      updated = [...selectedTags, tag];
+    }
 
-      const updated = [...prev, tag];
-      // onChange를 비동기로 호출하여 렌더링 중 상태 업데이트 방지
-      setTimeout(() => onChange?.(updated), 0);
-      return updated;
-    });
+    if (!isControlled) {
+      setInternalSelectedTags(updated);
+    }
+    onChange?.(updated);
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setSelectedTags(prev => {
-      const updated = prev.filter(tag => tag !== tagToRemove);
-      // onChange를 비동기로 호출하여 렌더링 중 상태 업데이트 방지
-      setTimeout(() => onChange?.(updated), 0);
-      return updated;
-    });
+    const updated = selectedTags.filter(tag => tag !== tagToRemove);
+
+    if (!isControlled) {
+      setInternalSelectedTags(updated);
+    }
+    onChange?.(updated);
   };
 
   const handleToggleOptions = () => {
