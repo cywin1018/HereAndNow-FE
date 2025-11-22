@@ -128,6 +128,16 @@ const PlaceDetail = () => {
     return tags;
   }, [currentPlace?.placeGroupCode]);
 
+  // 주소 디버깅
+  useEffect(() => {
+    console.log('[PlaceDetail] ===== 주소 디버깅 =====');
+    console.log('[PlaceDetail] currentPlace 전체:', currentPlace);
+    console.log('[PlaceDetail] placeStreetNameAddress:', currentPlace?.placeStreetNameAddress);
+    console.log('[PlaceDetail] placeNumberAddress:', currentPlace?.placeNumberAddress);
+    console.log('[PlaceDetail] placeName:', currentPlace?.placeName);
+    console.log('[PlaceDetail] =========================');
+  }, [currentPlace]);
+
   return (
     <div className="flex w-full flex-col gap-[32px] pb-16">
       <PageHeader title="장소 세부설명" />

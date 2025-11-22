@@ -136,10 +136,20 @@ const ConfirmAddressBottomSheet = ({
     }
 
     // Place 정보 구성
-    const fullStreetAddress = detailAddress ? `${address.address} ${detailAddress}` : address.address;
+    // fullAddress가 있으면 우선 사용 (road_address_name), 없으면 address 사용 (address_name)
+    const baseAddress = address.fullAddress || address.address;
+    const fullStreetAddress = detailAddress ? `${baseAddress} ${detailAddress}` : baseAddress;
+
+    // 주소에서 지역명 추출 (서울시 하드코딩 제거)
+    // address_name 형식: "부산 기장군 일광읍 삼성리 142" → 첫 번째 단어 "부산"
+    // road_address_name 형식: "부산 기장군 일광읍 기장해안로 1290" → 첫 번째 단어 "부산"
+    const addressParts = baseAddress?.split(' ') || [];
+    const region = addressParts[0] || ''; // 첫 번째 단어가 지역명 (예: "부산", "서울특별시" 등)
+
+    // bname이 있으면 지역명 + bname 조합, 없으면 전체 주소 사용
     const fullNumberAddress = address.bname
-      ? `서울시 ${address.bname} ${address.zonecode}${detailAddress ? ` ${detailAddress}` : ''}`
-      : '';
+      ? `${region} ${address.bname} ${address.zonecode || ''}${detailAddress ? ` ${detailAddress}` : ''}`.trim()
+      : baseAddress;
 
     const place: Place = {
       placeName,
@@ -147,15 +157,10 @@ const ConfirmAddressBottomSheet = ({
       placeNumberAddress: fullNumberAddress,
       placeLatitude: coordinates.latitude,
       placeLongitude: coordinates.longitude,
-      placeGroupCode: placeDetails?.groupCode || '',
+      placeGroupCode: placeDetails?.groupCode || 'AT4', // 카테고리가 없으면 기본값 AT4 (관광명소)
       placeCategory: placeDetails?.category || '',
       placeUrl: placeDetails?.url || '',
     };
-
-    console.log('[ConfirmAddressBottomSheet] 생성된 Place 정보:', {
-      place,
-      placeDetails,
-    });
 
     // 새로 추가될 핀의 인덱스 계산 (addPin 전에 계산해야 함)
     const newPinIndex = courseData?.pinList?.length || 0;
@@ -187,7 +192,16 @@ const ConfirmAddressBottomSheet = ({
   };
 
   const roadAddress = address?.address || '';
-  const oldAddress = address?.bname ? `서울 ${address.bname} ${address.zonecode}` : '';
+  // oldAddress 대신 placeName 사용
+  const displayAddress = placeName || '';
+
+  // displayAddress 디버깅
+  useEffect(() => {
+    console.log('[ConfirmAddressBottomSheet] ===== displayAddress 디버깅 =====');
+    console.log('[ConfirmAddressBottomSheet] placeName:', placeName);
+    console.log('[ConfirmAddressBottomSheet] displayAddress 최종 값:', displayAddress);
+    console.log('[ConfirmAddressBottomSheet] =============================');
+  }, [placeName, displayAddress]);
 
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose}>
@@ -212,7 +226,7 @@ const ConfirmAddressBottomSheet = ({
 
         <div className="flex flex-col">
           <div className="text-s1 text-iceblue-8">{roadAddress}</div>
-          {oldAddress && <div className="text-b4 text-iceblue-8">{oldAddress}</div>}
+          {displayAddress && <div className="text-b4 text-iceblue-8">{displayAddress}</div>}
         </div>
 
         <div className="flex flex-col gap-2">
