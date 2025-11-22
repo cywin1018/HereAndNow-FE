@@ -15,7 +15,7 @@ const PageHeader = (props: PageHeaderProps) => {
   };
 
   return (
-    <div className="relative flex items-center p-5">
+    <div className="relative flex items-center py-5">
       <button
         type="button"
         className="flex h-6 w-6 cursor-pointer items-center justify-center"
