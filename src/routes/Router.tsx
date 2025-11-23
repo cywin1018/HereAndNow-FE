@@ -25,6 +25,7 @@ import ExploreCoursePage from '@pages/explore/ExploreCoursePage';
 import ExploreSearchPage from '@pages/explore/ExploreSearchPage';
 import Mypage from '@pages/mypage/Mypage';
 import SettingPage from '@pages/mypage/SettingPage';
+import BookMarkPage from '@pages/bookmark/BookMarkPage';
 
 interface RouterProps {
   enableAuthCheck?: boolean; // 디버깅용: 인증 체크 활성화/비활성화 (기본값: true)
@@ -56,6 +57,7 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
             <Route path="/connecting/course/detail" element={<ConnectingCourseDetail />} />
             <Route path="/mypage" element={<Mypage />} />
             <Route path="/setting" element={<SettingPage />} />
+            <Route path="/bookmark" element={<BookMarkPage />} />
           </Route>
 
           {/* 아카이브 검색 페이지 */}
