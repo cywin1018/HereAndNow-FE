@@ -15,7 +15,7 @@ const Layout = ({ withHeader = true, pageTitle, withBottomNavigation = true }: L
 
   return (
     <div className="min-h-screen">
-      <main className="mx-auto min-h-screen w-full max-w-[402px] bg-white shadow-lg">
+      <main className="mx-auto min-h-screen w-full max-w-[402px] bg-white pb-16 shadow-lg">
         {withHeader && <Header />}
         {pageTitle && <PageHeader title={pageTitle} />}
 
