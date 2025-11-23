@@ -18,27 +18,52 @@ const BottomNavigation = () => {
 
   // [개선 1] 렌더링을 유발하지 않는 값은 useRef로 관리
   const lastScrollY = useRef(0);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scrollDirectionRef = useRef<'up' | 'down' | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      const prevScrollY = lastScrollY.current; // Ref에서 값 읽기
+      const prevScrollY = lastScrollY.current;
 
       // [개선 3] 과도한 연산 방지 (이미 맨 위거나, 스크롤 변화가 적으면 무시)
-      // 예: 10px 미만의 미세한 움직임은 무시 (Jittering 방지)
-      if (Math.abs(currentScrollY - prevScrollY) < 10) {
+      // 모바일에서는 5px로 더 작게 설정하여 민감도 향상
+      if (Math.abs(currentScrollY - prevScrollY) < 5) {
         return;
       }
 
-      // [개선 2] 상태 변경이 필요할 때만 setState 호출 (성능 최적화)
-      // 스크롤을 내리는 중 (현재 위치 > 이전 위치) && 현재 위치가 어느정도 아래임
-      if (currentScrollY > prevScrollY && currentScrollY > 50) {
-        setIsVisible(prev => (prev ? false : prev)); // 이미 false면 업데이트 안 함
+      // 스크롤 방향 결정 (더 정확한 판단을 위해)
+      const isScrollingDown = currentScrollY > prevScrollY;
+      const isScrollingUp = currentScrollY < prevScrollY;
+
+      // 스크롤 방향이 명확할 때만 방향 저장
+      if (isScrollingDown) {
+        scrollDirectionRef.current = 'down';
+      } else if (isScrollingUp) {
+        scrollDirectionRef.current = 'up';
       }
-      // 스크롤을 올리는 중
-      else if (currentScrollY < prevScrollY) {
-        setIsVisible(prev => (!prev ? true : prev)); // 이미 true면 업데이트 안 함
+
+      // 기존 타이머가 있으면 취소 (스크롤이 계속 진행 중)
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
       }
+
+      // 스크롤이 끝난 후 상태 변경 (모바일 momentum scrolling 대응)
+      scrollTimeoutRef.current = setTimeout(() => {
+        const direction = scrollDirectionRef.current;
+        const scrollY = window.scrollY;
+
+        // 스크롤을 내리는 중 && 현재 위치가 어느정도 아래임
+        if (direction === 'down' && scrollY > 50) {
+          setIsVisible(prev => (prev ? false : prev));
+        }
+        // 스크롤을 올리는 중 || 맨 위에 가까움
+        else if (direction === 'up' || scrollY < 50) {
+          setIsVisible(prev => (!prev ? true : prev));
+        }
+
+        scrollDirectionRef.current = null;
+      }, 150); // 모바일 스크롤이 완전히 끝날 때까지 대기
 
       // 현재 스크롤 위치 업데이트
       lastScrollY.current = currentScrollY;
@@ -49,6 +74,9 @@ const BottomNavigation = () => {
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
     };
   }, []); // [중요] 의존성 배열을 비워서 마운트 시 1회만 바인딩
 
