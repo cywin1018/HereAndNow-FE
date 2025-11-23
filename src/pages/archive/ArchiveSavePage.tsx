@@ -1,6 +1,6 @@
 import Modal from '@common/components/Modal';
 import PlaceCard from '@pages/home/components/PlaceCard';
-import CourseCard from '@pages/home/components/CourseCard';
+import CourseCard from '@pages/bookmark/components/CourseCard';
 import TabNavigation from '@pages/home/components/TabNavigation';
 import LoadingIndicator from '@common/LoadingIndicator';
 import { useState } from 'react';
@@ -120,8 +120,12 @@ const ArchiveSavePage = () => {
                   location={course.courseRegion}
                   placeCount={course.pinCount}
                   tags={course.courseTags}
-                  hasComments={false}
+                  courseImages={course.courseImages}
                   onClick={() => navigate(`/archive/${course.courseId}`)}
+                  onSaveClick={(e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    handleSaveButtonClick(course.courseId, 'course');
+                  }}
                 />
               ))}
 
