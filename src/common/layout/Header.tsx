@@ -14,12 +14,15 @@ const Header = () => {
   const handleMypageNavigation = () => {
     navigate('/mypage');
   };
+  const handleHomeNavigation = () => {
+    navigate('/');
+  };
 
   return (
     <>
       <header className="p-4">
         <div className="flex items-center justify-between">
-          <img src="/LogoIcon.svg" alt="Here&Now 로고" className="h-7 w-auto" />
+          <img src="/LogoIcon.svg" alt="Here&Now 로고" className="h-7 w-auto" onClick={handleHomeNavigation} />
 
           <div className="flex items-center gap-x-[8px]">
             <button type="button" className="p-2" onClick={handleAlarmClick}>
