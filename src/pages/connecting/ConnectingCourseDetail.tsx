@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useParams } from 'react-router-dom';
 import PageHeader from '@common/layout/PageHeader';
 import KakaoMap from '@common/KakaoMap';
 import DetailSection from './components/DetailSection';
@@ -24,7 +25,9 @@ const getTagColorClass = (index: number): string => {
 };
 
 const ConnectingCourseDetail = () => {
-  const { data: course, isLoading } = useGetCourse(1);
+  const { id } = useParams<{ id: string }>();
+  const courseId = id ? parseInt(id, 10) : 1;
+  const { data: course, isLoading } = useGetCourse(courseId);
 
   const formattedDate = useMemo(() => {
     if (!course?.data?.courseVisitDate) return null;

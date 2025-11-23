@@ -54,7 +54,7 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
             <Route path="/connecting/profile-modify" element={<ProfileModifyPage />} />
             <Route path="/connecting/search" element={<ConnectingSearchPage />} />
             <Route path="/connecting/archive" element={<ConnectingArchive />} />
-            <Route path="/connecting/course/detail" element={<ConnectingCourseDetail />} />
+            <Route path="/connecting/course/detail/:id" element={<ConnectingCourseDetail />} />
             <Route path="/mypage" element={<Mypage />} />
             <Route path="/setting" element={<SettingPage />} />
             <Route path="/bookmark" element={<BookMarkPage />} />

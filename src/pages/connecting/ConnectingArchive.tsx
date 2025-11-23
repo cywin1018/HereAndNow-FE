@@ -102,7 +102,11 @@ const ConnectingArchive = () => {
   console.log('connectingSearchData:', connectingSearchData);
 
   const handleSearchClick = () => {
-    navigate('/connecting/course/detail');
+    navigate('/connecting/search');
+  };
+
+  const handleCourseClick = (courseId: number) => {
+    navigate(`/connecting/course/detail/${courseId}`);
   };
 
   return (
@@ -125,7 +129,10 @@ const ConnectingArchive = () => {
         )}
 
         {/* 상단 큰 폴더 (최근 코스) */}
-        <div className="relative h-66.75 w-93">
+        <div
+          className="relative h-66.75 w-93 cursor-pointer"
+          onClick={() => recentCourse?.courseId && handleCourseClick(recentCourse.courseId)}
+        >
           <img src={bigPinkFolder} alt="폴더" className="h-full w-full object-cover" />
           <span className="text-s2 text-iceblue-1 absolute top-2.75 left-10">{recentDaysAgo}</span>
 
@@ -343,7 +350,11 @@ const ConnectingArchive = () => {
           <div className="flex w-full flex-wrap gap-x-5 gap-y-8 px-1.75">
             {filteredCourses.length > 0
               ? filteredCourses.map((course: FilteredCourse) => (
-                  <div key={course.id} className="flex h-26 w-18 flex-col">
+                  <div
+                    key={course.id}
+                    className="flex h-26 w-18 cursor-pointer flex-col"
+                    onClick={() => handleCourseClick(course.id)}
+                  >
                     <div className="relative flex h-18 w-18 items-center justify-center">
                       <img src={smallPinkFolder} alt="폴더" className="h-full w-full object-cover" />
 
