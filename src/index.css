@@ -1,2 +1,8 @@
-@import "tailwindcss";
-@import "./styles/index.css";
+@import 'tailwindcss';
+@import './styles/index.css';
+
+/* 전역 스크롤 동작 설정 */
+html,
+body {
+  overscroll-behavior-y: none;
+}
