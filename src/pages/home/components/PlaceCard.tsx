@@ -1,4 +1,5 @@
 import Star from './Star';
+import placeSaveIcon from '@assets/icons/place_save.svg';
 
 interface PlaceCardProps {
   imageUrl: string;
@@ -9,7 +10,7 @@ interface PlaceCardProps {
   rating: number;
   reviewCount: number;
   hasSaveButton?: boolean;
-  onSaveButtonClick?: () => void;
+  onSaveButtonClick?: (e: React.MouseEvent) => void;
   onClick?: () => void;
 }
 
@@ -44,14 +45,19 @@ const PlaceCard = ({
     return stars;
   };
 
+  const handleSaveClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onSaveButtonClick?.(e);
+  };
+
   return (
-    <div className="flex w-full flex-col gap-1 overflow-hidden rounded-lg bg-white shadow-sm">
+    <div className="flex w-full flex-col gap-1 overflow-hidden rounded-lg bg-white p-2.5 shadow-sm">
       <div className={`flex w-full bg-transparent ${onClick ? 'cursor-pointer' : ''}`} onClick={onClick}>
         <div className="h-[120px] w-[120px] flex-shrink-0">
-          <img src={imageUrl} alt={name} className="h-full w-full object-cover" />
+          <img src={imageUrl} alt={name} className="h-full w-full rounded-lg object-cover" />
         </div>
 
-        <div className="flex flex-1 flex-col justify-between p-4">
+        <div className="flex flex-1 flex-col justify-between p-2">
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-2">
               <h3 className="text-b3 text-neutral-8">{name}</h3>
@@ -79,12 +85,13 @@ const PlaceCard = ({
       </div>
 
       {hasSaveButton && (
-        <div className="flex w-full justify-end">
+        <div className="flex w-full justify-end pb-4">
           <button
-            className="bg-iceblue-2 text-s5 text-iceblue-7 flex h-13.5 w-[98px] cursor-pointer items-center justify-center rounded-[12px]"
-            onClick={onSaveButtonClick}
+            onClick={handleSaveClick}
+            className="bg-pink-2 text-pink-7 hover:bg-pink-3 flex h-10 w-[98px] items-center justify-center gap-[6.4px] rounded-lg transition-colors"
           >
-            저장
+            <img src={placeSaveIcon} alt="저장" className="h-5 w-5" />
+            <span className="text-s5">저장</span>
           </button>
         </div>
       )}

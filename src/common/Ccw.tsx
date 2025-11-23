@@ -60,7 +60,7 @@ const CircularImagePoints: React.FC<CircularImagePointsProps> = ({
   };
 
   const points = calculatePoints(pointCount);
-  const radius = 180; // 중심에서 점까지의 거리
+  const radius = 240; // 중심에서 점까지의 거리 (180 → 240으로 증가)
   const centerX = 400; // SVG 중심 X
   const centerY = 400; // SVG 중심 Y
 
@@ -121,7 +121,7 @@ const CircularImagePoints: React.FC<CircularImagePointsProps> = ({
               d={generatePath()}
               fill="none"
               stroke="#ec4899"
-              strokeWidth="10"
+              strokeWidth="16"
               strokeLinecap="round"
               strokeLinejoin="round"
               opacity="0.6"
@@ -137,19 +137,19 @@ const CircularImagePoints: React.FC<CircularImagePointsProps> = ({
             return (
               <g key={point.id}>
                 {/* 포인트 이미지 컨테이너 */}
-                <rect x={x - 40} y={y - 40 - 70} width="80" height="80" rx="16" fill="white" filter="url(#shadow)" />
+                <rect x={x - 50} y={y - 50 - 90} width="100" height="100" rx="20" fill="white" filter="url(#shadow)" />
 
                 {/* 핑크색 원 */}
-                <circle cx={x} cy={y} r="8" fill="#ec4899" />
+                <circle cx={x} cy={y} r="12" fill="#ec4899" />
 
                 {pointImages[point.id] && (
                   <image
                     href={pointImages[point.id]}
-                    x={x - 35}
-                    y={y - 35 - 70}
-                    width="70"
-                    height="70"
-                    clipPath="inset(0 round 12px)"
+                    x={x - 45}
+                    y={y - 45 - 90}
+                    width="90"
+                    height="90"
+                    clipPath="inset(0 round 15px)"
                   />
                 )}
               </g>
