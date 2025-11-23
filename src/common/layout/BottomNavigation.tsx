@@ -16,69 +16,73 @@ const BottomNavigation = () => {
   const location = useLocation();
   const [isVisible, setIsVisible] = useState(true);
 
-  // [개선 1] 렌더링을 유발하지 않는 값은 useRef로 관리
   const lastScrollY = useRef(0);
-  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const scrollDirectionRef = useRef<'up' | 'down' | null>(null);
+
+  // 스크롤 방향 누적 추적 (bouncing 무시용)
+  const scrollDeltaRef = useRef(0);
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       const prevScrollY = lastScrollY.current;
+      const delta = currentScrollY - prevScrollY;
 
-      // [개선 3] 과도한 연산 방지 (이미 맨 위거나, 스크롤 변화가 적으면 무시)
-      // 모바일에서는 5px로 더 작게 설정하여 민감도 향상
-      if (Math.abs(currentScrollY - prevScrollY) < 5) {
+      // 스크롤이 실제로 발생했는지 확인
+      if (Math.abs(delta) < 1) {
         return;
       }
 
-      // 스크롤 방향 결정 (더 정확한 판단을 위해)
-      const isScrollingDown = currentScrollY > prevScrollY;
-      const isScrollingUp = currentScrollY < prevScrollY;
+      // [핵심] 델타를 누적해서 전체적인 스크롤 방향 파악
+      scrollDeltaRef.current += delta;
 
-      // 스크롤 방향이 명확할 때만 방향 저장
-      if (isScrollingDown) {
-        scrollDirectionRef.current = 'down';
-      } else if (isScrollingUp) {
-        scrollDirectionRef.current = 'up';
+      // 기존 숨김 타이머 취소
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
       }
 
-      // 기존 타이머가 있으면 취소 (스크롤이 계속 진행 중)
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
+      // 누적 델타가 충분히 크면 (확실한 방향 전환) - 임계값을 낮춤
+      if (Math.abs(scrollDeltaRef.current) > 20) {
+        if (scrollDeltaRef.current > 0 && currentScrollY > 50) {
+          // 확실하게 아래로 스크롤 중
+          setIsVisible(false);
+        } else if (scrollDeltaRef.current < 0 || currentScrollY < 50) {
+          // 확실하게 위로 스크롤 중 또는 상단 근처
+          setIsVisible(true);
+        }
+
+        // 델타 리셋
+        scrollDeltaRef.current = 0;
       }
 
-      // 스크롤이 끝난 후 상태 변경 (모바일 momentum scrolling 대응)
-      scrollTimeoutRef.current = setTimeout(() => {
-        const direction = scrollDirectionRef.current;
-        const scrollY = window.scrollY;
+      // 스크롤이 멈춘 후 상태 재확인 (bounce 후 정리)
+      hideTimeoutRef.current = setTimeout(() => {
+        const finalScrollY = window.scrollY;
 
-        // 스크롤을 내리는 중 && 현재 위치가 어느정도 아래임
-        if (direction === 'down' && scrollY > 50) {
-          setIsVisible(prev => (prev ? false : prev));
-        }
-        // 스크롤을 올리는 중 || 맨 위에 가까움
-        else if (direction === 'up' || scrollY < 50) {
-          setIsVisible(prev => (!prev ? true : prev));
+        // 스크롤이 멈췄을 때 최종 위치 기준으로 판단
+        if (finalScrollY < 50) {
+          setIsVisible(true);
         }
 
-        scrollDirectionRef.current = null;
-      }, 150); // 모바일 스크롤이 완전히 끝날 때까지 대기
+        // 델타 완전 리셋
+        scrollDeltaRef.current = 0;
+      }, 150);
 
-      // 현재 스크롤 위치 업데이트
       lastScrollY.current = currentScrollY;
     };
 
-    // [성능 팁] passive: true 옵션으로 스크롤 성능 향상
+    // scroll 이벤트와 wheel 이벤트 모두 감지
     window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('wheel', handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
+      window.removeEventListener('wheel', handleScroll);
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
       }
     };
-  }, []); // [중요] 의존성 배열을 비워서 마운트 시 1회만 바인딩
+  }, []);
 
   return (
     <div
@@ -86,10 +90,6 @@ const BottomNavigation = () => {
         isVisible ? 'translate-y-0' : 'translate-y-full'
       }`}
     >
-      {/* [UX 개선] pointer-events-none을 부모에 주고, 자식(네비)에 auto를 줌.
-         이렇게 하면 네비게이션 옆의 투명한 공간은 클릭이 뚫고 지나가서
-         뒤에 있는 컨텐츠를 클릭할 수 있게 됨.
-      */}
       <div className="border-neutral-4 pointer-events-auto flex w-auto items-center gap-x-6 rounded-[8px] border bg-white px-[8px] py-[6px] shadow-lg">
         {navItems.map(item => (
           <Link
