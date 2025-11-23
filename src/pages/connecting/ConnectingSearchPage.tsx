@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import StarRatingFilter from '@common/components/StarRatingFilter';
-import PageHeader from '@common/layout/PageHeader';
 import TagSelector from '@common/components/TagSelector';
 import RegionDropdown from '@common/RegionDropdown';
 import BottomActionButton from '@common/button/BottomActionButton';
@@ -23,7 +22,6 @@ const ConnectingSearchPage = () => {
 
   return (
     <div className="bg-neutral-1 flex min-h-screen flex-col">
-      <PageHeader title="검색" />
       <span className="text-h4 text-neutral-10 py-8">찾고 싶은 추억이 있나요?</span>
 
       <div className="flex w-full flex-col gap-8">

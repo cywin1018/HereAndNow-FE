@@ -25,7 +25,6 @@ import ExploreCoursePage from '@pages/explore/ExploreCoursePage';
 import ExploreSearchPage from '@pages/explore/ExploreSearchPage';
 import Mypage from '@pages/mypage/Mypage';
 import SettingPage from '@pages/mypage/SettingPage';
-import BookMarkPage from '@pages/bookmark/BookMarkPage';
 
 interface RouterProps {
   enableAuthCheck?: boolean; // 디버깅용: 인증 체크 활성화/비활성화 (기본값: true)
@@ -44,20 +43,56 @@ const Router = ({ enableAuthCheck = true }: RouterProps) => {
 
         {/* 보호된 라우트 (인증 필요) */}
         <Route element={<ProtectedRoute enabled={enableAuthCheck} />}>
-          <Route element={<Layout withHeader={false} withBottomNavigation={false} />}>
+          {/* 코스 등록 페이지 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="코스 등록" />}>
             <Route path="/place/save-place" element={<CourseSave />} />
-            <Route path="/place/register" element={<CourseRegister />} />
-            <Route path="/place/add-place" element={<AddPlacePage />} />
             <Route path="/place/course/submit" element={<CourseSubmit />} />
-            <Route path="/place/course/result" element={<CourseResult />} />
+          </Route>
+
+          {/* 장소 세부설명 페이지 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="장소 세부설명" />}>
+            <Route path="/place/register" element={<CourseRegister />} />
             <Route path="/place/detail" element={<PlaceDetail />} />
+          </Route>
+
+          {/* 장소 추가 페이지 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="장소 추가" />}>
+            <Route path="/place/add-place" element={<AddPlacePage />} />
+          </Route>
+
+          {/* 코스 결과 페이지 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} />}>
+            <Route path="/place/course/result" element={<CourseResult />} />
+          </Route>
+
+          {/* 프로필 수정 페이지 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="수정" />}>
             <Route path="/connecting/profile-modify" element={<ProfileModifyPage />} />
+          </Route>
+
+          {/* 커넥팅 검색 페이지 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="검색" />}>
             <Route path="/connecting/search" element={<ConnectingSearchPage />} />
+          </Route>
+
+          {/* 커넥팅 아카이브 페이지 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="커넥팅 아카이브" />}>
             <Route path="/connecting/archive" element={<ConnectingArchive />} />
+          </Route>
+
+          {/* 커넥팅 코스 상세 페이지 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="코스 상세" />}>
             <Route path="/connecting/course/detail/:id" element={<ConnectingCourseDetail />} />
+          </Route>
+
+          {/* 마이페이지 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="MY" />}>
             <Route path="/mypage" element={<Mypage />} />
+          </Route>
+
+          {/* 설정 페이지 */}
+          <Route element={<Layout withHeader={false} withBottomNavigation={false} pageTitle="설정" />}>
             <Route path="/setting" element={<SettingPage />} />
-            <Route path="/bookmark" element={<BookMarkPage />} />
           </Route>
 
           {/* 아카이브 검색 페이지 */}

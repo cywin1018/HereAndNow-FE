@@ -3,7 +3,6 @@ import filterSearchIcon from '@assets/icons/filter_search.svg';
 import filterCancelIcon from '@assets/icons/filter_cancel.svg';
 import smallPinkFolder from '@assets/images/smallPinkFolder.png';
 import { useNavigate } from 'react-router-dom';
-import PageHeader from '@common/layout/PageHeader';
 import useGetConnectingSearch from '@apis/connecting/useGetConnectingSearch';
 import useGetConnectingRecent from '@apis/connecting/useGetConnectingRecent';
 import { useEffect } from 'react';
@@ -111,7 +110,6 @@ const ConnectingArchive = () => {
 
   return (
     <div className="min-h-screen overflow-hidden">
-      <PageHeader title="커넥팅 아카이브" />
       <div className="flex w-full flex-col items-center gap-8">
         {/* 날짜 표시 (최근 코스 기준) */}
         {recentDateParts ? (

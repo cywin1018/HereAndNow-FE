@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PageHeader from '@common/layout/PageHeader';
 import Modal from '@common/components/Modal';
 
 const SettingPage = () => {
@@ -25,8 +24,6 @@ const SettingPage = () => {
   return (
     <>
       <div className="flex w-full flex-col pb-24">
-        <PageHeader title="설정" />
-
         {/* 연인 해제하기 */}
         <div className="px-4 pt-6">
           <button type="button" onClick={handleUnpairClick} className="text-h5 text-neutral-10 w-full py-4 text-left">

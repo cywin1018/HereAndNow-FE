@@ -4,7 +4,7 @@ import DotsIcon from '@assets/icons/dots.svg';
 import KimHereIcon from '@assets/icons/kim_here.svg';
 import ChoiNowIcon from '@assets/icons/choi_now.svg';
 import { useNavigate } from 'react-router-dom';
-import CardSlider from './components/CardSlider';
+import CardSwiper from './components/CardSwiper'; // CardSlider 대신 CardSwiper 사용
 import ConnectingCard from './components/ConnectingCard';
 import ConnectingBottomNavigation from './components/ConnectingBottomNavigation';
 import BottomNavigation from '@common/layout/BottomNavigation';
@@ -21,6 +21,7 @@ const ConnectingPage = () => {
   const [isInviteSheetOpen, setIsInviteSheetOpen] = useState(false);
   const [isInviteCompleteModalOpen, setIsInviteCompleteModalOpen] = useState(false);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+
   const handleDotsClick = () => {
     navigate('/connecting/profile-modify');
   };
@@ -33,10 +34,7 @@ const ConnectingPage = () => {
 
   // 대기 중 커플 요청 조회
   const { data: requestPending, refetch: refetchRequestPending } = useGetRequestPending();
-  console.log('requestPending', requestPending);
   const { mutate: approveCouple } = usePostApproveCouple();
-  // const coupleInfo: any = { data: {} }; // 빈 데이터 (잠금 상태)
-  // const coupleInfo: any = null; // null (잠금 상태)
 
   // 커플 배너 조회
   const { data: coupleBanner } = useGetCoupleBanner({ page: 0, size: 10 });
@@ -57,12 +55,10 @@ const ConnectingPage = () => {
   };
 
   // 멤버 정보의 isCouple 값으로 잠금 상태 결정
-  // 응답 예시:
-  // data: { username, email, nickname, profileImageUrl, isCouple }
   const isCouple = memberInfo?.data?.isCouple ?? false;
   const isLocked = !isCouple;
 
-  // 대기 중인 커플 요청 데이터 (형식: { coupleId, opponentUsername, ... } 가정)
+  // 대기 중인 커플 요청 데이터
   const pendingData = (requestPending as any)?.data;
 
   // isCouple이 false이고 대기 중인 요청이 있을 때 모달 오픈
@@ -80,17 +76,58 @@ const ConnectingPage = () => {
 
     approveCouple(pendingData.coupleId, {
       onSuccess: async () => {
-        // 커플 수락 후, 멤버/커플/요청 정보를 최신 상태로 동기화
         try {
           await Promise.all([refetchMemberInfo(), refetchCoupleInfo(), refetchRequestPending()]);
         } catch (error) {
           console.error('[ConnectingPage] 커플 수락 후 refetch 실패:', error);
         }
-
         setIsRequestModalOpen(false);
       },
     });
   };
+
+  // 카드 배열 생성
+  const cards =
+    coupleBanner?.data?.content && coupleBanner.data.content.length > 0
+      ? coupleBanner.data.content.map((banner: any, index: number) => (
+          <ConnectingCard
+            key={`banner-${banner.courseId || index}`}
+            date={banner.startDate || ''}
+            placeCount={banner.placeCount || 0}
+            title={banner.courseTitle || ''}
+            description={banner.courseDescription || ''}
+            backgroundImage={banner.thumbnailImageLink}
+            backgroundClassName={
+              !banner.thumbnailImageLink ? 'bg-gradient-to-br from-blue-400 to-purple-500' : undefined
+            }
+          />
+        ))
+      : [
+          <ConnectingCard
+            key="card-1"
+            date="2025.11.05"
+            placeCount={4}
+            title="우리의 첫 도쿄"
+            description="엔화 미리 환전할 걸 까먹고 공항에서 했는데 미리..."
+            backgroundClassName="bg-gradient-to-br from-blue-400 to-purple-500"
+          />,
+          <ConnectingCard
+            key="card-2"
+            date="2025.11.03"
+            placeCount={3}
+            title="서울 한강 나들이"
+            description="날씨가 좋아서 한강에서 피크닉을 즐겼어요"
+            backgroundClassName="bg-gradient-to-br from-pink-400 to-orange-500"
+          />,
+          <ConnectingCard
+            key="card-3"
+            date="2025.11.01"
+            placeCount={5}
+            title="부산 여행"
+            description="해운대에서 일출을 보며 시작한 하루"
+            backgroundClassName="bg-gradient-to-br from-cyan-400 to-blue-500"
+          />,
+        ];
 
   return (
     <>
@@ -155,53 +192,8 @@ const ConnectingPage = () => {
           </div>
         </div>
 
-        {/* 카드 슬라이더 영역 */}
-        <CardSlider
-          isLocked={isLocked}
-          onInviteClick={handleInviteClick}
-          cards={
-            coupleBanner?.data?.content && coupleBanner.data.content.length > 0
-              ? coupleBanner.data.content.map((banner: any, index: number) => (
-                  <ConnectingCard
-                    key={`banner-${banner.courseId || index}`}
-                    date={banner.startDate || ''}
-                    placeCount={banner.placeCount || 0}
-                    title={banner.courseTitle || ''}
-                    description={banner.courseDescription || ''}
-                    backgroundImage={banner.thumbnailImageLink}
-                    backgroundClassName={
-                      !banner.thumbnailImageLink ? 'bg-gradient-to-br from-blue-400 to-purple-500' : undefined
-                    }
-                  />
-                ))
-              : [
-                  <ConnectingCard
-                    key="card-1"
-                    date="2025.11.05"
-                    placeCount={4}
-                    title="우리의 첫 도쿄"
-                    description="엔화 미리 환전할 걸 까먹고 공항에서 했는데 미리..."
-                    backgroundClassName="bg-gradient-to-br from-blue-400 to-purple-500"
-                  />,
-                  <ConnectingCard
-                    key="card-2"
-                    date="2025.11.03"
-                    placeCount={3}
-                    title="서울 한강 나들이"
-                    description="날씨가 좋아서 한강에서 피크닉을 즐겼어요"
-                    backgroundClassName="bg-gradient-to-br from-pink-400 to-orange-500"
-                  />,
-                  <ConnectingCard
-                    key="card-3"
-                    date="2025.11.01"
-                    placeCount={5}
-                    title="부산 여행"
-                    description="해운대에서 일출을 보며 시작한 하루"
-                    backgroundClassName="bg-gradient-to-br from-cyan-400 to-blue-500"
-                  />,
-                ]
-          }
-        />
+        {/* CardSlider를 CardSwiper로 교체 */}
+        <CardSwiper cards={cards} isLocked={isLocked} onInviteClick={handleInviteClick} />
       </div>
 
       {/* 잠금 상태일 때는 일반 BottomNavigation, 아니면 ConnectingBottomNavigation */}
@@ -224,7 +216,7 @@ const ConnectingPage = () => {
         rightButtonOnClick={() => setIsInviteCompleteModalOpen(false)}
       />
 
-      {/* 커플 요청 도착 모달 (isCouple이 false이고, 대기 중 요청이 있을 때) */}
+      {/* 커플 요청 도착 모달 */}
       <Modal
         isOpen={isRequestModalOpen}
         onClose={() => setIsRequestModalOpen(false)}

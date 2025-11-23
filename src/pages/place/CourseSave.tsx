@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RegionDropdown from '@common/RegionDropdown';
 import BottomActionButton from '@common/button/BottomActionButton';
-import PageHeader from '@common/layout/PageHeader';
 import Modal from '@common/components/Modal';
 import CoupleInviteBottomSheet from '@pages/place/components/CoupleInviteBottomSheet';
 import { useCourseSaveStore } from '@stores/course-save';
@@ -47,8 +46,6 @@ const CourseSave = () => {
 
   return (
     <div className="flex min-h-screen w-full flex-col">
-      <PageHeader title="코스 등록" />
-
       <main className="flex flex-1 flex-col gap-[32px] pt-[32px] pb-[32px]">
         {/* 날짜 입력 섹션 */}
 

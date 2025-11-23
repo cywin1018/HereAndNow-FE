@@ -4,7 +4,6 @@ import StarRatingFilter from '@common/components/StarRatingFilter';
 import PhotoUploader from '@common/components/PhotoUploader';
 import TagSelector from '@common/components/TagSelector';
 import LabeledTextarea from '@common/components/LabeledTextarea';
-import PageHeader from '@common/layout/PageHeader';
 import PlaceCard from '@pages/home/components/PlaceCard';
 import BottomActionButton from '@common/button/BottomActionButton';
 import { useCourseSaveStore } from '@stores/course-save';
@@ -140,7 +139,6 @@ const PlaceDetail = () => {
 
   return (
     <div className="flex w-full flex-col gap-[32px] pb-16">
-      <PageHeader title="장소 세부설명" />
       <PlaceCard
         imageUrl={currentPlace?.placeUrl || '/dummy_placecard.png'}
         name={currentPlace?.placeName || '장소 이름'}

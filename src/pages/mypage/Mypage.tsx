@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PageHeader from '@common/layout/PageHeader';
 import { AlarmModal, dummyAlarms } from '@common/alarm';
 import Modal from '@common/components/Modal';
 import useGetMemberInfo from '@apis/member/useGetMemberInfo';
@@ -46,8 +45,6 @@ const Mypage = () => {
   return (
     <>
       <div className="flex w-full flex-col gap-[24px] pb-24">
-        <PageHeader title="MY" />
-
         {/* 프로필 섹션 */}
         <div className="flex items-center gap-4 px-5">
           <div className="h-20 w-20 overflow-hidden rounded-full">

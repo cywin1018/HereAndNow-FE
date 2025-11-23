@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import PageHeader from '@common/layout/PageHeader';
 import ConfirmAddressBottomSheet from './components/ConfirmAddressBottomSheet';
 import type { AddressData } from './types';
 
@@ -127,8 +126,6 @@ const AddPlacePage = () => {
 
   return (
     <div className="flex w-full flex-col">
-      <PageHeader title="장소 추가" />
-
       <main className="flex flex-col gap-6 py-6">
         <section className="flex flex-col gap-3">
           <h2 className="text-h4 text-neutral-10">주소 검색</h2>

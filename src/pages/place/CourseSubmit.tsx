@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PageHeader from '@common/layout/PageHeader';
 import StarRatingFilter from '@common/components/StarRatingFilter';
 import BottomActionButton from '@common/button/BottomActionButton';
 import LabeledTextarea from '@common/components/LabeledTextarea';
@@ -126,8 +125,6 @@ const CourseSubmit = () => {
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-white pb-32">
-      <PageHeader title="코스 등록" />
-
       <main className="flex flex-1 flex-col gap-8 px-5 pt-6 pb-16">
         <section className="flex flex-col gap-3">
           <h1 className="text-h4 text-neutral-10 leading-snug">

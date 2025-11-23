@@ -1,5 +1,4 @@
 import { useMemo, useState, useRef } from 'react';
-import PageHeader from '@common/layout/PageHeader';
 import PlusCircleIcon from '@assets/icons/bx_plus-circle.svg';
 import SelectBox from '@common/components/SelectBox';
 import BottomActionButton from '@common/button/BottomActionButton';
@@ -61,8 +60,6 @@ const ProfileModifyPage = () => {
 
   return (
     <div className="flex w-full flex-col pb-24">
-      <PageHeader title="수정" />
-
       <section className="flex flex-col gap-6">
         <div className="flex flex-col gap-3">
           <span className="text-d1 text-neutral-6">처음 만난 날</span>

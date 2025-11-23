@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import PageHeader from '@common/layout/PageHeader';
 import KakaoMap from '@common/KakaoMap';
 import DetailSection from './components/DetailSection';
 import useGetCourse from '@apis/course/query/useGetCourse';
@@ -69,7 +68,6 @@ const ConnectingCourseDetail = () => {
 
   return (
     <div className="">
-      <PageHeader title="코스 상세" />
       <div className="relative z-0 w-full overflow-hidden rounded-[24px]">
         <KakaoMap latitude={mapCenter.latitude} longitude={mapCenter.longitude} className="h-[292px] w-full" />
 

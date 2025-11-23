@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import PageHeader from '@common/layout/PageHeader';
 import PlaceCard from '@pages/home/components/PlaceCard';
 import PencilIcon from '@assets/icons/bxs_pencil.svg';
 import MinusCircleIcon from '@assets/icons/bx_minus-circle.svg';
@@ -39,8 +38,6 @@ const CourseRegister = () => {
 
   return (
     <div className="flex w-full flex-col gap-[24px] pb-24">
-      <PageHeader title="장소 세부설명" />
-
       <main className="flex flex-col gap-[24px] px-4">
         <section className="flex flex-col gap-[16px]">
           {pinList.map((pin, index) => {
