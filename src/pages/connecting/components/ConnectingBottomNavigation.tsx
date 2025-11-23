@@ -18,7 +18,7 @@ const ConnectingBottomNavigation = ({ onHomeClick }: ConnectingBottomNavigationP
   };
 
   return (
-    <div className="fixed right-0 bottom-0 left-0 z-50 flex justify-center px-5 pb-8">
+    <div className="fixed right-0 bottom-0 left-0 z-50 flex justify-center pb-8">
       <div className="flex h-[48px] w-full max-w-[402px] items-center gap-2 px-[20px]">
         {/* 홈 아이콘 */}
         <div className="relative flex h-[48px] w-[48px] flex-shrink-0 items-center justify-center">
