@@ -36,6 +36,18 @@ api.interceptors.response.use(
       _retry?: boolean;
     };
 
+    // CORS로 차단된 Network Error 처리 (백엔드 리다이렉트 시 발생)
+    if (!error.response && error.message === 'Network Error') {
+      console.warn('[API] Network Error 감지 (CORS 차단 가능성):', {
+        url: error.config?.url,
+        message: error.message,
+      });
+      // 인증 실패로 간주하고 로그인 페이지로 이동
+      localStorage.clear();
+      window.location.href = '/login';
+      return Promise.reject(new Error('Network error - authentication required'));
+    }
+
     // 리다이렉트 에러 처리 (3xx 상태 코드) - CORS 에러 방지
     if (error.response?.status && error.response.status >= 300 && error.response.status < 400) {
       console.warn('[API] 리다이렉트 감지 (인증 필요):', {
