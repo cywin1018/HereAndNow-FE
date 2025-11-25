@@ -7,6 +7,7 @@ import TabNavigation from './components/TabNavigation';
 import PlaceCard from './components/PlaceCard';
 import CourseCard from './components/CourseCard';
 import { getAdsPlaces, getRecommendedPlaces, getRecommendedCourses } from '@apis/home/home';
+import ProgressiveBlurOverlay from '@common/ProgressiveBlurOverlay';
 
 type TabType = 'course' | 'place';
 type SortType = 'latest' | 'liked' | 'reviewed';
@@ -31,8 +32,8 @@ const HomePage = () => {
   const [sort, setSort] = useState<SortType>('latest'); // 기본값: 최신 순
 
   // 현재 위치 (임시로 하드코딩, 추후 실제 위치로 변경)
-  const latitude = 37.566826;
-  const longitude = 126.9786567;
+  const latitude = 37.6820541261203;
+  const longitude = 127.07893054506737;
 
   // 탭 변경 시 정렬을 최신순으로 초기화
   useEffect(() => {
@@ -127,13 +128,19 @@ const HomePage = () => {
       <div className="flex flex-col gap-[28px]">
         <AddCourse />
 
-        <KakaoMap
-          latitude={mapCenter.latitude}
-          longitude={mapCenter.longitude}
-          className="h-[292px]"
-          markers={mapMarkers}
-          searchBar={searchBarData}
-        />
+        <div
+          className="relative h-[292px] w-full overflow-hidden rounded-lg"
+          style={{ boxShadow: '0px 4px 10px rgba(0,0,0,0.1)' }}
+        >
+          <KakaoMap
+            latitude={mapCenter.latitude}
+            longitude={mapCenter.longitude}
+            className="h-[292px]"
+            markers={mapMarkers}
+            searchBar={searchBarData}
+          />
+          <ProgressiveBlurOverlay />
+        </div>
 
         <TabNavigation activeTab={activeTab} selectedSort={sort} onTabChange={setActiveTab} onSortChange={setSort} />
 

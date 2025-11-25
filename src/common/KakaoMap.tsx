@@ -83,11 +83,16 @@ const KakaoMap = ({
     <div className={`relative overflow-hidden rounded-lg ${className || ''}`} style={{ width, height }}>
       <div className="overflow-hidden rounded-lg" ref={mapContainer} style={{ width: '100%', height: '100%' }} />
 
-      <div className="absolute right-4 bottom-4 left-4 z-10 flex items-end gap-[18px]">
+      <div className="absolute bottom-6 left-1/2 z-10 flex w-[322px] -translate-x-1/2 items-center gap-4">
         {searchBar && (
-          <div className="flex flex-1 items-center gap-4 rounded-[16px] bg-white pt-[6px] pr-[6px] pb-[6px] pl-4 shadow-lg">
+          <div
+            className="flex h-12 w-[258px] items-center gap-4 rounded-[30px] bg-white pr-[8px] pl-[14px]"
+            style={{
+              boxShadow: '0px 4px 8px 0px #0000000F',
+            }}
+          >
             {searchBar.name && (
-              <div className="text-b3 text-neutral-8 max-w-[170px] min-w-0 flex-auto">{searchBar.name}</div>
+              <div className="text-s5 text-neutral-8 max-w-[146px] flex-auto truncate">{searchBar.name}</div>
             )}
 
             {searchBar.previewImages && searchBar.previewImages.length > 0 && (
@@ -95,7 +100,8 @@ const KakaoMap = ({
                 {searchBar.previewImages.slice(0, 3).map((imageUrl, index) => (
                   <div
                     key={index}
-                    className={`h-[40px] w-[40px] overflow-hidden rounded-full ${index > 0 ? '-ml-4' : ''}`}
+                    className={`h-9 w-9 overflow-hidden rounded-full border-2 border-white ${index > 0 ? '-ml-[14px]' : ''}`}
+                    style={{ zIndex: searchBar.previewImages?.length ? searchBar.previewImages.length - index : 0 }}
                   >
                     <img src={imageUrl} alt={`미리보기 ${index + 1}`} className="h-full w-full object-cover" />
                   </div>
@@ -108,7 +114,7 @@ const KakaoMap = ({
         {showHeartButton && (
           <button
             onClick={() => setIsHeartClicked(!isHeartClicked)}
-            className="relative flex flex-shrink-0 items-center justify-center rounded-lg bg-white p-[10px] shadow-lg transition-opacity hover:opacity-80"
+            className="relative h-12 w-12 items-center justify-center rounded-[4px] bg-white p-[10px] transition-opacity hover:opacity-80"
           >
             <img
               src={isHeartClicked ? UnheartIcon : HeartIcon}

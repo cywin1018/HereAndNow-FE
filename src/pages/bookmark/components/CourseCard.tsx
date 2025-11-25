@@ -1,6 +1,6 @@
 import LocationIcon from '@assets/icons/pinpoint.svg';
 import MapIcon from '@assets/icons/map.svg';
-import placeSaveIcon from '@assets/icons/place_save.svg';
+import placeSaveIcon from '@assets/icons/place_not_save.svg';
 import Tag from '@common/Tag';
 import CircularImagePoints from '@common/Ccw';
 
