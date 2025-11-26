@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import HeartIcon from '@assets/icons/heart.svg';
-import UnheartIcon from '@assets/icons/unheart_icon.svg';
+import UnScrappedIcon from '@assets/icons/place_not_save.svg';
+import ScrappedIcon from '@assets/icons/place_save.svg';
 import PlacePickerIcon from '@assets/icons/placePicker.svg';
 
 interface MarkerPosition {
@@ -114,11 +115,11 @@ const KakaoMap = ({
         {showHeartButton && (
           <button
             onClick={() => setIsHeartClicked(!isHeartClicked)}
-            className="relative h-12 w-12 items-center justify-center rounded-[4px] bg-white p-[10px] transition-opacity hover:opacity-80"
+            className="relative h-12 w-12 cursor-pointer items-center justify-center rounded-[4px] bg-white p-[10px]"
           >
             <img
-              src={isHeartClicked ? UnheartIcon : HeartIcon}
-              alt={isHeartClicked ? '언하트' : '하트'}
+              src={isHeartClicked ? UnScrappedIcon : ScrappedIcon}
+              alt={isHeartClicked ? '언스크랩' : '스크랩'}
               className="h-[32px] w-[32px]"
             />
           </button>

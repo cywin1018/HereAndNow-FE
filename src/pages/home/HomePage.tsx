@@ -124,7 +124,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className="bg-neutral-1 min-h-screen">
+    <div className="min-h-screen">
       <div className="flex flex-col gap-[28px]">
         <AddCourse />
 
