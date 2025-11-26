@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Star from '@pages/home/components/Star';
 import moreArrowIcon from '@assets/icons/more_arrow.svg';
 import usePostPlaceScrap from '@apis/place/mutation/usePostPlaceScrap';
-import placeSaveIcon from '@assets/icons/place_save.svg';
+import placeSaveIcon from '@assets/icons/place_not_save.svg';
 
 interface ArchivePlaceItemProps {
   title: number;

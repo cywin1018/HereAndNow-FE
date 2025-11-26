@@ -1,5 +1,5 @@
 import Star from './Star';
-import placeSaveIcon from '@assets/icons/place_save.svg';
+import placeSaveIcon from '@assets/icons/place_not_save.svg';
 
 interface PlaceCardProps {
   imageUrl: string;
