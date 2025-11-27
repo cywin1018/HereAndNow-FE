@@ -15,35 +15,11 @@ const PlaceDetail = () => {
   const { setPinFiles, pinFiles, courseData, updatePin } = useCourseSaveStore();
 
   // location.state에서 pinIndex 가져오기 (없으면 새 핀 추가 시 -1)
-  console.log('[PlaceDetail] location.state 확인:', {
-    state: location.state,
-    pinIndex: (location.state as { pinIndex?: number })?.pinIndex,
-    hasState: !!location.state,
-  });
   const pinIndex = (location.state as { pinIndex?: number })?.pinIndex ?? -1;
-  console.log('[PlaceDetail] 최종 pinIndex:', pinIndex);
 
   // store에서 현재 pin 정보 가져오기
   const currentPin = pinIndex >= 0 && courseData?.pinList?.[pinIndex] ? courseData.pinList[pinIndex] : null;
   const currentPlace = currentPin?.place;
-
-  // 카테고리 정보 디버깅
-  useEffect(() => {
-    console.log('[PlaceDetail] ===== 카테고리 정보 디버깅 =====');
-    console.log('[PlaceDetail] currentPlace 전체:', currentPlace);
-    console.log('[PlaceDetail] currentPin 전체:', currentPin);
-    // console.log('[PlaceDetail] 카테고리 코드 (placeGroupCode):', currentPlace?.placeGroupCode);
-    // console.log('[PlaceDetail] 카테고리 이름 (placeCategory):', currentPlace?.placeCategory);
-    // console.log('[PlaceDetail] 장소 이름 (placeName):', currentPlace?.placeName);
-    // console.log('[PlaceDetail] 카테고리 코드 타입:', typeof currentPlace?.placeGroupCode);
-    // console.log('[PlaceDetail] 카테고리 코드 존재 여부:', !!currentPlace?.placeGroupCode);
-    if (currentPlace?.placeGroupCode) {
-      console.log('[PlaceDetail] ✅ 카테고리 코드가 존재합니다:', currentPlace.placeGroupCode);
-    } else {
-      console.warn('[PlaceDetail] ⚠️ 카테고리 코드가 없습니다!');
-    }
-    console.log('[PlaceDetail] =================================');
-  }, [currentPlace]);
 
   // 별점 상태 관리 (store의 pinRating 또는 기본값 0)
   const [rating, setRating] = useState<number>(currentPin?.pinRating || 0);
@@ -88,15 +64,7 @@ const PlaceDetail = () => {
   // 파일이 변경되면 스토어에 저장
   useEffect(() => {
     if (pinIndex >= 0) {
-      console.log(`[PlaceDetail] 파일 변경 감지 - 핀 ${pinIndex}:`, {
-        fileCount: currentFiles.length,
-        fileNames: currentFiles.map(f => f.name),
-        pinIndex,
-      });
       setPinFiles(pinIndex, currentFiles);
-      console.log(`[PlaceDetail] 스토어에 저장 완료 - 핀 ${pinIndex}`);
-    } else {
-      console.warn('[PlaceDetail] pinIndex가 유효하지 않음:', pinIndex);
     }
   }, [currentFiles, pinIndex, setPinFiles]);
 
@@ -105,37 +73,15 @@ const PlaceDetail = () => {
     setRating(newRating);
     if (pinIndex >= 0) {
       updatePin(pinIndex, { pinRating: newRating });
-      console.log(`[PlaceDetail] 별점 업데이트 - 핀 ${pinIndex}:`, newRating);
     }
   };
 
   // 카테고리 코드에 따른 태그 옵션 가져오기
   const categoryTags = useMemo(() => {
     const categoryCode = currentPlace?.placeGroupCode;
-    console.log('[PlaceDetail] ===== 태그 옵션 가져오기 =====');
-    console.log('[PlaceDetail] 입력된 카테고리 코드:', categoryCode);
     const tags = getCategoryTags(categoryCode);
-    console.log('[PlaceDetail] 반환된 태그 옵션:', {
-      atmosphere: tags.atmosphere,
-      atmosphereCount: tags.atmosphere.length,
-      facility: tags.facility,
-      facilityCount: tags.facility.length,
-      etc: tags.etc,
-      etcCount: tags.etc.length,
-    });
-    console.log('[PlaceDetail] =============================');
     return tags;
   }, [currentPlace?.placeGroupCode]);
-
-  // 주소 디버깅
-  useEffect(() => {
-    console.log('[PlaceDetail] ===== 주소 디버깅 =====');
-    console.log('[PlaceDetail] currentPlace 전체:', currentPlace);
-    console.log('[PlaceDetail] placeStreetNameAddress:', currentPlace?.placeStreetNameAddress);
-    console.log('[PlaceDetail] placeNumberAddress:', currentPlace?.placeNumberAddress);
-    console.log('[PlaceDetail] placeName:', currentPlace?.placeName);
-    console.log('[PlaceDetail] =========================');
-  }, [currentPlace]);
 
   return (
     <div className="flex w-full flex-col gap-[32px] pb-16">
@@ -155,17 +101,8 @@ const PlaceDetail = () => {
         </label>
         <PhotoUploader
           onFilesChange={allFiles => {
-            console.log(`[PlaceDetail] PhotoUploader에서 파일 수신 - 핀 ${pinIndex}:`, {
-              allFilesCount: allFiles.length,
-              allFileNames: allFiles.map(f => f.name),
-              currentFilesCount: currentFiles.length,
-            });
             // PhotoUploader가 전체 파일 목록을 전달하므로 그대로 사용
             setCurrentFiles(allFiles);
-            console.log(`[PlaceDetail] 파일 목록 업데이트 - 핀 ${pinIndex}:`, {
-              updatedCount: allFiles.length,
-              updatedFileNames: allFiles.map(f => f.name),
-            });
           }}
         />
       </div>
