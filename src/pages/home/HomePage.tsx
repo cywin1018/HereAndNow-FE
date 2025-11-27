@@ -107,6 +107,7 @@ const HomePage = () => {
       ? adsPlaces.map(place => ({
           latitude: place.placeMarker.latitude,
           longitude: place.placeMarker.longitude,
+          name: place.placeName,
         }))
       : [];
 

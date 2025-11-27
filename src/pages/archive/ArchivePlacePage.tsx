@@ -180,7 +180,13 @@ const ArchivePlacePage = () => {
           <KakaoMap
             latitude={placeInfo.lat}
             longitude={placeInfo.lon}
-            showMarker
+            markers={[
+              {
+                latitude: placeInfo.lat,
+                longitude: placeInfo.lon,
+                name: placeInfo.placeName,
+              },
+            ]}
             showHeartButton={false}
             className="h-full w-full"
           />
