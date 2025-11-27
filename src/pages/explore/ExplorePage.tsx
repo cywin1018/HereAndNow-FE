@@ -27,11 +27,24 @@ const ExplorePage = () => {
   // API 데이터가 없으면 빈 배열
   const displayData = data?.data && data.data.length > 0 ? data.data : [];
 
+  // 마커 데이터 생성
+  const mapMarkers = displayData.map(item => ({
+    latitude: item.placeMarker.latitude,
+    longitude: item.placeMarker.longitude,
+    name: item.placeCard.placeName,
+  }));
+
   return (
     <div className="relative h-screen w-full">
       {/* 지도 */}
       <div className="absolute inset-0 z-0">
-        <KakaoMap latitude={latitude} longitude={longitude} showHeartButton={false} className="h-full w-full" />
+        <KakaoMap
+          latitude={latitude}
+          longitude={longitude}
+          markers={mapMarkers}
+          showHeartButton={false}
+          className="h-full w-full"
+        />
       </div>
 
       {/* 검색 바 */}

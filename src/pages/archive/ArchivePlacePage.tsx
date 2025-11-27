@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import dummyPlaceCardImage from '/dummy_placecard.png';
 import Star from '@pages/home/components/Star';
@@ -6,10 +6,15 @@ import KakaoMap from '@common/KakaoMap';
 import CourseCard from '@pages/home/components/CourseCard';
 import useGetPlace from '@apis/common/useGetPlace';
 import LoadingIndicator from '@common/LoadingIndicator';
+import usePostPlaceScrap from '@apis/place/mutation/usePostPlaceScrap';
+import placeSaveIcon from '@assets/icons/place_save.svg';
+import placeNotSaveIcon from '@assets/icons/place_not_save.svg';
 
 const ArchivePlacePage = () => {
   const { id } = useParams<{ id: string }>();
   const [selectedTab, setSelectedTab] = useState<'good' | 'bad'>('good');
+  const [isSaved, setIsSaved] = useState(false);
+  const [expandedReviews, setExpandedReviews] = useState<Set<string>>(new Set());
 
   // URL 파라미터를 숫자로 변환
   const placeId = id ? parseInt(id, 10) : 0;
@@ -18,6 +23,31 @@ const ArchivePlacePage = () => {
   const { data: placeResponse, isLoading, error } = useGetPlace(placeId);
   const placeData = placeResponse?.data;
   const placeInfo = placeData?.placeCardResponseDto;
+
+  // 장소 스크랩 mutation
+  const { mutate: scrapPlace } = usePostPlaceScrap();
+
+  const handleSaveClick = () => {
+    if (placeId) {
+      scrapPlace(placeId, {
+        onSuccess: () => {
+          setIsSaved(true);
+        },
+      });
+    }
+  };
+
+  const handleOpenKakaoMap = () => {
+    if (placeInfo?.lat && placeInfo?.lon && placeInfo?.placeName) {
+      const kakaoMapUrl = `https://map.kakao.com/link/map/${encodeURIComponent(placeInfo.placeName)},${placeInfo.lat},${placeInfo.lon}`;
+      window.open(kakaoMapUrl, '_blank');
+    }
+  };
+
+  useEffect(() => {
+    console.log('[ArchivePlacePage] 위도:', placeInfo?.lat);
+    console.log('[ArchivePlacePage] 경도:', placeInfo?.lon);
+  }, [placeInfo?.lat, placeInfo?.lon]);
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -157,7 +187,13 @@ const ArchivePlacePage = () => {
           <KakaoMap
             latitude={placeInfo.lat}
             longitude={placeInfo.lon}
-            showMarker
+            markers={[
+              {
+                latitude: placeInfo.lat,
+                longitude: placeInfo.lon,
+                name: placeInfo.placeName,
+              },
+            ]}
             showHeartButton={false}
             className="h-full w-full"
           />
@@ -184,7 +220,7 @@ const ArchivePlacePage = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSelectedTab('good')}
-              className={`flex h-7 w-16 items-start justify-center ${
+              className={`flex h-7 w-16 cursor-pointer items-start justify-center ${
                 selectedTab === 'good' ? 'border-iceblue-10 border-b-2' : ''
               }`}
             >
@@ -194,7 +230,7 @@ const ArchivePlacePage = () => {
             </button>
             <button
               onClick={() => setSelectedTab('bad')}
-              className={`flex h-7 w-[75px] items-start justify-center ${
+              className={`flex h-7 w-[75px] cursor-pointer items-start justify-center ${
                 selectedTab === 'bad' ? 'border-iceblue-10 border-b-2' : ''
               }`}
             >
@@ -207,26 +243,46 @@ const ArchivePlacePage = () => {
           <div className="flex w-full flex-col gap-2">
             {selectedTab === 'good' ? (
               placeData.placePositiveList && placeData.placePositiveList.length > 0 ? (
-                placeData.placePositiveList.map((review, index) => (
-                  <div key={index} className="border-iceblue-2 h-fit w-full rounded-[8px] border px-5 py-3">
-                    <span className="text-b4 text-iceblue-8 block truncate overflow-hidden text-ellipsis whitespace-nowrap">
-                      {review}
-                    </span>
-                  </div>
-                ))
+                placeData.placePositiveList.map((review, index) => {
+                  const reviewKey = `good-${index}`;
+                  const isExpanded = expandedReviews.has(reviewKey);
+                  return (
+                    <div
+                      key={index}
+                      className="border-iceblue-2 h-fit w-full cursor-pointer rounded-[8px] border px-5 py-3"
+                      onClick={() => setExpandedReviews(prev => new Set(prev).add(reviewKey))}
+                    >
+                      <span
+                        className={`text-b4 text-iceblue-8 block ${!isExpanded ? 'truncate overflow-hidden text-ellipsis whitespace-nowrap' : ''}`}
+                      >
+                        {review}
+                      </span>
+                    </div>
+                  );
+                })
               ) : (
                 <div className="border-iceblue-2 h-fit w-full rounded-[8px] border px-5 py-3">
                   <span className="text-b4 text-neutral-5">아직 좋았던 점이 없습니다.</span>
                 </div>
               )
             ) : placeData.placeNegativeList && placeData.placeNegativeList.length > 0 ? (
-              placeData.placeNegativeList.map((review, index) => (
-                <div key={index} className="border-iceblue-2 h-fit w-full rounded-[8px] border px-5 py-3">
-                  <span className="text-b4 text-iceblue-8 block truncate overflow-hidden text-ellipsis whitespace-nowrap">
-                    {review}
-                  </span>
-                </div>
-              ))
+              placeData.placeNegativeList.map((review, index) => {
+                const reviewKey = `bad-${index}`;
+                const isExpanded = expandedReviews.has(reviewKey);
+                return (
+                  <div
+                    key={index}
+                    className="border-iceblue-2 h-fit w-full cursor-pointer rounded-[8px] border px-5 py-3"
+                    onClick={() => setExpandedReviews(prev => new Set(prev).add(reviewKey))}
+                  >
+                    <span
+                      className={`text-b4 text-iceblue-8 block ${!isExpanded ? 'truncate overflow-hidden text-ellipsis whitespace-nowrap' : ''}`}
+                    >
+                      {review}
+                    </span>
+                  </div>
+                );
+              })
             ) : (
               <div className="border-iceblue-2 h-fit w-full rounded-[8px] border px-5 py-3">
                 <span className="text-b4 text-neutral-5">아직 아쉬웠던 점이 없습니다.</span>
@@ -263,12 +319,15 @@ const ArchivePlacePage = () => {
         <div className="mt-8 flex w-full gap-3 py-5">
           <button
             type="button"
-            className="bg-iceblue-2 text-s5 text-iceblue-7 flex h-13.5 w-full flex-1 cursor-pointer items-center justify-center rounded-[12px]"
+            onClick={handleSaveClick}
+            className="bg-iceblue-2 text-s5 text-iceblue-7 flex h-13.5 w-full flex-1 cursor-pointer items-center justify-center gap-4 rounded-[12px]"
           >
-            저장
+            <img src={isSaved ? placeSaveIcon : placeNotSaveIcon} alt="저장" className="h-8 w-8" />
+            <span className="text-s5 text-iceblue-7">{isSaved ? '저장 취소' : '저장'}</span>
           </button>
           <button
             type="button"
+            onClick={handleOpenKakaoMap}
             className="bg-iceblue-8 text-s5 flex h-13.5 w-full flex-1 cursor-pointer items-center justify-center rounded-[12px] text-white"
           >
             지도에서 보기

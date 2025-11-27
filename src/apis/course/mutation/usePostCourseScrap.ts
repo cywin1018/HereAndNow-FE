@@ -40,3 +40,5 @@ const usePostCourseScrap = () => {
 
 export default usePostCourseScrap;
 
+
+

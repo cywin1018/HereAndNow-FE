@@ -87,6 +87,18 @@ const ArchiveDetailPage = () => {
     };
   }, [course?.data?.pins]);
 
+  const mapMarkers = useMemo(() => {
+    if (!course?.data?.pins || course.data.pins.length === 0) {
+      return [];
+    }
+
+    return course.data.pins.map(pin => ({
+      latitude: pin.placeDetails.placeLatitude,
+      longitude: pin.placeDetails.placeLongitude,
+      name: pin.placeDetails.placeName,
+    }));
+  }, [course?.data?.pins]);
+
   let pageBody: ReactNode = null;
 
   if (!isCourseIdValid) {
@@ -127,7 +139,7 @@ const ArchiveDetailPage = () => {
           <KakaoMap
             latitude={mapCenter.latitude}
             longitude={mapCenter.longitude}
-            showMarker
+            markers={mapMarkers}
             showHeartButton={false}
             className="h-full w-full"
           />
