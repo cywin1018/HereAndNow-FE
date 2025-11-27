@@ -37,6 +37,13 @@ const ArchivePlacePage = () => {
     }
   };
 
+  const handleOpenKakaoMap = () => {
+    if (placeInfo?.lat && placeInfo?.lon && placeInfo?.placeName) {
+      const kakaoMapUrl = `https://map.kakao.com/link/map/${encodeURIComponent(placeInfo.placeName)},${placeInfo.lat},${placeInfo.lon}`;
+      window.open(kakaoMapUrl, '_blank');
+    }
+  };
+
   useEffect(() => {
     console.log('[ArchivePlacePage] 위도:', placeInfo?.lat);
     console.log('[ArchivePlacePage] 경도:', placeInfo?.lon);
@@ -320,6 +327,7 @@ const ArchivePlacePage = () => {
           </button>
           <button
             type="button"
+            onClick={handleOpenKakaoMap}
             className="bg-iceblue-8 text-s5 flex h-13.5 w-full flex-1 cursor-pointer items-center justify-center rounded-[12px] text-white"
           >
             지도에서 보기
