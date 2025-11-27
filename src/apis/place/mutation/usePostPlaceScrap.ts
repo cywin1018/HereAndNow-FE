@@ -43,4 +43,3 @@ const usePostPlaceScrap = () => {
 };
 
 export default usePostPlaceScrap;
-

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import dummyPlaceCardImage from '/dummy_placecard.png';
 import Star from '@pages/home/components/Star';
@@ -6,10 +6,14 @@ import KakaoMap from '@common/KakaoMap';
 import CourseCard from '@pages/home/components/CourseCard';
 import useGetPlace from '@apis/common/useGetPlace';
 import LoadingIndicator from '@common/LoadingIndicator';
+import usePostPlaceScrap from '@apis/place/mutation/usePostPlaceScrap';
+import placeSaveIcon from '@assets/icons/place_save.svg';
+import placeNotSaveIcon from '@assets/icons/place_not_save.svg';
 
 const ArchivePlacePage = () => {
   const { id } = useParams<{ id: string }>();
   const [selectedTab, setSelectedTab] = useState<'good' | 'bad'>('good');
+  const [isSaved, setIsSaved] = useState(false);
 
   // URL 파라미터를 숫자로 변환
   const placeId = id ? parseInt(id, 10) : 0;
@@ -18,6 +22,24 @@ const ArchivePlacePage = () => {
   const { data: placeResponse, isLoading, error } = useGetPlace(placeId);
   const placeData = placeResponse?.data;
   const placeInfo = placeData?.placeCardResponseDto;
+
+  // 장소 스크랩 mutation
+  const { mutate: scrapPlace } = usePostPlaceScrap();
+
+  const handleSaveClick = () => {
+    if (placeId) {
+      scrapPlace(placeId, {
+        onSuccess: () => {
+          setIsSaved(true);
+        },
+      });
+    }
+  };
+
+  useEffect(() => {
+    console.log('[ArchivePlacePage] 위도:', placeInfo?.lat);
+    console.log('[ArchivePlacePage] 경도:', placeInfo?.lon);
+  }, [placeInfo?.lat, placeInfo?.lon]);
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -263,9 +285,11 @@ const ArchivePlacePage = () => {
         <div className="mt-8 flex w-full gap-3 py-5">
           <button
             type="button"
-            className="bg-iceblue-2 text-s5 text-iceblue-7 flex h-13.5 w-full flex-1 cursor-pointer items-center justify-center rounded-[12px]"
+            onClick={handleSaveClick}
+            className="bg-iceblue-2 text-s5 text-iceblue-7 flex h-13.5 w-full flex-1 cursor-pointer items-center justify-center gap-4 rounded-[12px]"
           >
-            저장
+            <img src={isSaved ? placeSaveIcon : placeNotSaveIcon} alt="저장" className="h-8 w-8" />
+            <span className="text-s5 text-iceblue-7">{isSaved ? '저장 취소' : '저장'}</span>
           </button>
           <button
             type="button"
