@@ -14,6 +14,7 @@ const ArchivePlacePage = () => {
   const { id } = useParams<{ id: string }>();
   const [selectedTab, setSelectedTab] = useState<'good' | 'bad'>('good');
   const [isSaved, setIsSaved] = useState(false);
+  const [expandedReviews, setExpandedReviews] = useState<Set<string>>(new Set());
 
   // URL 파라미터를 숫자로 변환
   const placeId = id ? parseInt(id, 10) : 0;
@@ -206,7 +207,7 @@ const ArchivePlacePage = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSelectedTab('good')}
-              className={`flex h-7 w-16 items-start justify-center ${
+              className={`flex h-7 w-16 cursor-pointer items-start justify-center ${
                 selectedTab === 'good' ? 'border-iceblue-10 border-b-2' : ''
               }`}
             >
@@ -216,7 +217,7 @@ const ArchivePlacePage = () => {
             </button>
             <button
               onClick={() => setSelectedTab('bad')}
-              className={`flex h-7 w-[75px] items-start justify-center ${
+              className={`flex h-7 w-[75px] cursor-pointer items-start justify-center ${
                 selectedTab === 'bad' ? 'border-iceblue-10 border-b-2' : ''
               }`}
             >
@@ -229,26 +230,46 @@ const ArchivePlacePage = () => {
           <div className="flex w-full flex-col gap-2">
             {selectedTab === 'good' ? (
               placeData.placePositiveList && placeData.placePositiveList.length > 0 ? (
-                placeData.placePositiveList.map((review, index) => (
-                  <div key={index} className="border-iceblue-2 h-fit w-full rounded-[8px] border px-5 py-3">
-                    <span className="text-b4 text-iceblue-8 block truncate overflow-hidden text-ellipsis whitespace-nowrap">
-                      {review}
-                    </span>
-                  </div>
-                ))
+                placeData.placePositiveList.map((review, index) => {
+                  const reviewKey = `good-${index}`;
+                  const isExpanded = expandedReviews.has(reviewKey);
+                  return (
+                    <div
+                      key={index}
+                      className="border-iceblue-2 h-fit w-full cursor-pointer rounded-[8px] border px-5 py-3"
+                      onClick={() => setExpandedReviews(prev => new Set(prev).add(reviewKey))}
+                    >
+                      <span
+                        className={`text-b4 text-iceblue-8 block ${!isExpanded ? 'truncate overflow-hidden text-ellipsis whitespace-nowrap' : ''}`}
+                      >
+                        {review}
+                      </span>
+                    </div>
+                  );
+                })
               ) : (
                 <div className="border-iceblue-2 h-fit w-full rounded-[8px] border px-5 py-3">
                   <span className="text-b4 text-neutral-5">아직 좋았던 점이 없습니다.</span>
                 </div>
               )
             ) : placeData.placeNegativeList && placeData.placeNegativeList.length > 0 ? (
-              placeData.placeNegativeList.map((review, index) => (
-                <div key={index} className="border-iceblue-2 h-fit w-full rounded-[8px] border px-5 py-3">
-                  <span className="text-b4 text-iceblue-8 block truncate overflow-hidden text-ellipsis whitespace-nowrap">
-                    {review}
-                  </span>
-                </div>
-              ))
+              placeData.placeNegativeList.map((review, index) => {
+                const reviewKey = `bad-${index}`;
+                const isExpanded = expandedReviews.has(reviewKey);
+                return (
+                  <div
+                    key={index}
+                    className="border-iceblue-2 h-fit w-full cursor-pointer rounded-[8px] border px-5 py-3"
+                    onClick={() => setExpandedReviews(prev => new Set(prev).add(reviewKey))}
+                  >
+                    <span
+                      className={`text-b4 text-iceblue-8 block ${!isExpanded ? 'truncate overflow-hidden text-ellipsis whitespace-nowrap' : ''}`}
+                    >
+                      {review}
+                    </span>
+                  </div>
+                );
+              })
             ) : (
               <div className="border-iceblue-2 h-fit w-full rounded-[8px] border px-5 py-3">
                 <span className="text-b4 text-neutral-5">아직 아쉬웠던 점이 없습니다.</span>
