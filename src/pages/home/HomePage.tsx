@@ -32,8 +32,8 @@ const HomePage = () => {
   const [sort, setSort] = useState<SortType>('latest'); // 기본값: 최신 순
 
   // 현재 위치 (임시로 하드코딩, 추후 실제 위치로 변경)
-  const latitude = 37.57254;
-  const longitude = 126.97717;
+  const latitude = 37.5473222653849;
+  const longitude = 127.043698279196;
 
   // 탭 변경 시 정렬을 최신순으로 초기화
   useEffect(() => {
