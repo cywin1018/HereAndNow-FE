@@ -53,12 +53,6 @@ const PlaceCard = ({
   return (
     <div className="flex w-full flex-col gap-1 overflow-hidden rounded-lg bg-white p-2.5 shadow-sm">
       <div className={`flex w-full bg-transparent ${onClick ? 'cursor-pointer' : ''}`} onClick={onClick}>
-        {imageUrl && (
-          <div className="h-[120px] w-[120px] flex-shrink-0">
-            <img src={imageUrl} alt={name} className="h-full w-full rounded-lg object-cover" />
-          </div>
-        )}
-
         <div className="flex min-w-0 flex-1 flex-col justify-between p-2">
           <div className="flex min-w-0 flex-col gap-1.5">
             <div className="flex min-w-0 items-center gap-2 overflow-hidden">
