@@ -105,29 +105,31 @@ const ArchivePlaceItem = ({
       </div>
 
       {/* 정보 */}
-      <div className="flex h-[174px] w-full items-start gap-3">
+      <div className="flex w-full items-start gap-3">
         {/* 썸네일 */}
-        <div className="border-iceblue-4 flex h-[173px] w-[173px] items-center justify-center overflow-hidden rounded-[8px] border-2">
+        <div className="border-iceblue-4 flex h-[173px] min-h-[173px] w-[173px] min-w-[173px] flex-shrink-0 items-center justify-center overflow-hidden rounded-[8px] border-2">
           <img src={thumbnail} alt="썸네일" className="h-full w-full object-cover" />
         </div>
 
         {/* 설명 */}
-        <div className="flex w-[173px] flex-col">
+        <div className="flex min-w-0 flex-1 flex-col">
           {/* 장소명 */}
-          <span className="text-b3 text-neutral-8">{placeName}</span>
+          <span className="text-b3 text-neutral-8 line-clamp-1">{placeName}</span>
 
           {/* 장소 카테고리 */}
-          <span className="text-d2 text-neutral-5 mt-1">{category}</span>
+          <span className="text-d2 text-neutral-5 mt-1 line-clamp-1">{category}</span>
 
           {/* 장소 주소 */}
-          <span className="text-d1 text-neutral-5 mt-3">{roadAddress}</span>
-          {jibunAddress && <span className="text-d1 text-neutral-5">(지번) {jibunAddress}</span>}
+          <div className="mt-3 flex flex-col gap-0.5">
+            <span className="text-d1 text-neutral-5 line-clamp-1">{roadAddress}</span>
+            {jibunAddress && <span className="text-d1 text-neutral-5 line-clamp-1">(지번) {jibunAddress}</span>}
+          </div>
 
           {/* 별점 */}
           <div className="mt-3 flex h-[22px] items-center gap-1">
-            <span className="text-b5 text-yellow-5">{rating}</span>
-            <div className="flex items-center">{renderStars(rating)}</div>
-            <div className="bg-neutral-3 h-2 w-[0.75px] rounded-full"></div>
+            <span className="text-b5 text-yellow-5 whitespace-nowrap">{rating}</span>
+            <div className="flex flex-shrink-0 items-center">{renderStars(rating)}</div>
+            <div className="bg-neutral-3 h-2 w-[0.75px] flex-shrink-0 rounded-full"></div>
             <span className="text-b5 text-neutral-5 whitespace-nowrap">리뷰 {reviewCount}건</span>
           </div>
 
@@ -135,18 +137,18 @@ const ArchivePlaceItem = ({
           <div className="mt-3 flex gap-2.5">
             {/* 자세히 버튼 */}
             <button
-              className="bg-iceblue-2 flex h-12 min-h-12 w-[115px] cursor-pointer items-center justify-between rounded-[8px] px-4"
+              className="bg-iceblue-2 flex h-12 min-h-12 flex-shrink-0 cursor-pointer items-center justify-between rounded-[8px] px-4"
               onClick={onDetailClick}
             >
-              <span className="text-b4 text-iceblue-8">자세히</span>
-              <div className="flex h-6 w-6 items-center justify-center">
+              <span className="text-b4 text-iceblue-8 whitespace-nowrap">자세히</span>
+              <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center">
                 <img src={moreArrowIcon} alt="자세히" className="h-6 w-6" />
               </div>
             </button>
 
             {/* 스크랩 버튼 */}
             <button
-              className="border-iceblue-2 flex h-12 w-12 cursor-pointer items-center justify-center rounded-[4px] border bg-transparent disabled:cursor-not-allowed disabled:opacity-50"
+              className="border-iceblue-2 flex h-12 w-12 flex-shrink-0 cursor-pointer items-center justify-center rounded-[4px] border bg-transparent disabled:cursor-not-allowed disabled:opacity-50"
               onClick={handleScrapClick}
               disabled={!placeId}
             >
