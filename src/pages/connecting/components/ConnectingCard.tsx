@@ -6,6 +6,7 @@ interface ConnectingCardProps {
   backgroundImage?: string;
   backgroundClassName?: string;
   isBlurred?: boolean; // 블러 처리 여부
+  onClick?: () => void; // 클릭 핸들러
 }
 
 const ConnectingCard = ({
@@ -16,9 +17,13 @@ const ConnectingCard = ({
   backgroundImage,
   backgroundClassName,
   isBlurred = false,
+  onClick,
 }: ConnectingCardProps) => {
   return (
-    <div className={`relative h-full w-full overflow-hidden ${isBlurred ? 'blur-[8px]' : ''}`}>
+    <div
+      className={`relative h-full w-full overflow-hidden ${isBlurred ? 'blur-[8px]' : ''} ${onClick ? 'cursor-pointer' : ''}`}
+      onClick={onClick}
+    >
       {/* 배경 이미지 - 사용자가 조절 */}
       {backgroundImage ? (
         <div className="absolute inset-0">

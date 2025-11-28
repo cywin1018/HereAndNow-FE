@@ -5,6 +5,7 @@ import BottomActionButton from '@common/button/BottomActionButton';
 import Modal from '@common/components/Modal';
 import CoupleInviteBottomSheet from '@pages/place/components/CoupleInviteBottomSheet';
 import { useCourseSaveStore } from '@stores/course-save';
+import useGetMemberInfo from '@apis/member/useGetMemberInfo';
 
 type CompanionType = '연인' | '친구' | '혼자' | '가족' | '지인';
 
@@ -15,6 +16,10 @@ const CourseSave = () => {
   const [isCoupleModalOpen, setIsCoupleModalOpen] = useState(false);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [isInviteCompleteModalOpen, setIsInviteCompleteModalOpen] = useState(false);
+
+  // 멤버 정보 조회 (연인 연결 상태 확인용)
+  const { data: memberInfo } = useGetMemberInfo();
+  const isCouple = memberInfo?.data?.isCouple ?? false;
 
   const companionOptions: CompanionType[] = ['연인', '친구', '혼자', '가족', '지인'];
 
@@ -33,7 +38,8 @@ const CourseSave = () => {
 
   const handleCompanionClick = (option: CompanionType) => {
     updateCourseData({ courseWith: option });
-    if (option === '연인') {
+    // 연인 버튼을 클릭했을 때, 연인과 연결되어 있지 않은 경우에만 모달 표시
+    if (option === '연인' && !isCouple) {
       setIsCoupleModalOpen(true);
     }
   };
