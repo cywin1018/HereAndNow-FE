@@ -127,15 +127,35 @@ const PhotoUploader = ({ maxCount = 7, onChange, onFilesChange }: PhotoUploaderP
     }
   };
 
+  const handleRemovePhoto = (index: number) => {
+    setPhotos(prev => {
+      const updated = prev.filter((_, i) => i !== index);
+      onChange?.(updated);
+      return updated;
+    });
+
+    setFileObjects(prev => {
+      const updated = prev.filter((_, i) => i !== index);
+      return updated;
+    });
+  };
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap gap-3">
         {photos.map((photo, index) => (
           <div
             key={`photo-${index}`}
-            className="border-iceblue-3 h-[81px] w-[81px] overflow-hidden rounded-[12px] border"
+            className="border-iceblue-3 relative h-[81px] w-[81px] overflow-hidden rounded-[12px] border"
           >
             <img src={photo} alt={`업로드한 사진 ${index + 1}`} className="h-full w-full object-cover" />
+            <button
+              type="button"
+              onClick={() => handleRemovePhoto(index)}
+              className="bg-iceblue-8 text-iceblue-1 absolute top-1 right-1 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full text-[10px] leading-none"
+            >
+              ×
+            </button>
           </div>
         ))}
         {canAddMorePhotos && (

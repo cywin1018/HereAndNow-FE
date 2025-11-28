@@ -86,9 +86,8 @@ const PlaceDetail = () => {
   return (
     <div className="flex w-full flex-col gap-[32px] pb-16">
       <PlaceCard
-        imageUrl={currentPlace?.placeUrl || '/dummy_placecard.png'}
         name={currentPlace?.placeName || '장소 이름'}
-        category={currentPlace?.placeCategory || '장소'}
+        category={currentPlace?.placeCategory?.split(' > ')[0] || '장소'}
         address={currentPlace?.placeStreetNameAddress || ''}
         addressDetail={currentPlace?.placeNumberAddress || ''}
         rating={rating}
