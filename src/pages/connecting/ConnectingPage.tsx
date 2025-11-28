@@ -86,6 +86,11 @@ const ConnectingPage = () => {
     });
   };
 
+  // 카드 클릭 핸들러
+  const handleCardClick = (courseId: number) => {
+    navigate(`/archive/${courseId}`);
+  };
+
   // 카드 배열 생성
   const cards =
     coupleBanner?.data?.content && coupleBanner.data.content.length > 0
@@ -100,6 +105,7 @@ const ConnectingPage = () => {
             backgroundClassName={
               !banner.thumbnailImageLink ? 'bg-gradient-to-br from-blue-400 to-purple-500' : undefined
             }
+            onClick={() => banner.courseId && handleCardClick(banner.courseId)}
           />
         ))
       : [
